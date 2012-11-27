@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>il.ac.technion.ee</groupId>
+	<artifactId>food-center</artifactId>
+	<version>0.0.1</version>
+	<packaging>pom</packaging>
+	<name>food-center</name>
+	<properties>
+		<!-- Convenience property to set the GWT version -->
+		<gwt.version>2.5.0</gwt.version>
+
+		<!-- GAE properties -->
+		<gae.version>1.7.3</gae.version>
+		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
+		<gae.application.version>1</gae.application.version>
+		<gae.server>com.google.appengine.tools.development.gwt.AppEngineLauncher</gae.server>
+
+		<!-- Don't let your Mac use a crazy non-standard encoding -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<modules>
+		<module>foodcenter-gwt-rpc-service</module>
+		<module>foodcenter-server</module>
+	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>
