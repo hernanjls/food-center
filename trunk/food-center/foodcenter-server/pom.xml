@@ -8,17 +8,6 @@
 	</parent>
 	<artifactId>foodcenter-server</artifactId>
 	<packaging>war</packaging>
-	<properties>
-		<!-- Convenience property to set the GWT version -->
-		<gwt.version>2.5.0</gwt.version>
-		<gae.version>1.7.3</gae.version>
-		<dn.version>3.1.1</dn.version>
-
-		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
 
 	<dependencies>
 
@@ -44,40 +33,30 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
-			<version>${gwt.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>2.5.0</version>
-			<scope>provided</scope>
 		</dependency>
 
 
 		<!-- ************************************************ -->
 		<!-- dependencies which come with the default project -->
 		<!-- ************************************************ -->
-
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-1.0-sdk</artifactId>
-			<version>${gae.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-labs</artifactId>
-			<version>${gae.version}</version>
 		</dependency>
-
 		<!-- missing appengine-endpoints -->
-
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-jsr107cache</artifactId>
-			<version>${gae.version}</version>
 		</dependency>
-		<dependency> <!-- maybe its not the proper asm -->
+		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>
 			<version>4.0</version>
@@ -85,17 +64,14 @@
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-api-jdo</artifactId>
-			<version>${dn.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-api-jpa</artifactId>
-			<version>${dn.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
-			<version>${dn.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.appengine.orm</groupId>
@@ -137,15 +113,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.5.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-							<!-- <goal>generateAsync</goal> <goal>test</goal> -->
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<!-- URL that should be automatically opened in the GWT shell (gwt:run). -->
 					<runTarget>Food_center.html</runTarget>
@@ -156,8 +123,6 @@
 					<appEngineHome>${gae.home}</appEngineHome>
 					<logLevel>INFO</logLevel>
 					<style>${gwt.style}</style>
-
-					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
 				</configuration>
 			</plugin>
@@ -185,35 +150,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>gwt-maven-plugin</artifactId>
-										<versionRange>[2.5.0,)</versionRange>
-										<goals>
-											<goal>generateAsync</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+
 	</build>
 
 </project>

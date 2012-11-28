@@ -17,18 +17,11 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
-			<version>${gwt.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>${gwt.version}</version>
-			<!-- "provided" so that we don't deploy -->
-			<scope>provided</scope>
 		</dependency>
-
 
 		<!-- Unit tests -->
 		<dependency>
