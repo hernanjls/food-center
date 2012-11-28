@@ -28,7 +28,7 @@
 		<module>foodcenter-gwt-rpc-service</module>
 		<module>foodcenter-server</module>
 	</modules>
-	
+
 	<!-- use these dependencies version when using these dependencies -->
 	<dependencyManagement>
 		<dependencies>
@@ -106,6 +106,8 @@
 								<!-- <goal>generateAsync</goal> <goal>test</goal> -->
 							</goals>
 							<configuration>
+								<appEngineVersion>${gae.version}</appEngineVersion>
+								<appEngineHome>${gae.home}</appEngineHome>
 								<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 							</configuration>
 						</execution>

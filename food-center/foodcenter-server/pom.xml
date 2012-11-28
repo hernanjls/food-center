@@ -114,15 +114,9 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
 				<configuration>
-					<!-- URL that should be automatically opened in the GWT shell (gwt:run). -->
+					<!-- gwt:run params. -->
 					<runTarget>Food_center.html</runTarget>
-					<!-- Ask GWT to create the Story of Your Compile (SOYC) (gwt:compile) -->
-					<compileReport>true</compileReport>
-					<module>foodcenter.Food_center</module>
-					<appEngineVersion>${gae.version}</appEngineVersion>
-					<appEngineHome>${gae.home}</appEngineHome>
 					<logLevel>INFO</logLevel>
-					<style>${gwt.style}</style>
 					<copyWebapp>true</copyWebapp>
 				</configuration>
 			</plugin>
