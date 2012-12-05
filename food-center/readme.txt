@@ -43,7 +43,17 @@ gae 1.7.3
 gwt sdk 2.5.0 (Only if eclipse makes problem):
 	download full sdk, and unpack it to: eclipse/plugins/com.google.gwt.eclipse.sdkbundle_2.5.0.v201211121240-rel-r42/gwt-2.5.0
 	https://developers.google.com/web-toolkit/download
-	
+
+Opening our docs:
+--------------------------
+UMLs: 
+	visual paradigm open docs/food-center.vpp
+
+System diagram:
+	load docs/food-center-system-dia.xml in http://www.diagram.ly/
+
+Gantt:
+	load docs/food-center-gantt.gxml in https://app.gantter.com/
 	
 Getting the source code:
 --------------------------
