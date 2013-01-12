@@ -12,5 +12,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/validation-api-1.0.0.GA.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/v2"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
