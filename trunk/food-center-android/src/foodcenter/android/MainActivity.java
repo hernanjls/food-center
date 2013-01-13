@@ -1,16 +1,11 @@
 package foodcenter.android;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import foodcenter.android.service.msg.MsgAddAsyncTask;
+import foodcenter.android.service.msg.MsgAddDialog;
 import foodcenter.android.service.msg.MsgGetAsyncTask;
-import foodcenter.android.service.msg.OnClickAddMsg;
 
 public class MainActivity extends Activity
 {
@@ -45,7 +40,10 @@ public class MainActivity extends Activity
 	    switch (item.getItemId())
 	    {
 	        case R.id.menu_add_msg:
-	            showAddMsgDialog();
+	            new MsgAddDialog(this);
+	            break;
+	        case R.id.menu_update_msgs:
+	            new MsgGetAsyncTask(this).execute();
 	            break;
             default:
                 break;
@@ -53,19 +51,5 @@ public class MainActivity extends Activity
 	    
 	    return super.onOptionsItemSelected(item);
 	}
-	
-	private void showAddMsgDialog()
-	{
-	    EditText msgText = new EditText(this);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("add new msg:");
-        builder.setCancelable(false);
-        builder.setView(msgText);
-        String msg = msgText.getText().toString();
-        Log.i("msg", msg);
-        builder.setPositiveButton("Add Msg", new OnClickAddMsg(this, msgText));  
-        builder.create().show();
-	}
-	
 	
 }
