@@ -7,7 +7,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 @ServiceName("foodcenter.service.msg.MsgService")
-public interface MsgServiceRequest extends RequestContext
+public interface MsgServiceProxy extends RequestContext
 {
 
 	Request<Void> createMsg(String msg);
