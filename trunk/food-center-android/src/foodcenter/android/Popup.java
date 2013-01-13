@@ -6,32 +6,26 @@ import android.widget.Toast;
 
 public class Popup
 {
-    //default receptions for mail
+    // default receptions for mail
     private final static String[] rec = new String[] {};
 
-    /***************************************************************************/
+    
     /**
-     * show this msg
+     * show this msg, this method must run from UI Thread <br>
+     * on o.runOnUiThread(new Runnable(...))
+     * 
      * @param o is the owner Activity
      * @param m
      */
-    public static void show(final Activity o,final  String m)
+    public static void show(final Activity o, final String m)
     {
-    	o.runOnUiThread(
-    		new Runnable() 
-    		{
-    		  public void run() 
-    		  {
-    			  Toast.makeText(o, m, Toast.LENGTH_LONG).show();
-    		  }
-    		}
-		);
-        
+        Toast.makeText(o, m, Toast.LENGTH_LONG).show();
     }
 
-    /***************************************************************************/
+    
     /**
      * send this msg by mail
+     * 
      * @param o is the owner activity
      * @param m is the msg
      * @param s is the subject
