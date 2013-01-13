@@ -3,6 +3,8 @@
 
     <string name="app_name">food-center-android</string>
     <string name="hello_world">Hello world!</string>
-    <string name="menu_add_msg">Add Msg</string>
     <string name="hila">hila 1st android string in android</string>
+    
+    <string name="menu_add_msg">Add Msg</string>
+    <string name="menu_update_msgs">Update Msgs</string>
 </resources>
