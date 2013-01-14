@@ -1,2 +1,0 @@
-serviceClass: foodcenter.shared.MsgService
-path: C62A2BD492BFA19FD4AA7968CD279665.gwt.rpc
