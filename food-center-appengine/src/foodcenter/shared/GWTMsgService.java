@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * The client side stub for the RPC service.
  */
 @RemoteServiceRelativePath("msgs")
-public interface MsgService extends RemoteService
+public interface GWTMsgService extends RemoteService
 {
 	public List<String> getMsgs() throws IllegalArgumentException;
 	

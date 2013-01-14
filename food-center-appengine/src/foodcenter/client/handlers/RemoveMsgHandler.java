@@ -7,8 +7,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import foodcenter.client.FoodCenter;
-import foodcenter.shared.MsgService;
-import foodcenter.shared.MsgServiceAsync;
+import foodcenter.shared.GWTMsgService;
+import foodcenter.shared.GWTMsgServiceAsync;
 
 public class RemoveMsgHandler implements ClickHandler
 {
@@ -17,7 +17,7 @@ public class RemoveMsgHandler implements ClickHandler
 	private final String msg;
 	
 	
-	private static MsgServiceAsync msgSvc = GWT.create(MsgService.class); 
+	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class); 
 
 	public RemoveMsgHandler(FoodCenter foodCenter, String msg)
 	{
@@ -31,7 +31,7 @@ public class RemoveMsgHandler implements ClickHandler
 		// Removes the msg to the db, and from the table on service success.
 		if (msgSvc == null)
 		{
-			msgSvc = GWT.create(MsgService.class);
+			msgSvc = GWT.create(GWTMsgService.class);
 		}
 		msgSvc.removeMsg(msg, new RemoveMsgsAsynCallback(msg));
 	}
