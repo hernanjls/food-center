@@ -12,13 +12,13 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import foodcenter.client.FoodCenter;
-import foodcenter.shared.MsgService;
-import foodcenter.shared.MsgServiceAsync;
+import foodcenter.shared.GWTMsgService;
+import foodcenter.shared.GWTMsgServiceAsync;
 
 public class AddMsgHandler implements KeyPressHandler, ClickHandler
 {
 	private final FoodCenter foodCenter;
-	private static MsgServiceAsync msgSvc = GWT.create(MsgService.class);
+	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
 
 	public AddMsgHandler(FoodCenter foodCenter)
 	{
@@ -59,7 +59,7 @@ public class AddMsgHandler implements KeyPressHandler, ClickHandler
 		// add the msg to the db, and to the table on service success.
 		if (msgSvc == null)
 		{
-			msgSvc = GWT.create(MsgService.class);
+			msgSvc = GWT.create(GWTMsgService.class);
 		}
 		msgSvc.addMsg(msg, new AddMsgAsyncCallback(msg));
 

@@ -15,8 +15,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import foodcenter.client.handlers.AddMsgHandler;
 import foodcenter.client.handlers.RemoveMsgHandler;
-import foodcenter.shared.MsgService;
-import foodcenter.shared.MsgServiceAsync;
+import foodcenter.shared.GWTMsgService;
+import foodcenter.shared.GWTMsgServiceAsync;
 
 public class FoodCenterImp implements FoodCenter
 {
@@ -32,7 +32,7 @@ public class FoodCenterImp implements FoodCenter
 
 	private ArrayList<String> msgs = new ArrayList<String>();
 
-	private static MsgServiceAsync msgSvc = GWT.create(MsgService.class);
+	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
 
 	/**
 	 * Entry point method.
@@ -81,7 +81,7 @@ public class FoodCenterImp implements FoodCenter
 		// Initialize the service proxy.
 		if (msgSvc == null)
 		{
-			msgSvc = GWT.create(MsgService.class);
+			msgSvc = GWT.create(GWTMsgService.class);
 		}
 
 		// Make the call to get the msgs from the db.

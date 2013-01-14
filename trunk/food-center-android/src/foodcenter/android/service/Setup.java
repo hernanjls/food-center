@@ -33,9 +33,24 @@ public class Setup
 	 */
 	public static final String PROD_URL = "https://" + APP_NAME + ".appspot.com";
 
+	
+	
 	/**
-	 * The C2DM sender ID for the server. A C2DM registration with this name
-	 * must exist for the app to function correctly.
-	 */
-	// public static final String SENDER_ID = "your_c2dm_account@gmail.com";
+     * Google API project id registered to use GCM.
+     */
+	public static final String SENDER_ID = "375781927792";
+	
+	
+	
+	
+	
+	 /**
+     * Intent used to display a message in the screen.
+     */
+	public static final String DISPLAY_MESSAGE_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
+	  /**
+     * Intent's extra that contains the message to be displayed.
+     */
+    public static final String EXTRA_MESSAGE = "message";
+    
 }
