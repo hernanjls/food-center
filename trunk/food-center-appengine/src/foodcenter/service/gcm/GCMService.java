@@ -1,6 +1,5 @@
 package foodcenter.service.gcm;
 
-import foodcenter.server.db.Datastore;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
 
@@ -9,14 +8,14 @@ public class GCMService
 
 	static DbHandler db = new DbHandlerImp();
 
-	public static void register(String regId)
+	public static void register(String email, String regId)
 	{
-	    Datastore.register(regId);
+	    db.gcmRegister(email, regId);
 	}
 
-	public static void unregister(String regId)
+	public static void unregister(String email, String regId)
 	{
-	    Datastore.unregister(regId);
+	    db.gcmUnregister(email, regId);
 	}
 
 
