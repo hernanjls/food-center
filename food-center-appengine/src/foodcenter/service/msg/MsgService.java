@@ -8,22 +8,22 @@ import foodcenter.server.db.DbHandlerImp;
 public class MsgService
 {
 
-	static DbHandler db = new DbHandlerImp();
+    static DbHandler db = new DbHandlerImp();
 
-	public static void createMsg(String msg)
-	{
-		db.saveMsg(msg);
-	}
+    public static void createMsg(String msg)
+    {
+        db.saveMsg(msg);
+    }
 
-	public static void deleteMsg(String msg)
-	{
+    public static void deleteMsg(String msg)
+    {
 
-		db.deleteMsg(msg);
-	}
+        db.deleteMsg(msg);
+    }
 
-	public static List<String> getMsgs()
-	{
-		return db.getMsgs();
-	}
+    public static List<String> getMsgs()
+    {
+        return db.getMsgs();
+    }
 
 }

@@ -32,12 +32,16 @@ public class MainActivity extends Activity
         // gcm registration
         GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(getApplicationContext());
-        if (!regId.equals(""))
+        final String regId = GCMRegistrar.getRegistrationId(MainActivity.this);
+        if (regId.equals(""))
         {
-            GCMRegistrar.unregister(getApplicationContext());
+            GCMRegistrar.register(this, Setup.SENDER_ID);    
         }
-        GCMRegistrar.register(this, Setup.SENDER_ID);
+        else
+        {
+            Log.i(TAG,"Already registered");
+        }
+        
     }
 
     @Override
@@ -80,8 +84,7 @@ public class MainActivity extends Activity
     protected void onDestroy()
     {
         unregisterReceiver(mHandleMessageReceiver);
-        GCMRegistrar.onDestroy(getApplicationContext());
-        Log.i(TAG, "unregistered");
+        GCMRegistrar.onDestroy(MainActivity.this);
         super.onDestroy();
     }
 

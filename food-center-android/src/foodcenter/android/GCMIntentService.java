@@ -16,13 +16,17 @@
 package foodcenter.android;
 
 import java.util.Random;
+import java.util.regex.Pattern;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.util.Patterns;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -145,7 +149,7 @@ public class GCMIntentService extends GCMBaseIntentService
         Log.i(TAG, "registering device (regId = " + regId + ")");
 
         FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        factory.gcmService().register(regId).fire(new GCMRegisterReciever(context, this, regId, attempt, backoff));
+        factory.gcmService().register(getAccountEmail(), regId).fire(new GCMRegisterReciever(context, this, regId, attempt, backoff));
 
     }
     
@@ -153,7 +157,21 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
         FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        factory.gcmService().unregister(regId).fire(new GCMUnRegisterReciever(context));
+        factory.gcmService().unregister(getAccountEmail(), regId).fire(new GCMUnRegisterReciever(context));
+    }
+    
+    private String getAccountEmail()
+    {
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+        Account[] accounts = AccountManager.get(this).getAccounts();
+        for (Account account : accounts) 
+        {
+            if (emailPattern.matcher(account.name).matches()) 
+            {
+                return account.name;
+            }
+        }
+        return null;
     }
 }
 

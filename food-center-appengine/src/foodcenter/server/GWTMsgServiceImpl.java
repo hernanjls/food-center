@@ -1,15 +1,11 @@
 package foodcenter.server;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.Sender;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import foodcenter.server.db.Datastore;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
 import foodcenter.shared.GWTMsgService;
@@ -21,8 +17,7 @@ import foodcenter.shared.GWTMsgService;
 public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgService
 {
 
-    DbHandler db = new DbHandlerImp();
-    private static String API_KEY = "AIzaSyC8N5hTFxhi6IYnY1NVC6JYl1mVS1EHbOs";
+    DbHandler db = new DbHandlerImp();    
 
     public List<String> getMsgs() throws IllegalArgumentException
     {
@@ -31,23 +26,13 @@ public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgSer
     }
 
     public void addMsg(String msg) throws IllegalArgumentException
-    {
+    {        
         db.saveMsg(msg);
-
-        Sender sender = new Sender(API_KEY);
-        Message message = new Message.Builder().addData("msg", msg).build();
-        List<String> dev = Datastore.getDevices();
+        List<String> dev = db.getGcmRegistered();
         if (!dev.isEmpty())
         {
-            try
-            {
                 Logger.getLogger(getClass().getName()).log(Level.INFO, "gcm: " + dev.size());
-                sender.send(message, dev, 5);
-            }
-            catch (IOException e)
-            {
-                Logger.getLogger(getClass().getName()).log(Level.WARNING, e.getMessage());
-            }
+                GCMSender.send(msg, dev, 5);
         }
         else
         {

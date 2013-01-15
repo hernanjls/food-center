@@ -8,8 +8,8 @@ import com.google.web.bindery.requestfactory.shared.ServiceName;
 public interface GCMServiceProxy extends RequestContext
 {
 
-	Request<Void> register(String regId);
+	Request<Void> register(String email, String regId);
 
-	Request<Void> unregister(String regId);
+	Request<Void> unregister(String email, String regId);
 
 }
