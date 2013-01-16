@@ -1,4 +1,4 @@
-package foodcenter.service.gcm;
+package foodcenter.server.service.gcm;
 
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;

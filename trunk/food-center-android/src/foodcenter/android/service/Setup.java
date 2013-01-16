@@ -34,15 +34,10 @@ public class Setup
 	public static final String PROD_URL = "https://" + APP_NAME + ".appspot.com";
 
 	
-	
 	/**
      * Google API project id registered to use GCM.
      */
 	public static final String SENDER_ID = "375781927792";
-	
-	
-	
-	
 	
 	 /**
      * Intent used to display a message in the screen.

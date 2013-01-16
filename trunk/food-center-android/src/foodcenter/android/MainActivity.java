@@ -5,13 +5,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.google.android.gcm.GCMRegistrar;
 
+import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
 import foodcenter.android.service.msg.MsgAddDialog;
 import foodcenter.android.service.msg.MsgGetAsyncTask;
@@ -28,27 +30,24 @@ public class MainActivity extends Activity
 
         // display msgs
         registerReceiver(mHandleMessageReceiver, new IntentFilter(Setup.DISPLAY_MESSAGE_ACTION));
-
-        // gcm registration
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(MainActivity.this);
-        if (regId.equals(""))
-        {
-            GCMRegistrar.register(this, Setup.SENDER_ID);    
-        }
-        else
-        {
-            Log.i(TAG,"Already registered");
-        }
-        
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
-        new MsgGetAsyncTask(this).execute();
+        SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
+        boolean isConnected = prefs.getBoolean(RequestUtils.IS_CONNECTED, false);
+        if (isConnected)
+        {
+            String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
+            Popup.show(MainActivity.this, "logged in as: " + accountName);
+            new MsgGetAsyncTask(this).execute();
+        }
+        else
+        {
+            Popup.show(MainActivity.this, "please login 1st");
+        }
     }
 
     @Override
@@ -56,7 +55,12 @@ public class MainActivity extends Activity
     {
 
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main, menu);
+        // Invoke the Register activity
+        menu.getItem(0).setIntent(new Intent(this, LoginActivity.class));        
+
         return true;
     }
 

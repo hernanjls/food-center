@@ -1,15 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_login"
+        android:orderInCategory="100"
+        android:title="@string/menu_login"/>
+  
+    <item
         android:id="@+id/menu_add_msg"
         android:orderInCategory="100"
         android:title="@string/menu_add_msg"/>
-    
     <item
         android:id="@+id/menu_update_msgs"
         android:orderInCategory="100"
         android:title="@string/menu_update_msgs"/>
-    
     <item
         android:id="@+id/menu_exit"
         android:orderInCategory="100"

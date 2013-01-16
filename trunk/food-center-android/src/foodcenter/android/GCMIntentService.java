@@ -16,24 +16,21 @@
 package foodcenter.android;
 
 import java.util.Random;
-import java.util.regex.Pattern;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
-import android.util.Patterns;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.R;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
 import foodcenter.android.service.gcm.CommonUtilities;
@@ -149,7 +146,8 @@ public class GCMIntentService extends GCMBaseIntentService
         Log.i(TAG, "registering device (regId = " + regId + ")");
 
         FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        factory.gcmService().register(getAccountEmail(), regId).fire(new GCMRegisterReciever(context, this, regId, attempt, backoff));
+        String email = getAccountEmail(context);
+        factory.gcmService().register(email, regId).fire(new GCMRegisterReciever(context, this, regId, attempt, backoff));
 
     }
     
@@ -157,21 +155,20 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
         FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        factory.gcmService().unregister(getAccountEmail(), regId).fire(new GCMUnRegisterReciever(context));
+        String email = getAccountEmail(context);
+        factory.gcmService().unregister(email, regId).fire(new GCMUnRegisterReciever(context));
     }
     
-    private String getAccountEmail()
+    /**
+     * gets the account email from {@link RequestUtils#getSharedPreferences(Context)}
+     * @param context
+     * @return email if set, otherwise null.
+     */
+    private String getAccountEmail(Context context)
     {
-        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
-        Account[] accounts = AccountManager.get(this).getAccounts();
-        for (Account account : accounts) 
-        {
-            if (emailPattern.matcher(account.name).matches()) 
-            {
-                return account.name;
-            }
-        }
-        return null;
+        final SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
+        String email = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
+        return email;        
     }
 }
 
@@ -197,6 +194,8 @@ class GCMRegisterReciever extends Receiver<Void>
     public void onSuccess(Void arg0)
     {
         GCMRegistrar.setRegisteredOnServer(context, true);
+        Editor edit = RequestUtils.getSharedPreferences(context).edit();
+        edit.putBoolean(RequestUtils.IS_CONNECTED, true).commit();
         String message = context.getString(R.string.server_registered);
         CommonUtilities.displayMessage(context, message);
     }
@@ -240,6 +239,13 @@ class GCMUnRegisterReciever extends Receiver<Void>
     public void onSuccess(Void arg0)
     {
         GCMRegistrar.setRegisteredOnServer(context, false);
+
+        // Delete the current account from shared preferences
+        Editor editor = RequestUtils.getSharedPreferences(context).edit();
+        editor.putString(RequestUtils.AUTH_COOKIE, null);
+        editor.putString(RequestUtils.ACCOUNT_NAME, null);
+        editor.commit();
+
         String message = context.getString(R.string.server_unregistered);
         CommonUtilities.displayMessage(context, message);
     }
