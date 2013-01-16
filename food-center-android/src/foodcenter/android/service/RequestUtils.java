@@ -55,15 +55,11 @@ public class RequestUtils
 	 */
 	public static final String ACCOUNT_NAME = "accountName";
 
+	public static final String IS_CONNECTED = "isConnected";
 	/**
 	 * Key for auth cookie name in shared preferences.
 	 */
 	public static final String AUTH_COOKIE = "authCookie";
-
-	/**
-	 * Key for device registration id in shared preferences.
-	 */
-	public static final String DEVICE_REGISTRATION_ID = "deviceRegistrationID";
 
 	/*
 	 * URL suffix for the RequestFactory servlet.
@@ -80,7 +76,7 @@ public class RequestUtils
 	/**
 	 * Key for shared preferences.
 	 */
-	private static final String SHARED_PREFS = "cloudtasks".toUpperCase(Locale.ENGLISH) + "_PREFS";
+	private static final String SHARED_PREFS = "foodcenter".toUpperCase(Locale.ENGLISH) + "_PREFS";
 
 	/**
 	 * Cache containing the base URL for a given context.
@@ -110,13 +106,14 @@ public class RequestUtils
 
 	/**
 	 * Creates and returns an initialized {@link RequestFactory} of the given
-	 * type.
+	 * type, with authCookie added to the request. <br>
+	 * RequestUtils.getSharedPrefs will be used.
 	 */
 	public static <T extends RequestFactory> T getRequestFactory(Context context, Class<T> factoryClass)
 	{
 		T requestFactory = RequestFactorySource.create(factoryClass);
 
-		SharedPreferences prefs = getSharedPreferences(context);
+		SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
 		String authCookie = prefs.getString(RequestUtils.AUTH_COOKIE, null);
 
 		String uriString = RequestUtils.getBaseUrl(context) + RF_METHOD;

@@ -15,6 +15,8 @@
  */
 package foodcenter.android.service;
 
+import android.util.Log;
+
 import com.google.web.bindery.requestfactory.shared.RequestTransport;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
@@ -40,6 +42,8 @@ public class AndroidRequestTransport implements RequestTransport
 
 	private final URI uri;
 
+	private final String TAG = AndroidRequestTransport.class.getSimpleName();
+	
 	private final String cookie;
 
 	/**
@@ -60,7 +64,10 @@ public class AndroidRequestTransport implements RequestTransport
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost();
 		post.setHeader("Content-Type", "application/json;charset=UTF-8");
-		post.setHeader("Cookie", cookie);
+		if (null != cookie)
+		{
+		    post.setHeader("Cookie", cookie);
+		}
 
 		post.setURI(uri);
 		Throwable ex;
@@ -81,15 +88,23 @@ public class AndroidRequestTransport implements RequestTransport
 		}
 		catch (UnsupportedEncodingException e)
 		{
+		    Log.e(TAG,"UnsupportedEncodingException", e);
 			ex = e;
 		}
 		catch (ClientProtocolException e)
 		{
+		    Log.e(TAG,"ClientProtocolException", e);
 			ex = e;
 		}
 		catch (IOException e)
 		{
+		    Log.e(TAG,"IOException", e);
 			ex = e;
+		}
+		catch (Exception e)
+		{
+		    Log.e(TAG,"Exception", e);
+            ex = e;
 		}
 		receiver.onTransportFailure(new ServerFailure(ex.getMessage()));
 	}
