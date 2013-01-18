@@ -1,6 +1,5 @@
 package foodcenter.server.service.msg;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,17 +43,17 @@ public class MsgService
         db.deleteMsg(msg);
     }
 
-    public static List<String> getMsgs()
+    public static List<DbMsg> getMsgs()
     {
     	
-//    	return db.getMsgs();
-    	List<DbMsg> msgs = db.getMsgs();
-    	LinkedList<String> res = new LinkedList<String>();
-    	for (DbMsg m : msgs)
-    	{
-    		res.add(m.getMsg());
-    	}
-        return res;
+    	return db.getMsgs();
+//    	List<DbMsg> msgs = db.getMsgs();
+//    	LinkedList<String> res = new LinkedList<String>();
+//    	for (DbMsg m : msgs)
+//    	{
+//    		res.add(m.getMsg());
+//    	}
+//        return res;
     }
 
 }

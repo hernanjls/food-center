@@ -14,6 +14,6 @@ public interface MsgServiceProxy extends RequestContext
 
 	Request<Void> deleteMsg(String msg);
 
-	Request<List<String>> getMsgs();
+	Request<List<MsgProxy>> getMsgs();
 
 }

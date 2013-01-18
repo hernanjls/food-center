@@ -1,6 +1,7 @@
 package foodcenter.android;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,10 +21,17 @@ public class MainActivity extends Activity
 {
     private final static String TAG = MainActivity.class.getSimpleName();
 
+	private ProgressDialog spin;
+
+	private MainActivity context = this;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+		spin = new ProgressDialog(context);
+		spin.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		spin.setCancelable(false);
+        
         setContentView(R.layout.activity_main);
 
         // register msg reciever handler (to show on ui thread)
@@ -86,10 +94,29 @@ public class MainActivity extends Activity
     {
         unregisterReceiver(mHandleMessageReceiver);
 //        GCMRegistrar.onDestroy(MainActivity.this);
+        Log.i(TAG, "dismissing spinner");
+		spin.dismiss();
         Log.i(TAG, "super.onDestroy");
         super.onDestroy();
     }
 
+	public void showSpinner(String msg)
+	{
+		spin.setMessage(msg);
+		if (!spin.isShowing())
+		{
+			spin.show();
+		}
+	}
+	
+	public void hideSpinner()
+	{
+		if (spin.isShowing())
+		{
+			spin.hide();
+		}
+	}
+	
     private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver()
     {
         @Override
