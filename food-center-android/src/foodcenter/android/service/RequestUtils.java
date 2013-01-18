@@ -55,7 +55,6 @@ public class RequestUtils
 	 */
 	public static final String ACCOUNT_NAME = "accountName";
 
-	public static final String IS_CONNECTED = "isConnected";
 	/**
 	 * Key for auth cookie name in shared preferences.
 	 */

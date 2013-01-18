@@ -14,11 +14,11 @@ public class DbHandlerImp implements DbHandler
 {
 
     @Override
-    public void saveMsg(String msg)
+    public void saveMsg(String email, String msg)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
-        DbMsg m = new DbMsg(msg);
+        DbMsg m = new DbMsg(email, msg);
 
         try
         {
@@ -48,16 +48,16 @@ public class DbHandlerImp implements DbHandler
     }
 
     @Override
-    public List<String> getMsgs()
+    public List<DbMsg> getMsgs()
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
         {
-            List<String> res = new LinkedList<String>();
+            List<DbMsg> res = new LinkedList<DbMsg>();
             Extent<DbMsg> extent = pm.getExtent(DbMsg.class, false);
             for (DbMsg m : extent)
             {
-                res.add(m.getMsg());
+                res.add(m);
             }
             return res;
         }

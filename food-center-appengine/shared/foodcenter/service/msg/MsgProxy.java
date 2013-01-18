@@ -8,7 +8,7 @@ public interface MsgProxy extends ValueProxy
 {
 
 	public String getMsg();
-
+	public String getEmail();
 	public Long getId();
 
 }
