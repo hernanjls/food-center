@@ -52,7 +52,6 @@ public class MsgAddAsyncTask extends AsyncTask<Void, String, Void>
 	{
 	    String msg = values[0];
 	    Popup.show(owner, msg);
-//	    new MsgGetAsyncTask(owner).execute();
 	}
 
 	@Override

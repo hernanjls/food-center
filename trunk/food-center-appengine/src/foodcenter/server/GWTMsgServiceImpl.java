@@ -1,13 +1,17 @@
 package foodcenter.server;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
+import foodcenter.server.db.modules.DbMsg;
 import foodcenter.shared.GWTMsgService;
 
 /**
@@ -21,13 +25,23 @@ public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgSer
 
     public List<String> getMsgs() throws IllegalArgumentException
     {
-        return db.getMsgs();
+    	LinkedList<String> res = new LinkedList<String>();
+    	for (DbMsg m : db.getMsgs())
+    	{
+    		res.add(m.getMsg());
+    	}
+        return res;//db.getMsgs();
 
     }
 
     public void addMsg(String msg) throws IllegalArgumentException
     {        
-        db.saveMsg(msg);
+    	
+    	UserService userService = UserServiceFactory.getUserService();
+		String email = userService.getCurrentUser().getEmail();
+
+		db.saveMsg(email, msg);
+		
         List<String> dev = db.getGcmRegistered();
         if (!dev.isEmpty())
         {

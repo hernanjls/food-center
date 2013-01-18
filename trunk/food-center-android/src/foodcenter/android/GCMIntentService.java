@@ -22,7 +22,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
@@ -32,9 +31,8 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.service.RequestUtils;
-import foodcenter.android.service.Setup;
-import foodcenter.android.service.gcm.CommonUtilities;
 import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.gcm.GCMServiceProxy;
 
 /**
  * IntentService responsible for handling GCM messages.
@@ -42,223 +40,206 @@ import foodcenter.service.FoodCenterRequestFactory;
 public class GCMIntentService extends GCMBaseIntentService
 {
 
-    public static final String TAG = "GCMIntentService";
-    public static final int MAX_ATTEMPTS = 5;
-    
-    private static final int BACKOFF_MILLI_SECONDS = 2000;
-    private static final Random random = new Random();
+	public static final String TAG = "GCMIntentService";
+	public static final int MAX_ATTEMPTS = 5;
 
-    public GCMIntentService()
-    {
-        super(Setup.SENDER_ID);
-    }
+	private static final int BACKOFF_MILLI_SECONDS = 2000;
+	private static final Random random = new Random();
 
-    @Override
-    protected void onRegistered(Context context, String registrationId)
-    {
-        Log.i(TAG, "Device registered: regId = " + registrationId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_registered));
-        
-        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
-        register(context, registrationId, MAX_ATTEMPTS, backoff);
-    }
+	/** Google API project id registered to use GCM. */
+	public static final String GCM_SENDER_ID = "375781927792";
 
-    @Override
-    protected void onUnregistered(Context context, String registrationId)
-    {
-        Log.i(TAG, "Device unregistered");
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_unregistered));
-        
-        if (GCMRegistrar.isRegisteredOnServer(context))
-        {
-            unregister(context, registrationId);
-        }
-        else
-        {
-            // This callback results from the call to unregister made on
-            // ServerUtilities when the registration to the server failed.
-            Log.i(TAG, "Ignoring unregister callback");
-        }
-    }
+	public GCMIntentService()
+	{
+		super(GCM_SENDER_ID);
+	}
 
-    @Override
-    protected void onMessage(Context context, Intent intent)
-    {
-        Log.i(TAG, "Received message");
-        String message = intent.getExtras().getString("msg");
-        CommonUtilities.displayMessage(context, message);
-        // notifies user
-        generateNotification(context, message);
-    }
+	@Override
+	protected void onRegistered(Context context, String regId)
+	{
+		Log.i(TAG, "GCM: Device registered: regId = " + regId);
+		CommonUtilities.displayMessage(context, getString(R.string.gcm_registered));
 
-    @Override
-    protected void onDeletedMessages(Context context, int total)
-    {
-        Log.i(TAG, "Received deleted messages notification");
-        String message = getString(R.string.gcm_deleted, total);
-        CommonUtilities.displayMessage(context, message);
-        // notifies user
-        generateNotification(context, message);
-    }
+		long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
 
-    @Override
-    public void onError(Context context, String errorId)
-    {
-        Log.i(TAG, "Received error: " + errorId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_error, errorId));
-    }
+		Log.i(TAG, "Server: registering gcm device (regId = " + regId + ")");
+		new GCMRegister(context, regId, 5, backoff).execute();
 
-    @Override
-    protected boolean onRecoverableError(Context context, String errorId)
-    {
-        // log message
-        Log.i(TAG, "Received recoverable error: " + errorId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_recoverable_error, errorId));
-        return super.onRecoverableError(context, errorId);
-    }
+	}
 
-    /**
-     * Issues a notification to inform the user that server has sent a message.
-     */
-    private static void generateNotification(Context context, String message)
-    {
-        int icon = R.drawable.ic_stat_gcm;
-        long when = System.currentTimeMillis();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
-        String title = context.getString(R.string.app_name);
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        // set intent so it does not start a new activity
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, message, intent);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(0, notification);
-    }
+	@Override
+	protected void onUnregistered(Context context, String regId)
+	{
+		Log.i(TAG, "Device unregistered");
+		CommonUtilities.displayMessage(context, getString(R.string.gcm_unregistered));
 
-    /**
-     * Register this account/device pair within the server.
-     * 
-     * @return whether the registration succeeded or not.
-     */
-    protected void register(final Context context, final String regId, int attempt, long backoff)
-    {
-        Log.i(TAG, "registering device (regId = " + regId + ")");
+		if (GCMRegistrar.isRegisteredOnServer(context))
+		{
+			Log.i(TAG, "unregistering device (regId = " + regId + ")");
+			FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
+			factory.gcmService().unregister(regId).fire(new GCMUnRegisterReciever(context));
+		}
+		else
+		{
+			// This callback results from the call to unregister made on
+			// ServerUtilities when the registration to the server failed.
+			Log.i(TAG, "Ignoring unregister callback");
+		}
+	}
 
-        FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        String email = getAccountEmail(context);
-        factory.gcmService().register(email, regId).fire(new GCMRegisterReciever(context, this, regId, attempt, backoff));
+	@Override
+	protected void onMessage(Context context, Intent intent)
+	{
+		Log.i(TAG, "Received message");
+		String message = intent.getExtras().getString("msg");
+		CommonUtilities.displayMessage(context, message);
+		// notifies user
+		generateNotification(context, message);
+	}
 
-    }
-    
-    private void unregister(final Context context, final String regId)
-    {
-        Log.i(TAG, "unregistering device (regId = " + regId + ")");
-        FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
-        String email = getAccountEmail(context);
-        factory.gcmService().unregister(email, regId).fire(new GCMUnRegisterReciever(context));
-    }
-    
-    /**
-     * gets the account email from {@link RequestUtils#getSharedPreferences(Context)}
-     * @param context
-     * @return email if set, otherwise null.
-     */
-    private String getAccountEmail(Context context)
-    {
-        final SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
-        String email = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
-        return email;        
-    }
+	@Override
+	protected void onDeletedMessages(Context context, int total)
+	{
+		Log.i(TAG, "Received deleted messages notification");
+		String message = getString(R.string.gcm_deleted, total);
+		CommonUtilities.displayMessage(context, message);
+		// notifies user
+		generateNotification(context, message);
+	}
+
+	@Override
+	public void onError(Context context, String errorId)
+	{
+		Log.i(TAG, "Received error: " + errorId);
+		CommonUtilities.displayMessage(context, getString(R.string.gcm_error, errorId));
+	}
+
+	@Override
+	protected boolean onRecoverableError(Context context, String errorId)
+	{
+		// log message
+		Log.i(TAG, "Received recoverable error: " + errorId);
+		CommonUtilities.displayMessage(context, getString(R.string.gcm_recoverable_error, errorId));
+		return super.onRecoverableError(context, errorId);
+	}
+
+	/**
+	 * Issues a notification to inform the user that server has sent a message.
+	 */
+	private static void generateNotification(Context context, String message)
+	{
+		int icon = R.drawable.ic_stat_gcm;
+		long when = System.currentTimeMillis();
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification(icon, message, when);
+		String title = context.getString(R.string.app_name);
+		Intent notificationIntent = new Intent(context, MainActivity.class);
+		// set intent so it does not start a new activity
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, title, message, intent);
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notificationManager.notify(0, notification);
+	}
 }
 
-class GCMRegisterReciever extends Receiver<Void>
+/**
+ * 
+ * registering gcm service with gcm regId on food-center-server <br>
+ * dont forget to run execute();
+ */
+class GCMRegister extends Receiver<Void>
 {
-    
-    private final Context context;
-    private final GCMIntentService service;
-    private final String regId;
-    private final int attempt;
-    private final long backoff;
+	// private static final String TAG = GCMRegistrar.class.getSimpleName();
 
-    public GCMRegisterReciever(final Context context, GCMIntentService service, String regId, int attempt, long backoff)
-    {
-        this.context = context;
-        this.service = service;
-        this.regId = regId;
-        this.attempt = attempt;
-        this.backoff = backoff;
-    }
+	private final Context context;
+	private final GCMServiceProxy service;
+	private final String regId;
+	private int attempt;
+	private long backoff;
 
-    @Override
-    public void onSuccess(Void arg0)
-    {
-        GCMRegistrar.setRegisteredOnServer(context, true);
-        Editor edit = RequestUtils.getSharedPreferences(context).edit();
-        edit.putBoolean(RequestUtils.IS_CONNECTED, true).commit();
-        String message = context.getString(R.string.server_registered);
-        CommonUtilities.displayMessage(context, message);
-    }
+	public GCMRegister(final Context context, String regId, int attempt, long backoff)
+	{
+		this.context = context;
+		this.regId = regId;
+		this.attempt = attempt;
+		this.backoff = backoff;
 
-    @Override
-    public void onFailure(ServerFailure error)
-    {
-        try
-        {
-            if (attempt > 0)
-            {
-                Log.d(GCMIntentService.TAG, "Sleeping for " + backoff + " ms before retry");
-                Thread.sleep(backoff);
-                service.register(context, regId, attempt - 1, backoff * 2);
-                return;
-            }
-            String message = context.getString(R.string.server_register_error, GCMIntentService.MAX_ATTEMPTS);
-            CommonUtilities.displayMessage(context, message);
-        }
-        catch (InterruptedException e)
-        {
-            // Activity finished before we complete - exit.
-            Log.d(GCMIntentService.TAG, "Thread interrupted: abort remaining retries!");
-            Thread.currentThread().interrupt();
-            return;
-        }
-    }
+		FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context, FoodCenterRequestFactory.class);
+		service = factory.gcmService();
+	}
+
+	public void execute()
+	{
+		service.register(regId).fire(this);
+	}
+
+	@Override
+	public void onSuccess(Void arg0)
+	{
+		GCMRegistrar.setRegisteredOnServer(context, true);
+		String message = context.getString(R.string.server_registered);
+		CommonUtilities.displayMessage(context, message);
+	}
+
+	@Override
+	public void onFailure(ServerFailure error)
+	{
+		try
+		{
+			if (attempt > 0)
+			{
+				Log.d(GCMIntentService.TAG, "Sleeping for " + backoff + " ms before retry");
+				Thread.sleep(backoff);
+				this.attempt--;
+				this.backoff *= 2;
+				execute();
+				return;
+			}
+			String message = context.getString(R.string.server_register_error, GCMIntentService.MAX_ATTEMPTS);
+			CommonUtilities.displayMessage(context, message);
+		}
+		catch (InterruptedException e)
+		{
+			// Activity finished before we complete - exit.
+			Log.d(GCMIntentService.TAG, "Thread interrupted: abort remaining retries!");
+			Thread.currentThread().interrupt();
+			return;
+		}
+	}
 }
 
 class GCMUnRegisterReciever extends Receiver<Void>
 {
-    
-    private final Context context;
 
-    public GCMUnRegisterReciever(final Context context)
-    {
-        this.context = context;
-    }
+	private final Context context;
 
-    @Override
-    public void onSuccess(Void arg0)
-    {
-        GCMRegistrar.setRegisteredOnServer(context, false);
+	public GCMUnRegisterReciever(final Context context)
+	{
+		this.context = context;
+	}
 
-        // Delete the current account from shared preferences
-        Editor editor = RequestUtils.getSharedPreferences(context).edit();
-        editor.putString(RequestUtils.AUTH_COOKIE, null);
-        editor.putString(RequestUtils.ACCOUNT_NAME, null);
-        editor.commit();
+	@Override
+	public void onSuccess(Void arg0)
+	{
+		GCMRegistrar.setRegisteredOnServer(context, false);
 
-        String message = context.getString(R.string.server_unregistered);
-        CommonUtilities.displayMessage(context, message);
-    }
+		// Delete the current auth cookie from shared preferences
+		Editor editor = RequestUtils.getSharedPreferences(context).edit();
+		editor.putString(RequestUtils.AUTH_COOKIE, null);
+		editor.commit();
 
-    @Override
-    public void onFailure(ServerFailure error)
-    {
-        // At this point the device is unregistered from GCM, but still
-        // registered in the server.
-        // We could try to unregister again, but it is not necessary:
-        // if the server tries to send a message to the device, it will get
-        // a "NotRegistered" error message and should unregister the device.
-        String message = context.getString(R.string.server_unregister_error, error.getMessage());
-        CommonUtilities.displayMessage(context, message);
-    }
+	}
+
+	@Override
+	public void onFailure(ServerFailure error)
+	{
+		// At this point the device is unregistered from GCM, but still
+		// registered in the server.
+		// We could try to unregister again, but it is not necessary:
+		// if the server tries to send a message to the device, it will get
+		// a "NotRegistered" error message and should unregister the device.
+		String message = context.getString(R.string.server_unregister_error, error.getMessage());
+		CommonUtilities.displayMessage(context, message);
+	}
 }

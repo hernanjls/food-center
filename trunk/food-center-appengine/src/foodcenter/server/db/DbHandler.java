@@ -2,12 +2,12 @@ package foodcenter.server.db;
 
 import java.util.List;
 
-import foodcenter.server.db.modules.DbUserGcm;
+import foodcenter.server.db.modules.DbMsg;
 
 public interface DbHandler
 {
 
-	public List<String> getMsgs();
+	public List<DbMsg> getMsgs();
 
 	/**
 	 * 
@@ -16,7 +16,7 @@ public interface DbHandler
 	 */
 	public long deleteMsg(String msg);
 
-	public void saveMsg(String msg);
+	public void saveMsg(String email, String msg);
 
 	
 	public void gcmRegister(String email, String regId);

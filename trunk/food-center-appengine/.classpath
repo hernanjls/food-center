@@ -57,11 +57,6 @@
 			<attribute name="javadoc_location" value="file:/C:/Programs/appengine-java-sdk/docs/javadoc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Programs/appengine-java-sdk/lib/appengine-tools-api.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/Programs/appengine-java-sdk/docs/javadoc/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/Programs/appengine-java-sdk/lib/opt/user/appengine-api-labs/v1/appengine-api-labs.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/Programs/appengine-java-sdk/docs/javadoc/"/>

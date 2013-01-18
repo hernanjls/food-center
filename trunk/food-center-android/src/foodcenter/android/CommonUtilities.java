@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foodcenter.android.service.gcm;
+package foodcenter.android;
 
 import foodcenter.android.service.Setup;
 import android.content.Context;
