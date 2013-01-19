@@ -50,8 +50,8 @@ public class RegisterAsyncTask extends AsyncTask<String, String, Boolean>
 	@Override
 	protected void onPreExecute()
 	{
-		super.onPreExecute();
 		context.showSpinner("Registering ...");
+//		super.onPreExecute();
 	}
 
 	/**
@@ -130,6 +130,7 @@ public class RegisterAsyncTask extends AsyncTask<String, String, Boolean>
 	protected void onProgressUpdate(String... values)
 	{
 		String msg = values[0];
+		context.showSpinner(msg);
 		context.showSpinner(msg);
 	}
 	/**

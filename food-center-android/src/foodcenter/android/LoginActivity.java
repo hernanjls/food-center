@@ -84,11 +84,19 @@ public class LoginActivity extends Activity
 		}
 	}
 	
+	public void hideSpinner()
+	{
+		if (spin.isShowing())
+		{
+			spin.dismiss();
+		}
+	}
+
 	/**
 	 * Sets the screen content based on the auth cookie. <br>
 	 * {@link R.layout.disconnect} or {@link R.layout.connect}
 	 */
-	private void setScreenContent()
+	public void setScreenContent()
 	{
 		SharedPreferences prefs = RequestUtils.getSharedPreferences(mContext);
 		String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);

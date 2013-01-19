@@ -21,9 +21,11 @@ public class MainActivity extends Activity
 {
     private final static String TAG = MainActivity.class.getSimpleName();
 
+
 	private ProgressDialog spin;
 
-	private MainActivity context = this;
+	public MainActivity context = this;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -35,7 +37,7 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
 
         // register msg reciever handler (to show on ui thread)
-        registerReceiver(mHandleMessageReceiver, new IntentFilter(Setup.DISPLAY_MESSAGE_ACTION));
+        registerReceiver(handlePopupReceiver, new IntentFilter(Setup.DISPLAY_POPUP_ACTION));
     }
 
     @Override
@@ -92,7 +94,7 @@ public class MainActivity extends Activity
     @Override
     protected void onDestroy()
     {
-        unregisterReceiver(mHandleMessageReceiver);
+        unregisterReceiver(handlePopupReceiver);
 //        GCMRegistrar.onDestroy(MainActivity.this);
         Log.i(TAG, "dismissing spinner");
 		spin.dismiss();
@@ -113,11 +115,11 @@ public class MainActivity extends Activity
 	{
 		if (spin.isShowing())
 		{
-			spin.hide();
+			spin.dismiss();
 		}
 	}
 	
-    private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver()
+    private final BroadcastReceiver handlePopupReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
@@ -126,4 +128,5 @@ public class MainActivity extends Activity
             Popup.show(MainActivity.this, newMessage);
         }
     };
+    
 }
