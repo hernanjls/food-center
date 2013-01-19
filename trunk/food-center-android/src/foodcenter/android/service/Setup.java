@@ -36,8 +36,9 @@ public class Setup
 	 /**
      * Intent used to display a message in the screen.
      */
-	public static final String DISPLAY_MESSAGE_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
-	  /**
+	public static final String DISPLAY_POPUP_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
+	
+     /**
      * Intent's extra that contains the message to be displayed.
      */
     public static final String EXTRA_MESSAGE = "message";

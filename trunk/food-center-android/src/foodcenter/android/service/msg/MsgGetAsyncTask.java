@@ -134,6 +134,7 @@ public class MsgGetAsyncTask extends AsyncTask<Void, MsgProxy, Void>
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
+			owner.showSpinner("Pressed on item " + position);
 			@SuppressWarnings("unchecked")
             ArrayAdapter<MsgTextView> adapter = (ArrayAdapter<MsgTextView>) parent.getAdapter();
 			new MsgDeleteAsyncTask(owner, adapter, msgsArray).execute(position);

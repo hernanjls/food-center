@@ -37,8 +37,10 @@ public final class CommonUtilities
      */
     public static void displayMessage(Context context, String message)
     {
-        Intent intent = new Intent(Setup.DISPLAY_MESSAGE_ACTION);
+        Intent intent = new Intent(Setup.DISPLAY_POPUP_ACTION);
         intent.putExtra(Setup.EXTRA_MESSAGE, message);
         context.sendBroadcast(intent);
     }
+    
+    
 }
