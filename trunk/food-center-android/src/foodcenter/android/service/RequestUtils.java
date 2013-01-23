@@ -23,18 +23,17 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.Debug;
 import android.util.Log;
 
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
-
 
 /**
  * Utility methods for getting the base URL for client-server communication and
@@ -46,7 +45,7 @@ public class RequestUtils
 	/**
 	 * Tag for logging.
 	 */
-	private static final String TAG = "Util";
+	private static final String TAG = RequestUtils.class.getSimpleName();
 
 	// Shared constants
 
@@ -55,6 +54,7 @@ public class RequestUtils
 	 */
 	public static final String ACCOUNT_NAME = "accountName";
 
+	public static final String DEBUG_URL = "DEBUGURL";
 	/**
 	 * Key for auth cookie name in shared preferences.
 	 */
@@ -75,7 +75,7 @@ public class RequestUtils
 	/**
 	 * Key for shared preferences.
 	 */
-	private static final String SHARED_PREFS = "foodcenter".toUpperCase(Locale.ENGLISH) + "_PREFS";
+	private static final String SHARED_PREFS = "FOODCENTER_PREFS";
 
 	/**
 	 * Cache containing the base URL for a given context.
@@ -89,15 +89,15 @@ public class RequestUtils
 	public static String getBaseUrl(Context context)
 	{
 		String url = URL_MAP.get(context);
-		if (url == null)
+		if (null == url && Debug.isDebuggerConnected())
 		{
 			// if a debug_url raw resource exists, use its contents as the url
 			url = getDebugUrl(context);
-			// otherwise, use the production url
-			if (url == null)
-			{
-				url = Setup.PROD_URL;
-			}
+			URL_MAP.put(context, url);
+		}
+		if (null == url)
+		{
+			url = Setup.PROD_URL;
 			URL_MAP.put(context, url);
 		}
 		return url;
@@ -204,7 +204,6 @@ public class RequestUtils
 				}
 			}
 		}
-
 		return url;
 	}
 

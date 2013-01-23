@@ -4,7 +4,7 @@ import com.google.web.bindery.requestfactory.shared.Locator;
 
 import foodcenter.server.db.modules.DbMsg;
 
-public class MsgLocator extends Locator<DbMsg, Void>
+public class MsgLocator extends Locator<DbMsg, Long>
 {
 
 	@Override
@@ -14,7 +14,7 @@ public class MsgLocator extends Locator<DbMsg, Void>
 	}
 
 	@Override
-	public DbMsg find(Class<? extends DbMsg> clazz, Void id)
+	public DbMsg find(Class<? extends DbMsg> clazz, Long id)
 	{
 		return create(clazz);
 	}
@@ -26,15 +26,15 @@ public class MsgLocator extends Locator<DbMsg, Void>
 	}
 
 	@Override
-	public Void getId(DbMsg domainObject)
+	public Long getId(DbMsg domainObject)
 	{
-		return null;
+		return domainObject.getId();
 	}
 
 	@Override
-	public Class<Void> getIdType()
+	public Class<Long> getIdType()
 	{
-		return Void.class;
+		return Long.class;
 	}
 
 	@Override

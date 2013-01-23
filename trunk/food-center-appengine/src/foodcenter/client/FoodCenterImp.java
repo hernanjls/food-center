@@ -3,22 +3,29 @@ package foodcenter.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.handlers.AddMsgHandler;
 import foodcenter.client.handlers.RemoveMsgHandler;
-import foodcenter.shared.GWTMsgService;
-import foodcenter.shared.GWTMsgServiceAsync;
+import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.msg.MsgProxy;
+//import foodcenter.server.db.modules.DbMsg;
+//import foodcenter.shared.GWTMsgService;
+//import foodcenter.shared.GWTMsgServiceAsync;
 
-public class FoodCenterImp implements FoodCenter
+public class FoodCenterImp implements EntryPoint, FoodCenter
 {
 
 	// private static final int REFRESH_INTERVAL = 5000; // ms
@@ -32,7 +39,7 @@ public class FoodCenterImp implements FoodCenter
 
 	private ArrayList<String> msgs = new ArrayList<String>();
 
-	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
+//	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
 
 	/**
 	 * Entry point method.
@@ -79,13 +86,34 @@ public class FoodCenterImp implements FoodCenter
 		msgFlexTable.setText(0, 1, "Remove");
 
 		// Initialize the service proxy.
-		if (msgSvc == null)
-		{
-			msgSvc = GWT.create(GWTMsgService.class);
-		}
+//		if (msgSvc == null)
+//		{
+//			msgSvc = GWT.create(GWTMsgService.class);
+//		}
 
 		// Make the call to get the msgs from the db.
-		msgSvc.getMsgs(new GetMsgsAsynCallback());
+//		msgSvc.getMsgs(new GetMsgsAsynCallback());
+		final EventBus eventBus = new SimpleEventBus();
+		FoodCenterRequestFactory requestFactory = GWT.create(FoodCenterRequestFactory.class);
+		requestFactory.initialize(eventBus);
+		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
+		{
+
+			@Override
+            public void onSuccess(List<MsgProxy> response)
+            {
+	            for (MsgProxy m : response)
+	            {
+	            	addMsgToTable(m.getMsg());
+	            }
+	            
+            }
+			@Override
+			public void onFailure(ServerFailure error)
+			{
+				Window.alert("[FAIL] service connection error: " + error.getMessage());
+			}
+		});
 
 	}
 
@@ -135,21 +163,21 @@ public class FoodCenterImp implements FoodCenter
 	    return newMsgTextBox;
     }
 
-	class GetMsgsAsynCallback implements AsyncCallback<List<String>>
-	{
-		public void onFailure(Throwable caught)
-		{
-			Window.alert("[FAIL] service connection error: " + caught.getMessage());
-		}
-
-		public void onSuccess(List<String> result)
-		{
-			for (String s : result)
-			{
-				addMsgToTable(s);
-			}
-		}
-
-	}
+//	class GetMsgsAsynCallback implements AsyncCallback<List<DbMsg>>
+//	{
+//		public void onFailure(Throwable caught)
+//		{
+//			Window.alert("[FAIL] service connection error: " + caught.getMessage());
+//		}
+//
+//		public void onSuccess(List<DbMsg> result)
+//		{
+//			for (DbMsg s : result)
+//			{
+//				addMsgToTable(s.getMsg());
+//			}
+//		}
+//
+//	}
 	
 }
