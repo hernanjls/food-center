@@ -4,13 +4,15 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import foodcenter.server.db.modules.DbMsg;
+
 /**
  * The async counterpart of <code>GreetingService</code>.
  */
 public interface GWTMsgServiceAsync
 {
 
-	public void getMsgs(AsyncCallback<List<String>> callback);
+	void getMsgs(AsyncCallback<List<String>> callback);
 
 	public void addMsg(String msg, AsyncCallback<Void> callback);
 

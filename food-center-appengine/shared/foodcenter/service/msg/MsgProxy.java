@@ -1,10 +1,10 @@
 package foodcenter.service.msg;
 
+import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyForName;
-import com.google.web.bindery.requestfactory.shared.ValueProxy;
 
-@ProxyForName(value = "foodcenter.server.db.modules.DbMsg", locator = "foodcenter.service.MsgLocator")
-public interface MsgProxy extends ValueProxy
+@ProxyForName(value = "foodcenter.server.db.modules.DbMsg", locator = "foodcenter.server.service.msg.MsgLocator")
+public interface MsgProxy extends EntityProxy
 {
 
 	public String getMsg();

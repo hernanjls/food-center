@@ -35,7 +35,7 @@
 		<link>
 			<name>shared</name>
 			<type>2</type>
-			<location>C:/workspace/food-center/food-center-appengine/shared</location>
+			<location>$%7BPARENT-1-PROJECT_LOC%7D/food-center-appengine/shared</location>
 		</link>
 	</linkedResources>
 </projectDescription>

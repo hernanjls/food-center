@@ -25,6 +25,7 @@ public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgSer
 
     public List<String> getMsgs() throws IllegalArgumentException
     {
+//    	return db.getMsgs();
     	LinkedList<String> res = new LinkedList<String>();
     	for (DbMsg m : db.getMsgs())
     	{
