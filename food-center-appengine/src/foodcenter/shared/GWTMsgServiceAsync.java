@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import foodcenter.server.db.modules.DbMsg;
-
 /**
  * The async counterpart of <code>GreetingService</code>.
  */
