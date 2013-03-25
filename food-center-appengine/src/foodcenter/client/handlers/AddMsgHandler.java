@@ -8,21 +8,29 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.FoodCenter;
+import foodcenter.client.service.RequestUtils;
+import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.msg.MsgProxy;
 import foodcenter.shared.GWTMsgService;
 import foodcenter.shared.GWTMsgServiceAsync;
 
 public class AddMsgHandler implements KeyPressHandler, ClickHandler
 {
 	private final FoodCenter foodCenter;
-	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
+    private RequestUtils reqUtils = null;
 
 	public AddMsgHandler(FoodCenter foodCenter)
 	{
 		this.foodCenter = foodCenter;
+		this.reqUtils = new RequestUtils();
 	}
 
 	@Override
@@ -60,11 +68,7 @@ public class AddMsgHandler implements KeyPressHandler, ClickHandler
 		foodCenter.getMsgTextBox().setText("");
 
 		// add the msg to the db, and to the table on service success.
-		if (msgSvc == null)
-		{
-			msgSvc = GWT.create(GWTMsgService.class);
-		}
-		msgSvc.addMsg(msg, new AddMsgAsyncCallback(msg));
+		reqUtils.getRequestFactory().msgService().createMsg(msg).fire(new AddMsgRecieverk(msg));
 
 	}
 
@@ -80,28 +84,29 @@ public class AddMsgHandler implements KeyPressHandler, ClickHandler
 		return true;
 	}
 	
-	class AddMsgAsyncCallback implements AsyncCallback<Void>
+	class AddMsgRecieverk extends Receiver<Void>
 	{
 
 		private final String msg;
 
-		public AddMsgAsyncCallback(String msg)
+		public AddMsgRecieverk(String msg)
 		{
 			this.msg = msg;
 		}
 
 		@Override
-		public void onFailure(Throwable caught)
-		{
-			Window.alert("[FAIL] add msg: " + caught.getMessage());
-			foodCenter.updateTableFromDb();
-		}
+        public void onSuccess(Void result)
+        {
+            foodCenter.addMsgToTable(msg);
+        }
+		
+        @Override
+        public void onFailure(ServerFailure error)
+        {
+            Window.alert("[FAIL] add msg : " + error.getMessage());
+        }
+        
 
-		@Override
-		public void onSuccess(Void result)
-		{
-			foodCenter.addMsgToTable(msg);
-		}
 
 	}
 

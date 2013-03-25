@@ -19,6 +19,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.handlers.AddMsgHandler;
 import foodcenter.client.handlers.RemoveMsgHandler;
+import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.msg.MsgProxy;
 //import foodcenter.server.db.modules.DbMsg;
@@ -93,9 +94,7 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 //
 //		// Make the call to get the msgs from the db.
 //		msgSvc.getMsgs(new GetMsgsAsynCallback());
-		final EventBus eventBus = new SimpleEventBus();
-		FoodCenterRequestFactory requestFactory = GWT.create(FoodCenterRequestFactory.class);
-		requestFactory.initialize(eventBus);
+		FoodCenterRequestFactory requestFactory = new RequestUtils().getRequestFactory();
 		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
 		{
 			@Override
