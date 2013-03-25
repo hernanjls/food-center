@@ -85,20 +85,19 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 		msgFlexTable.setText(0, 0, "Msg");
 		msgFlexTable.setText(0, 1, "Remove");
 
-		// Initialize the service proxy.
+//		// Initialize the service proxy.
 //		if (msgSvc == null)
 //		{
 //			msgSvc = GWT.create(GWTMsgService.class);
 //		}
-
-		// Make the call to get the msgs from the db.
+//
+//		// Make the call to get the msgs from the db.
 //		msgSvc.getMsgs(new GetMsgsAsynCallback());
 		final EventBus eventBus = new SimpleEventBus();
 		FoodCenterRequestFactory requestFactory = GWT.create(FoodCenterRequestFactory.class);
 		requestFactory.initialize(eventBus);
 		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
 		{
-
 			@Override
             public void onSuccess(List<MsgProxy> response)
             {
