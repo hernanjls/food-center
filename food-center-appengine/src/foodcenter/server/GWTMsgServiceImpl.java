@@ -25,7 +25,7 @@ public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgSer
 
     public List<String> getMsgs() throws IllegalArgumentException
     {
-//    	return db.getMsgs();
+//    	return db.getMsgs(); //dont forget to inherit DbMsg in xml
     	LinkedList<String> res = new LinkedList<String>();
     	for (DbMsg m : db.getMsgs())
     	{
@@ -46,8 +46,8 @@ public class GWTMsgServiceImpl extends RemoteServiceServlet implements GWTMsgSer
         List<String> dev = db.getGcmRegistered();
         if (!dev.isEmpty())
         {
-                Logger.getLogger(getClass().getName()).log(Level.INFO, "gcm: " + dev.size());
-                GCMSender.send(msg, dev, 5);
+            Logger.getLogger(getClass().getName()).log(Level.INFO, "gcm: " + dev.size());
+            GCMSender.send(msg, dev, 5);
         }
         else
         {

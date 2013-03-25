@@ -42,18 +42,21 @@ public class AddMsgHandler implements KeyPressHandler, ClickHandler
 
 	private void addMsg()
 	{
-
+	    // Get the new msg from the UI
 		final String msg = foodCenter.getMsgTextBox().getText();
 
+		// Set the focus in case the msg isn't valid, for the user to continue typing
 		foodCenter.getMsgTextBox().setFocus(true);
 
 		// Don't add the msg if it's already in the table or invalid.
+		// Get the table messages
 		List<String> msgs = foodCenter.getMsgs();
 		if (msgs.contains(msg) || !isValidMsg(msg))
 		{
 			return;
 		}
 
+		// Clear the message for the input because it will be added to the DB.
 		foodCenter.getMsgTextBox().setText("");
 
 		// add the msg to the db, and to the table on service success.
