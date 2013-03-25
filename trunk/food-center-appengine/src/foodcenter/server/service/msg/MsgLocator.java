@@ -40,7 +40,7 @@ public class MsgLocator extends Locator<DbMsg, Long>
 	@Override
 	public Object getVersion(DbMsg domainObject)
 	{
-		return domainObject.getId();
+		return domainObject.getVersion();
 	}
 
 }
