@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">food-center-android</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="hila">hila 1st android string in android</string>
+    <!-- GCM -->
+    <string name="gcm_registered">From GCM: device successfully registered!</string>
+    <string name="gcm_unregistered">From GCM: device successfully unregistered!</string>
+    <string name="gcm_message">From GCM: you got message!</string>
+    <string name="gcm_error">From GCM: error (%1$s).</string>
+    <string name="gcm_recoverable_error">From GCM: recoverable error (%1$s).</string>
+    <string name="gcm_deleted">From GCM: server deleted %1$d pending messages!</string>
+    <string name="server_registering">Trying (attempt %1$d/%2$d) to register device on Demo Server.</string>
+    <string name="server_registered">From Demo Server: successfully added device!</string>
+    <string name="server_unregistered">From Demo Server: successfully removed device!</string>
+    <string name="server_register_error">Could not register device on Demo Server after %1$d attempts.</string>
+    <string name="server_unregister_error">Could not unregister device on Demo Server (%1$s).</string>
+    <string name="menu_add_msg">Add Msg</string>
+    <string name="menu_update_msgs">Update Msgs</string>
+    <string name="menu_exit">Exit</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+    <!-- LoginActivity -->
+    <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
+    <string name="connect_text">This application requests permission to connect your mobile device to the cloud.</string>
+
+    <!-- Header text for "Connect" screen [CHAR LIMIT=NONE] -->
+    <string name="connect_to_the_cloud">Connect To The Cloud</string>
+
+    <!-- List view header text [CHAR LIMIT=NONE] -->
+    <string name="select_account">Select the account you wish to authorize:</string>
+
+    <!-- Footer text for "Connect" screen [CHAR LIMIT=NONE] -->
+    <string name="do_you_want_to_connect">Do you want to connect?</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+    <string name="exit">Close</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+    <string name="connect">Connect</string>
+
+    <!-- Header text for "Connected" screen [CHAR LIMIT=NONE] -->
+    <string name="connected_to_the_cloud">Connected To The Cloud</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+    <string name="disconnect">Disconnect</string>
+
+    <!-- Dialog message text [CHAR LIMIT=NONE] -->
+    <string name="needs_account">To receive notifications from this app, you must first create an account.</string>
+
+    <!-- Dialog button [CHAR LIMIT=NONE] -->
+    <string name="add_account">Add Account..</string>
+
+    <!-- Dialog button text [CHAR LIMIT=NONE] -->
+    <string name="skip">Skip</string>
+
+    <!-- Dialog title text [CHAR LIMIT=NONE] -->
+    <string name="attention">Attention</string>
+
+    <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
+    <string name="disconnect_text">This device is currently connected to the cloud as %1$s.  To disconnect, press the button below.</string>
+    
+    <string name="menu_login">Login</string>
+
+</resources>
