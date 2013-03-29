@@ -1,8 +1,11 @@
 package foodcenter.server.service.msg;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -15,7 +18,8 @@ import foodcenter.server.db.modules.DbMsg;
 public class MsgService
 {
 
-    static DbHandler db = new DbHandlerImp();
+    private static DbHandler db = new DbHandlerImp();
+    private static Logger logger = LoggerFactory.getLogger(MsgService.class); 
 
     public static void createMsg(String msg)
     {
@@ -28,12 +32,12 @@ public class MsgService
 		List<String> dev = db.getGcmRegistered();
 		if (!dev.isEmpty())
 		{
-			Logger.getLogger(MsgService.class.getName()).log(Level.INFO, "gcm: " + dev.size());
+			logger.info("gcm: " + dev.size());
 			GCMSender.send(msg, dev, 5);
 		}
 		else
 		{
-			Logger.getLogger(MsgService.class.getName()).log(Level.INFO, "no devices to broadcast");
+		    logger.info("no devices to broadcast");
 		}
 
     }
