@@ -4,14 +4,95 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import foodcenter.server.db.modules.DbMsg;
+import foodcenter.server.db.modules.DbObject;
+import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUserGcm;
 
 public class DbHandlerImp implements DbHandler
 {
+    private Logger logger = LoggerFactory.getLogger(DbHandlerImp.class);
+
+    @Override
+    public <T extends DbObject> T find(Class<T> clazz, Long id)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        try
+        {
+            return pm.getObjectById(clazz, id);
+        }
+        catch (JDOObjectNotFoundException e)
+        {
+            logger.info(e.getMessage());
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage(), e);
+        }
+        finally
+        {
+            pm.close();
+        }
+        return null;
+    }
+    @Override
+    public DbRestaurant searchRestaurantByName(String name)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        try
+        {
+
+            Query q = pm.newQuery(DbRestaurant.class);
+            q.setFilter("name == value"); // where DbRestaurant.name = 'value'
+            q.declareParameters("String value");
+            q.setRange(0, 1); // limit query for the 1st result
+
+            @SuppressWarnings("unchecked")
+            List<DbRestaurant> res = (List<DbRestaurant>) q.execute(name); // with name as value
+
+            return res.isEmpty() ? null : res.get(0);
+
+        }
+        catch (Exception e)
+        {
+            logger.error("unexpected exeption", e);
+            return null;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
+
+    public Long createRestaurant(String name)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+
+        DbRestaurant r = new DbRestaurant(name);
+
+        try
+        {
+            logger.info("createing a new restaurant with name " + name);
+            pm.makePersistent(r);
+            return r.getId();
+        }
+        catch (Exception e)
+        {
+            logger.error("unexpected exeption", e);
+            return null;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
 
     @Override
     public void saveMsg(String email, String msg)
@@ -97,8 +178,7 @@ public class DbHandlerImp implements DbHandler
             pm.close();
         }
     }
-    
-    
+
     @Override
     public List<String> getGcmRegistered()
     {
@@ -107,12 +187,12 @@ public class DbHandlerImp implements DbHandler
         {
             List<String> res = new LinkedList<String>();
             Extent<DbUserGcm> extent = pm.getExtent(DbUserGcm.class, false);
-            
+
             for (DbUserGcm m : extent)
             {
                 res.add(m.getGcmKey());
             }
-            
+
             return res;
         }
         finally

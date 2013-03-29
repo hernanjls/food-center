@@ -38,5 +38,8 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/repackaged-appengine-tomcat-juli-6.0.29.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/validation-api-1.0.0.GA.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/hibernate-validator-4.2.0.Final.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-jdk14-1.7.5.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

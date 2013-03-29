@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -22,9 +19,7 @@ import foodcenter.client.handlers.RemoveMsgHandler;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.msg.MsgProxy;
-//import foodcenter.server.db.modules.DbMsg;
-//import foodcenter.shared.GWTMsgService;
-//import foodcenter.shared.GWTMsgServiceAsync;
+
 
 public class FoodCenterImp implements EntryPoint, FoodCenter
 {
@@ -39,8 +34,6 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 	private Button addMsgButton = new Button("Add");
 
 	private ArrayList<String> msgs = new ArrayList<String>();
-
-//	private static GWTMsgServiceAsync msgSvc = GWT.create(GWTMsgService.class);
 
 	/**
 	 * Entry point method.
@@ -86,14 +79,6 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 		msgFlexTable.setText(0, 0, "Msg");
 		msgFlexTable.setText(0, 1, "Remove");
 
-//		// Initialize the service proxy.
-//		if (msgSvc == null)
-//		{
-//			msgSvc = GWT.create(GWTMsgService.class);
-//		}
-//
-//		// Make the call to get the msgs from the db.
-//		msgSvc.getMsgs(new GetMsgsAsynCallback());
 		FoodCenterRequestFactory requestFactory = new RequestUtils().getRequestFactory();
 		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
 		{

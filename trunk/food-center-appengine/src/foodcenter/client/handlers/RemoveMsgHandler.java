@@ -1,17 +1,13 @@
 package foodcenter.client.handlers;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.FoodCenter;
 import foodcenter.client.service.RequestUtils;
-import foodcenter.shared.GWTMsgService;
-import foodcenter.shared.GWTMsgServiceAsync;
 
 public class RemoveMsgHandler implements ClickHandler
 {
