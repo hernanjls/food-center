@@ -6,7 +6,12 @@ import javax.jdo.annotations.PersistenceCapable;
 @PersistenceCapable
 public class DbCompanyBranch extends DbObject
 {
-    public DbCompanyBranch()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5543026953456550227L;
+
+	public DbCompanyBranch()
     {
         super();
     }

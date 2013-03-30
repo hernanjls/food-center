@@ -2,9 +2,8 @@ package foodcenter.server.db;
 
 import java.util.List;
 
-import foodcenter.server.db.modules.DbObject;
-import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbMsg;
+import foodcenter.server.db.modules.DbObject;
 import foodcenter.server.db.modules.DbRestaurant;
 
 public interface DbHandler

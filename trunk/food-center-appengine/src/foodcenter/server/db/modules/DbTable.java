@@ -6,7 +6,12 @@ import javax.jdo.annotations.PersistenceCapable;
 public class DbTable extends DbObject
 {
     
-    public DbTable()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4949395591622620937L;
+
+	public DbTable()
     {
         super();
     }
