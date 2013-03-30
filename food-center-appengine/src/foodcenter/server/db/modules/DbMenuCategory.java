@@ -5,7 +5,12 @@ import javax.jdo.annotations.PersistenceCapable;
 @PersistenceCapable
 public class DbMenuCategory extends DbObject
 {
-    public DbMenuCategory()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7877797583355332333L;
+
+	public DbMenuCategory()
     {
         super();
     }

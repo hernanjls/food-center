@@ -6,7 +6,12 @@ import javax.jdo.annotations.PersistenceCapable;
 @PersistenceCapable
 public class DbCourse extends DbObject
 {
-    public DbCourse()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4031177620915344142L;
+
+	public DbCourse()
     {
         super();
     }
