@@ -19,3 +19,4 @@ public interface FoodCenter extends EntryPoint
 	public List<String> getMsgs();
 
 }
+
