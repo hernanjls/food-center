@@ -44,7 +44,7 @@ public class RemoveMsgHandler implements ClickHandler
         public void onFailure(ServerFailure error)
         {
             Window.alert("[FAIL] remove msg : " + error.getMessage());
-            foodCenter.updateTableFromDb();
+            foodCenter.updateMsgsTableFromDb();
         }
         
 		@Override

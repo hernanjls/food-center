@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.TextBox;
 public interface FoodCenter extends EntryPoint
 {
 
-	public void updateTableFromDb();
+	public void updateMsgsTableFromDb();
 
 	public void addMsgToTable(String msg);
 
@@ -17,6 +17,9 @@ public interface FoodCenter extends EntryPoint
 	public TextBox getMsgTextBox();
 	
 	public List<String> getMsgs();
+	
+	public void setHeader(String header);
+	
 
 }
 
