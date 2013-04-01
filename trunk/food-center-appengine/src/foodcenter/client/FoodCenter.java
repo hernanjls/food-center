@@ -20,6 +20,5 @@ public interface FoodCenter extends EntryPoint
 	
 	public void setHeader(String header);
 	
-
 }
 

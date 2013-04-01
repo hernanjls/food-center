@@ -5,6 +5,8 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.service.enums.ServiceType;
+
 @PersistenceCapable
 public class DbRestaurantBranch extends DbObject
 {
@@ -38,7 +40,7 @@ public class DbRestaurantBranch extends DbObject
     private DbLocation location;
     
     @Persistent
-    private List<DbServiceType> services;
+    private List<ServiceType> services;
     
     @Persistent
     private String phone;

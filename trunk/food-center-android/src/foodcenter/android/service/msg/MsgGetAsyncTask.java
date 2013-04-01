@@ -19,7 +19,7 @@ import foodcenter.android.Popup;
 import foodcenter.android.R;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.msg.MsgProxy;
+import foodcenter.service.proxies.MsgProxy;
 
 public class MsgGetAsyncTask extends AsyncTask<Void, MsgProxy, Void>
 {

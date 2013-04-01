@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -20,25 +17,25 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.handlers.AddMsgHandler;
 import foodcenter.client.handlers.RemoveMsgHandler;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.common.LoginInfoProxy;
-import foodcenter.service.common.RestaurantBaseInfoProxy;
-import foodcenter.service.msg.MsgProxy;
+import foodcenter.service.enums.ServiceType;
+import foodcenter.service.proxies.LoginInfoProxy;
+import foodcenter.service.proxies.MsgProxy;
+import foodcenter.service.proxies.RestaurantProxy;
 
-public class FoodCenterImp implements EntryPoint, FoodCenter
+public class FoodCenterImp implements EntryPoint, FoodCenter, RestaurantListShowable
 {
 
-	private static final String GWT_MENU_CONTAINER = "gwtMenuContainer";
+//	private static final String GWT_MENU_CONTAINER = "gwtMenuContainer";
 	private static final String GWT_CONTINER = "gwtContainer";
 	private FoodCenterRequestFactory requestFactory = new RequestUtils().getRequestFactory();
 
 	/**************************************************************************
 	 * Data Objects
 	 **************************************************************************/
-	private ArrayList<RestaurantBaseInfoProxy> restaurants = new ArrayList<RestaurantBaseInfoProxy>(); 
+	private ArrayList<RestaurantProxy> restaurants = new ArrayList<RestaurantProxy>(); 
 	
 	/**************************************************************************
 	 * Panels																 	
@@ -52,7 +49,7 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 	private CheckBox searchRestDeliveryCheckBox = new CheckBox("delivery");
 	private CheckBox searchRestTakeAwayCheckBox = new CheckBox("take away");
 	private CheckBox searchRestTableCheckBox = new CheckBox("table");
-	private Button searchRestButton = new Button("?");
+	private Button searchRestButton = new Button("Search");
 	private FlexTable restaurantsTable = new FlexTable();
 	
 	// companies pannel
@@ -62,7 +59,7 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 	private CheckBox searchCompDeliveryCheckBox = new CheckBox("delivery");
 	private CheckBox searchCompTakeAwayCheckBox = new CheckBox("take away");
 	private CheckBox searchCompTableCheckBox = new CheckBox("table");
-	private Button searchCompButton = new Button("?");
+	private Button searchCompButton = new Button("Search");
 	private FlexTable companiesTable = new FlexTable();
 	
 	
@@ -73,9 +70,9 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 
 	// private HorizontalPanel horizonalHelloePanel = new HorizontalPanel();
 
-	private HorizontalPanel horizonalAddMsgPanel = new HorizontalPanel();
+//	private HorizontalPanel horizonalAddMsgPanel = new HorizontalPanel();
 	private TextBox newMsgTextBox = new TextBox();
-	private Button addMsgButton = new Button("Add");
+//	private Button addMsgButton = new Button("Add");
 
 	private ArrayList<String> msgs = new ArrayList<String>();
 
@@ -87,7 +84,7 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 	public void onModuleLoad()
 	{
 		mainStackPanel.setWidth("95%");
-
+		restaurantsTable.addStyleName("fc_table");
 		// restaurants load
 		searchRestDeliveryCheckBox.setValue(true);
 		searchRestTakeAwayCheckBox.setValue(true);
@@ -124,34 +121,34 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 		
 		RootPanel.get(FoodCenterImp.GWT_CONTINER).add(mainStackPanel);
 		
+		getDefaultRestaurantsFromRPC();
 		
-		
-		// deprecated
-		// Assemble Add Msg panel.
-		horizonalAddMsgPanel.add(newMsgTextBox);
-		horizonalAddMsgPanel.add(addMsgButton);
-
-		// Assemble Main panel.
-		verticalMainPanel.add(msgFlexTable);
-		verticalMainPanel.add(horizonalAddMsgPanel);
-
-		// Associate the Main panel with the HTML host page.
-		RootPanel.get(FoodCenterImp.GWT_MENU_CONTAINER).add(getMenu());
-		RootPanel.get(FoodCenterImp.GWT_CONTINER).add(verticalMainPanel);
-
-		// Move cursor focus to the input box.
-		newMsgTextBox.setFocus(true);
-
-		// Listen for mouse events on the Add button.
-		addMsgButton.addClickHandler(new AddMsgHandler(this));
-		newMsgTextBox.addKeyPressHandler(new AddMsgHandler(this));
-
-		// Create table for msgs in the db.
-		updateMsgsTableFromDb();
-		// Window.Location.assign("test");
-
-		// Assemble the Hellow panel
-		requestFactory.getLoginService().getLoginInfo().fire(new LoginInfoReciever(this));
+//		// deprecated
+//		// Assemble Add Msg panel.
+//		horizonalAddMsgPanel.add(newMsgTextBox);
+//		horizonalAddMsgPanel.add(addMsgButton);
+//
+//		// Assemble Main panel.
+//		verticalMainPanel.add(msgFlexTable);
+//		verticalMainPanel.add(horizonalAddMsgPanel);
+//
+//		// Associate the Main panel with the HTML host page.
+//		RootPanel.get(FoodCenterImp.GWT_MENU_CONTAINER).add(getMenu());
+//		RootPanel.get(FoodCenterImp.GWT_CONTINER).add(verticalMainPanel);
+//
+//		// Move cursor focus to the input box.
+//		newMsgTextBox.setFocus(true);
+//
+//		// Listen for mouse events on the Add button.
+//		addMsgButton.addClickHandler(new AddMsgHandler(this));
+//		newMsgTextBox.addKeyPressHandler(new AddMsgHandler(this));
+//
+//		// Create table for msgs in the db.
+//		updateMsgsTableFromDb();
+//		// Window.Location.assign("test");
+//
+//		// Assemble the Hellow panel
+//		requestFactory.getUserCommonService().getLoginInfo().fire(new LoginInfoReciever(this));
 
 	}
 
@@ -160,20 +157,23 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 	{
 
 		restaurantsTable.removeAllRows();
-		msgs.clear();
-		msgFlexTable.setText(0, 0, "Msg");
-		msgFlexTable.setText(0, 1, "Remove");
+		restaurants.clear();
+		restaurantsTable.setText(0, 0, "Image");
+		restaurantsTable.setText(0, 1, "Name");
+		restaurantsTable.setText(0, 2, "Delivery");
+		restaurantsTable.setText(0, 3, "TakeAway");
+		restaurantsTable.setText(0, 4, "Table");
+		//only if user is admin
+		restaurantsTable.setText(0, 5, "Edit");
+		restaurantsTable.setText(0, 6, "Delete");
 
-		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
+		requestFactory.getUserCommonService().getDefaultRestaurants().fire(new Receiver<List<RestaurantProxy>>()
 		{
+		
 			@Override
-			public void onSuccess(List<MsgProxy> response)
+			public void onSuccess(List<RestaurantProxy> response)
 			{
-				for (MsgProxy m : response)
-				{
-					addMsgToTable(m.getMsg());
-				}
-
+				addRestaurants(response);
 			}
 
 			@Override
@@ -193,41 +193,42 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 		verticalMainPanel.add(h);
 	}
 	
-	/**
-	 * Add msg to FlexTable. Executed when the user clicks the addMsgButton or
-	 * presses enter in the newMsgTextBox.
-	 */
-
+	
 	@Override
-	public void updateMsgsTableFromDb()
+	public void addRestaurants(List<RestaurantProxy> restaurants)
 	{
-
-		msgFlexTable.removeAllRows();
-		msgs.clear();
-		msgFlexTable.setText(0, 0, "Msg");
-		msgFlexTable.setText(0, 1, "Remove");
-
-		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
+		for (RestaurantProxy r : restaurants)
 		{
-			@Override
-			public void onSuccess(List<MsgProxy> response)
+			// add the restaurant to the page cache
+			this.restaurants.add(r);
+			
+			//create a new row
+			int row = restaurantsTable.getRowCount();
+			
+			//TODO icon
+			
+			restaurantsTable.setWidget(row, 0, RequestUtils.getImage(r.getIconBytes()));
+//			restaurantsTable.setW
+			restaurantsTable.setText(row, 1, r.getName());
+			
+			// add the services
+			int i = 2;
+			for (ServiceType s: ServiceType.values())
 			{
-				for (MsgProxy m : response)
-				{
-					addMsgToTable(m.getMsg());
-				}
-
+				String value = r.getServices().contains(s) ? "yes" : "no";  
+				restaurantsTable.setText(row, i, value);
+				++i;				
 			}
-
-			@Override
-			public void onFailure(ServerFailure error)
-			{
-				Window.alert("[FAIL] service connection error: " + error.getMessage());
-			}
-		});
-
+			
+			Button editButton = new Button("edit");
+			// TODO click handler;
+			restaurantsTable.setWidget(row, 5, editButton);
+			Button deleteButton = new Button("delete");
+			// TODO click handler;
+			restaurantsTable.setWidget(row, 6, deleteButton);
+		}
 	}
-
+	
 	/**
 	 * adds the msg to the table, doesn't update/use any service.
 	 * 
@@ -274,40 +275,76 @@ public class FoodCenterImp implements EntryPoint, FoodCenter
 		return newMsgTextBox;
 	}
 
-	private MenuBar getMenu()
+//	private MenuBar getMenu()
+//	{
+//		// Create a menu bar
+//		MenuBar menu = new MenuBar();
+//		menu.setAutoOpen(true);
+//		menu.setWidth("100px");
+//		menu.setAnimationEnabled(true);
+//
+//		// Create the profile menu
+//		MenuBar profile = new MenuBar();
+//		profile.setAnimationEnabled(true);
+//
+//		profile.addItem("My Profile", new Command()
+//		{
+//			@Override
+//			public void execute()
+//			{
+//				Window.Location.assign("/profile.jsp");
+//			}
+//		});
+//		
+//		profile.addItem("Logout", new Command()
+//		{
+//			@Override
+//			public void execute()
+//			{
+//				Window.Location.assign("/user_profile.jsp");
+//			}
+//		});
+//
+//		menu.addItem(new MenuItem("Profile", profile));
+//		menu.addItem(new MenuItem("Profile2", profile));
+//		return menu;
+//	}
+	
+	/**
+	 * Add msg to FlexTable. Executed when the user clicks the addMsgButton or
+	 * presses enter in the newMsgTextBox.
+	 */
+
+	@Override
+	public void updateMsgsTableFromDb()
 	{
-		// Create a menu bar
-		MenuBar menu = new MenuBar();
-		menu.setAutoOpen(true);
-		menu.setWidth("100px");
-		menu.setAnimationEnabled(true);
 
-		// Create the profile menu
-		MenuBar profile = new MenuBar();
-		profile.setAnimationEnabled(true);
+		msgFlexTable.removeAllRows();
+		msgs.clear();
+		msgFlexTable.setText(0, 0, "Msg");
+		msgFlexTable.setText(0, 1, "Remove");
 
-		profile.addItem("My Profile", new Command()
+		requestFactory.msgService().getMsgs().fire(new Receiver<List<MsgProxy>>()
 		{
 			@Override
-			public void execute()
+			public void onSuccess(List<MsgProxy> response)
 			{
-				Window.Location.assign("/profile.jsp");
+				for (MsgProxy m : response)
+				{
+					addMsgToTable(m.getMsg());
+				}
+
 			}
-		});
-		
-		profile.addItem("Logout", new Command()
-		{
+
 			@Override
-			public void execute()
+			public void onFailure(ServerFailure error)
 			{
-				Window.Location.assign("/user_profile.jsp");
+				Window.alert("[FAIL] service connection error: " + error.getMessage());
 			}
 		});
 
-		menu.addItem(new MenuItem("Profile", profile));
-		menu.addItem(new MenuItem("Profile2", profile));
-		return menu;
 	}
+
 }
 
 class LoginInfoReciever extends Receiver<LoginInfoProxy>

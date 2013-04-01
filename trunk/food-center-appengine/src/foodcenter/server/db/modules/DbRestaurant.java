@@ -7,6 +7,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
+import foodcenter.service.enums.ServiceType;
+
 @PersistenceCapable
 public class DbRestaurant extends DbObject
 {
@@ -23,7 +25,7 @@ public class DbRestaurant extends DbObject
     private DbMenu menu;
     
     @Persistent
-    private char[] icon;
+    private List<Byte> iconBytes;
     
     @Persistent
     private String phone;
@@ -33,6 +35,9 @@ public class DbRestaurant extends DbObject
     
     @Persistent
     private List<DbUser> admins;
+    
+    @Persistent
+    private List<ServiceType> services;
     
     public DbRestaurant()
     {
@@ -65,14 +70,14 @@ public class DbRestaurant extends DbObject
         this.menu = menu;
     }
 
-    public char[] getIcon()
+    public List<Byte> getIconBytes()
     {
-        return icon;
+        return iconBytes;
     }
 
-    public void setIcon(char[] icon)
+    public void setIconBytes(List<Byte> iconBytes)
     {
-        this.icon = icon;
+        this.iconBytes = iconBytes;
     }
 
     public String getPhone()
@@ -103,6 +108,16 @@ public class DbRestaurant extends DbObject
     public void setAdmins(List<DbUser> admins)
     {
         this.admins = admins;
+    }
+
+	public List<ServiceType> getServices()
+    {
+	    return services;
+    }
+
+	public void setServices(List<ServiceType> services)
+    {
+	    this.services = services;
     }
     
 

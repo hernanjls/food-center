@@ -32,7 +32,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.gcm.GCMServiceProxy;
+import foodcenter.service.GCMServiceProxy;
 
 /**
  * IntentService responsible for handling GCM messages.

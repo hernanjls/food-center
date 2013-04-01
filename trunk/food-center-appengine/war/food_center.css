@@ -63,3 +63,10 @@ html, body
     font-size: 13px;
     text-align: right;
 }
+
+.fc_table {
+	width: 100%;
+	border-width: thin;
+	border-color: black;
+	border-style: solid;
+}
