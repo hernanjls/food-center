@@ -1,4 +1,4 @@
-package foodcenter.service.common;
+package foodcenter.service.proxies;
 
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyForName;

@@ -41,5 +41,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-jdk14-1.7.5.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-1.0-sdk-1.7.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-jsr107cache-1.7.6.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-1.3.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-lang-20030203.000129.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

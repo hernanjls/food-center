@@ -1,4 +1,4 @@
-package foodcenter.service.gcm;
+package foodcenter.service;
 
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;

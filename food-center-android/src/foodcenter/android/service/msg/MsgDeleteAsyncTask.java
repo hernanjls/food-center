@@ -13,7 +13,8 @@ import foodcenter.android.MainActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.msg.MsgGetAsyncTask.MsgTextView;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.msg.MsgProxy;
+import foodcenter.service.proxies.MsgProxy;
+
 
 public class MsgDeleteAsyncTask extends AsyncTask<Integer, String, Void>
 {
