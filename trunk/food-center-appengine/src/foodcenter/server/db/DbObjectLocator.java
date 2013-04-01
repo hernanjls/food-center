@@ -1,12 +1,10 @@
-package foodcenter.server.service;
+package foodcenter.server.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
 
-import foodcenter.server.db.DbHandler;
-import foodcenter.server.db.DbHandlerImp;
 import foodcenter.server.db.modules.DbObject;
 
 public class DbObjectLocator extends Locator<DbObject, Long>

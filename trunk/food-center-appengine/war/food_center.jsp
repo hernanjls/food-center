@@ -1,3 +1,10 @@
+<%@page language="java" contentType="text/html; charset=windows-1255" pageEncoding="windows-1255"%>
+
+<%@page import="org.slf4j.Logger" %>
+<%@page import="org.slf4j.LoggerFactory" %>
+<%@page import="foodcenter.server.service.common.UserCommonService" %>
+<%@page import="foodcenter.server.service.common.LoginInfo" %>
+
 <!doctype html>
 <!-- The DOCTYPE declaration above will set the     -->
 <!-- browser's rendering engine into                -->
@@ -11,7 +18,7 @@
     <!--                                                               -->
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="Food_center.css">
+    <link type="text/css" rel="stylesheet" href="food_center.css">
 
     <!--                                           -->
     <!-- Any title is fine                         -->
@@ -32,9 +39,33 @@
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
   <body>
+    <%
+        Logger logger = LoggerFactory.getLogger(getClass());
+        LoginInfo info = UserCommonService.getLoginInfo();    
+        String nickName = info.getNickName();
+        String userId = info.getUserId();
+        String role = info.isAdmin() ? "Admin" : "User";        
+        String email = info.getEmail();        
+        String logoutUrl = info.getLogoutUrl();
 
+        logger.debug("loggged in: " + email);
+    %>
+    <div id ="header" class="header">
+	    <div id ="headerInformation" class="headerInformation">
+	       Hellow: 
+	       <a href="user_profile.jsp"><% out.println(nickName); %></a>
+	       You are logged in as <% out.println(role); %>  
+	    </div>
+	    <div id="logout" class="logout">
+	        <a href="<% out.println(logoutUrl); %>">logout</a>
+	    </div>
+    </div>
+    
+    <div id="gwtMenuContainer"></div>
     <h1>Food Center</h1>
-    <div id="msgList"></div>
+    
+    <!--  container for gwt -->
+    <div id="gwtContainer"></div>
     
     <!-- OPTIONAL: include this if you want history support -->
     <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
