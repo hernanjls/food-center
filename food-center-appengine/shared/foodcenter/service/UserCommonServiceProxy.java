@@ -18,4 +18,9 @@ public interface UserCommonServiceProxy extends RequestContext
 	
 	public Request<List<RestaurantProxy>> getDefaultRestaurants();
 	
+	public Request<RestaurantProxy> getRestaurant(Long id);
+	
+	public Request<Boolean> saveRestaurant(RestaurantProxy rest);
+	
+	public Request<Boolean> deleteRestaurant(Long id);
 }
