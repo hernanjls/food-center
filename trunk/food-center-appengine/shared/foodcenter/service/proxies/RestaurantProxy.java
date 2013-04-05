@@ -14,6 +14,7 @@ public interface RestaurantProxy extends EntityProxy
 	public Long getId();
 	public String getName();
 	public MenuProxy getMenu();
+	public void setMenu(MenuProxy menu);
 	public List<Byte> getIconBytes();
 	public String getPhone();
 	public List<ServiceType> getServices();

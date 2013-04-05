@@ -20,6 +20,50 @@ public class DbHandlerImp implements DbHandler
 {
     private Logger logger = LoggerFactory.getLogger(DbHandlerImp.class);
 
+    
+    @Override
+    public <T extends DbObject> T save(T object)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        try
+        {
+            return pm.makePersistent(object);
+        }
+        catch (Throwable e)
+        {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
+    
+    @Override
+    public <T extends DbObject> Long delete(Class<T> clazz, Long id)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        
+        
+        try
+        {
+            Query q = pm.newQuery(clazz);
+            q.setFilter("id == value");
+            q.declareParameters("String value");
+            return q.deletePersistentAll(id.toString());
+        }
+        catch (Throwable e)
+        {
+            logger.error(e.getMessage(), e);
+            return 0L;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
+    
     @Override
     public <T extends DbObject> T find(Class<T> clazz, Long id)
     {

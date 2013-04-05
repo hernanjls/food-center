@@ -1,6 +1,7 @@
 package foodcenter.server.db.modules;
 
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -19,25 +20,25 @@ public class DbRestaurant extends DbObject
 
     @Persistent
     @NotNull
-    private String name;
+    private String name = "";
     
     @Persistent
-    private DbMenu menu;
+    private DbMenu menu = new DbMenu();
     
     @Persistent
-    private List<Byte> iconBytes;
+    private List<Byte> iconBytes = new LinkedList<Byte>();
     
     @Persistent
-    private String phone;
+    private String phone = "";
     
     @Persistent(mappedBy = "restaurant")
-    private List<DbRestaurantBranch> branches;
+    private List<DbRestaurantBranch> branches = new LinkedList<DbRestaurantBranch>();
     
     @Persistent
-    private List<DbUser> admins;
+    private List<DbUser> admins = new LinkedList<DbUser>();
     
     @Persistent
-    private List<ServiceType> services;
+    private List<ServiceType> services = new LinkedList<ServiceType>();
     
     public DbRestaurant()
     {

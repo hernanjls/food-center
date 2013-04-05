@@ -2,6 +2,8 @@ package foodcenter.server.db;
 
 import java.util.List;
 
+import com.google.web.bindery.requestfactory.shared.Request;
+
 import foodcenter.server.db.modules.DbMsg;
 import foodcenter.server.db.modules.DbObject;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -43,6 +45,11 @@ public interface DbHandler
     public List<String> getGcmRegistered();
 
     public <T extends DbObject> T find(Class<T> clazz, Long id);
+    
+    public <T extends DbObject> Long delete(Class<T> clazz, Long id);
+    
+    public <T extends DbObject> T save(T object);
+    
 
 
 
