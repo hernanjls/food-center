@@ -47,7 +47,7 @@ public class UserCommonService
 		a.setServices(Arrays.asList(ServiceType.values()));
 		try
         {
-	        byte[] bytes = FileUtils.readFileToByteArray(new File("favicon.ico"));
+	        byte[] bytes = FileUtils.readFileToByteArray(new File("images/pizza-delivery.png"));
 	        List<Byte> list = Bytes.asList(bytes);
 	        a.setIconBytes(list);
         }
@@ -60,6 +60,7 @@ public class UserCommonService
 		
 		
 		
+		res.add(a);
 		res.add(a);
 		return res;
 	}
