@@ -30,7 +30,7 @@
     <!-- If you add any GWT meta tags, they must   -->
     <!-- be added before this line.                -->
     <!--                                           -->
-    <script type="text/javascript" src="food_center/manage_restaurant.nocache.js"></script>
+    <script type="text/javascript" src="manage_restaurant/manage_restaurant.nocache.js"></script>
   </head>
 
   <!--                                           -->

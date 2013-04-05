@@ -34,6 +34,10 @@ public class RequestUtils
     
     public static Image getImage(List<Byte> imageByteArray)
 	{
+        if (null == imageByteArray)
+        {
+            return null;
+        }
     	byte[] b = imageByteArray.toArray(new Byte[0]).toString().getBytes();
     	return RequestUtils.getImage(b);
 	}
