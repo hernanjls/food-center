@@ -10,8 +10,8 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
 
-import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 
@@ -19,13 +19,16 @@ public class CoursesFlexTable extends FlexTable
 {
 
     private final MenuCategoryProxy menuCatProxy;
-    private final FoodCenterRequestFactory requestFactory;
+    private final RequestContext requestContext;
+    private final Boolean isAdmin;
     
-    public CoursesFlexTable(FoodCenterRequestFactory requestFactory, MenuCategoryProxy menuCatProxy)
+    public CoursesFlexTable(RequestContext requestContext, MenuCategoryProxy menuCatProxy, Boolean isAdmin)
     {
         super();
-        this.requestFactory = requestFactory;
+        this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
+        this.isAdmin = isAdmin;
+        
         createHeader();
         List<CourseProxy> courses = menuCatProxy.getCourses();
         if (null == courses)
@@ -33,6 +36,7 @@ public class CoursesFlexTable extends FlexTable
             courses = new LinkedList<CourseProxy>();
             menuCatProxy.setCourses(courses);
         }
+        
         for (CourseProxy cp : courses)
         {
             printCourseRow(cp);
@@ -50,7 +54,7 @@ public class CoursesFlexTable extends FlexTable
     
     public void addCourse()
     {
-        CourseProxy courseProxy = requestFactory.getUserCommonService().create(CourseProxy.class);
+        CourseProxy courseProxy = requestContext.create(CourseProxy.class);
         menuCatProxy.getCourses().add(courseProxy);
         printCourseRow(courseProxy);
     }
@@ -73,9 +77,15 @@ public class CoursesFlexTable extends FlexTable
         Button delete = new Button("delete"); 
         delete.addClickHandler(new DeleteCourseClickHandler(row));
         
+        
+        name.setEnabled(isAdmin);
+        price.setEnabled(isAdmin);
+        delete.setEnabled(isAdmin);
+        
         setWidget(row, 0, name);
         setWidget(row, 1, price);
         setWidget(row, 2, delete);
+        
     }
     
     class AddCourseHandler implements ClickHandler

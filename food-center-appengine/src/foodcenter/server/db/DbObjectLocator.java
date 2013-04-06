@@ -7,7 +7,7 @@ import com.google.web.bindery.requestfactory.shared.Locator;
 
 import foodcenter.server.db.modules.DbObject;
 
-public class DbObjectLocator extends Locator<DbObject, Long>
+public class DbObjectLocator extends Locator<DbObject, String>
 {
     private DbHandler db;
     private Logger logger;
@@ -33,7 +33,7 @@ public class DbObjectLocator extends Locator<DbObject, Long>
     }
 
     @Override
-    public DbObject find(Class<? extends DbObject> clazz, Long id)
+    public DbObject find(Class<? extends DbObject> clazz, String id)
     {
         return db.find(clazz, id);
     }
@@ -45,15 +45,15 @@ public class DbObjectLocator extends Locator<DbObject, Long>
     }
 
     @Override
-    public Long getId(DbObject domainObject)
+    public String getId(DbObject domainObject)
     {
         return domainObject.getId();
     }
 
     @Override
-    public Class<Long> getIdType()
+    public Class<String> getIdType()
     {
-        return Long.class;
+        return String.class;
     }
 
     @Override

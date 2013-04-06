@@ -11,7 +11,7 @@ import foodcenter.service.enums.ServiceType;
 public interface RestaurantProxy extends EntityProxy
 {
 
-	public Long getId();
+	public String getId();
 	public String getName();
 	public MenuProxy getMenu();
 	public void setMenu(MenuProxy menu);

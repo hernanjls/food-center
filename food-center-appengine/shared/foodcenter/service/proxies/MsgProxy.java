@@ -9,6 +9,6 @@ public interface MsgProxy extends EntityProxy
 
 	public String getMsg();
 	public String getEmail();
-	public Long getId();
+	public String getId();
 
 }
