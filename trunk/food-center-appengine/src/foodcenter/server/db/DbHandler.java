@@ -2,8 +2,6 @@ package foodcenter.server.db;
 
 import java.util.List;
 
-import com.google.web.bindery.requestfactory.shared.Request;
-
 import foodcenter.server.db.modules.DbMsg;
 import foodcenter.server.db.modules.DbObject;
 import foodcenter.server.db.modules.DbRestaurant;

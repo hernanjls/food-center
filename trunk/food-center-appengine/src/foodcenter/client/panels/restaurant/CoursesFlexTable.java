@@ -1,12 +1,12 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.restaurant;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
@@ -21,14 +21,14 @@ public class CoursesFlexTable extends FlexTable
     private final MenuCategoryProxy menuCatProxy;
     private final RequestContext requestContext;
     private final Boolean isAdmin;
-    
+
     public CoursesFlexTable(RequestContext requestContext, MenuCategoryProxy menuCatProxy, Boolean isAdmin)
     {
         super();
         this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
         this.isAdmin = isAdmin;
-        
+
         createHeader();
         List<CourseProxy> courses = menuCatProxy.getCourses();
         if (null == courses)
@@ -36,13 +36,13 @@ public class CoursesFlexTable extends FlexTable
             courses = new LinkedList<CourseProxy>();
             menuCatProxy.setCourses(courses);
         }
-        
+
         for (CourseProxy cp : courses)
         {
             printCourseRow(cp);
         }
     }
-    
+
     private void createHeader()
     {
         this.setText(0, 0, "name");
@@ -51,7 +51,7 @@ public class CoursesFlexTable extends FlexTable
         addCourseButton.addClickHandler(new AddCourseHandler());
         this.setWidget(0, 2, addCourseButton);
     }
-    
+
     public void addCourse()
     {
         CourseProxy courseProxy = requestContext.create(CourseProxy.class);
@@ -65,29 +65,28 @@ public class CoursesFlexTable extends FlexTable
         courses.remove(row - 1);
         removeRow(row);
     }
-    
+
     public void printCourseRow(CourseProxy courseProxy)
     {
         int row = getRowCount();
-        
-        TextBox name = new TextBox();   
-        name.addKeyPressHandler(new CourseNameKeyPressHandler(name, courseProxy)); 
-        TextBox price = new TextBox();  
-        price.addKeyPressHandler(new CoursePriceKeyPressHandler(price, courseProxy));
-        Button delete = new Button("delete"); 
+
+        TextBox name = new TextBox();
+        name.addKeyUpHandler(new CourseNameKeyUpHandler(name, courseProxy));
+        TextBox price = new TextBox();
+        price.addKeyUpHandler(new CoursePriceKeyUpHandler(price, courseProxy));
+        Button delete = new Button("delete");
         delete.addClickHandler(new DeleteCourseClickHandler(row));
-        
-        
+
         name.setEnabled(isAdmin);
         price.setEnabled(isAdmin);
         delete.setEnabled(isAdmin);
-        
+
         setWidget(row, 0, name);
         setWidget(row, 1, price);
         setWidget(row, 2, delete);
-        
+
     }
-    
+
     class AddCourseHandler implements ClickHandler
     {
         @Override
@@ -96,56 +95,56 @@ public class CoursesFlexTable extends FlexTable
             addCourse();
         }
     }
-    
+
     class DeleteCourseClickHandler implements ClickHandler
     {
 
         private final int row;
-        
+
         public DeleteCourseClickHandler(int row)
         {
             this.row = row;
         }
-        
+
         @Override
         public void onClick(ClickEvent event)
         {
             deleteCourse(row);
         }
     }
-    
-    class CourseNameKeyPressHandler implements KeyPressHandler
+
+    class CourseNameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
         private final CourseProxy course;
-        
-        public CourseNameKeyPressHandler(TextBox titleBox, CourseProxy course)
+
+        public CourseNameKeyUpHandler(TextBox titleBox, CourseProxy course)
         {
             this.titleBox = titleBox;
             this.course = course;
         }
-        
+
         @Override
-        public void onKeyPress(KeyPressEvent event)
+        public void onKeyUp(KeyUpEvent event)
         {
             course.setName(titleBox.getText());
         }
-        
+
     }
-    
-    class CoursePriceKeyPressHandler implements KeyPressHandler
+
+    class CoursePriceKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
         private final CourseProxy course;
-        
-        public CoursePriceKeyPressHandler(TextBox titleBox, CourseProxy course)
+
+        public CoursePriceKeyUpHandler(TextBox titleBox, CourseProxy course)
         {
             this.titleBox = titleBox;
             this.course = course;
         }
-        
+
         @Override
-        public void onKeyPress(KeyPressEvent event)
+        public void onKeyUp(KeyUpEvent event)
         {
             Double price = 0.0;
             try
@@ -154,10 +153,10 @@ public class CoursesFlexTable extends FlexTable
             }
             catch (Exception e)
             {
-                //TODO log e
+                // TODO log e
             }
             course.setPrice(price);
         }
-        
+
     }
 }

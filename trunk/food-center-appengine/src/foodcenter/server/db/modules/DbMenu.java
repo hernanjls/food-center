@@ -6,8 +6,6 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import foodcenter.service.proxies.MenuCategoryProxy;
-
 @PersistenceCapable
 public class DbMenu extends DbObject
 {

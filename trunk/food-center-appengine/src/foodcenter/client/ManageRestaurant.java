@@ -18,7 +18,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.panels.MenuFlexTable;
+import foodcenter.client.panels.restaurant.MenuFlexTable;
+import foodcenter.client.panels.restaurant.ProfilePannel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.UserCommonServiceProxy;
@@ -46,7 +47,7 @@ public class ManageRestaurant implements EntryPoint
 	@Override
     public void onModuleLoad()
     {
-	    isAdmin = false;
+	    isAdmin = true;
 	    RestaurantProxy rest = null;
 	    
 	    //if new :
@@ -83,7 +84,7 @@ public class ManageRestaurant implements EntryPoint
         StackPanel stackPanel = new StackPanel();
         
         //profile pannel
-        Panel profilePanel = createProfilePannel(rest);
+        Panel profilePanel = new ProfilePannel(rest, isAdmin);
         Panel menuPanel = createMenuPannel(rest);
         Panel adminsPanel = createAdminPannel(rest);
         Panel waitersPanel = createWaitersPannel(rest);
@@ -149,72 +150,6 @@ public class ManageRestaurant implements EntryPoint
         VerticalPanel profile = new VerticalPanel();
         return profile;
     }
-
-    private void setNotNullText(ValueBoxBase<String> w, String s)
-    {
-        if (null != s)
-        {
-            w.setText(s);
-        }
-    }
-    
-    private Panel createProfilePannel(RestaurantProxy rest)
-	{
-        
-	    HorizontalPanel profile = new HorizontalPanel();
-	    Image image = RequestUtils.getImage(rest.getIconBytes()); //TODO get image bytes;
-	    if (null != image)
-	    {
-	        profile.add(image);
-	    }
-	    
-	    //create the information pannel
-	    VerticalPanel info = new VerticalPanel();
-	    
-	    //creates the name panel with restaurant name
-	    HorizontalPanel name = new HorizontalPanel();
-	    name.add(new Label("Name: "));
-	    TextBox nameBox = new TextBox();
-	    setNotNullText(nameBox, rest.getName());
-	    //TODO name KeyboardListenerAdapter
-
-        name.add(nameBox);
-	    info.add(name);
-	    
-	    //creates the phone panel with restaurant phone
-        HorizontalPanel phone = new HorizontalPanel();
-        phone.add(new Label("Phone: "));
-        TextBox phoneBox = new TextBox();
-        setNotNullText(phoneBox, rest.getPhone());
-        //TODO KeyboardListenerAdapter
-        
-        phone.add(phoneBox);
-        info.add(phone);
-       
-        
-        HorizontalPanel services = new HorizontalPanel();
-        
-        CheckBox deliveryCheckBox = new CheckBox("delivery");
-        //deliveryCheckBox.setValue(rest.getServices().contains(ServiceType.DELIVERY));
-        //TODO click handler
-        
-        CheckBox takeAwayCheckBox = new CheckBox("take away");
-        //takeAwayCheckBox.setValue(rest.getServices().contains(ServiceType.TAKE_AWAY));
-        //TODO click handler
-        
-        CheckBox tableCheckBox = new CheckBox("table");
-        //tableCheckBox.setValue(rest.getServices().contains(ServiceType.TABLE));
-        //TODO click handler
-        
-        services.add(deliveryCheckBox);
-        services.add(takeAwayCheckBox);
-        services.add(tableCheckBox);
-	    info.add(services);
-	    
-	    profile.add(info);
-	    
-	    return profile;
-	}
 	
 	private Panel createMenuPannel(RestaurantProxy rest)
     {
@@ -270,7 +205,7 @@ public class ManageRestaurant implements EntryPoint
 		@Override
         public void onSuccess(Boolean response)
         {
-			Window.alert("saved!!!");
+			Window.Location.replace("/food_center.jsp");
         }
 		
 		@Override
