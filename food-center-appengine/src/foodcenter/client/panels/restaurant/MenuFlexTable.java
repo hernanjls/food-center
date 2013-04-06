@@ -1,4 +1,4 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.restaurant;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,14 +32,22 @@ public class MenuFlexTable extends FlexTable
         this.menuProxy = menuProxy;
         this.isAdmin = isAdmin;
         
-        // print the header row of this table
+        redraw();
+    }
+    
+    public final void redraw()
+    {
+        // Clear all the rows of this table
+        removeAllRows();
+        
+        // Print the header row of this table
         printTableHeader();   
         
-        // print all the categories if exits
+        // Print all the categories if exits
         List<MenuCategoryProxy> cats = menuProxy.getCategories();
         if (null != cats)
         {
-        	for (MenuCategoryProxy mcp : cats)
+            for (MenuCategoryProxy mcp : cats)
             {
                 printCategoryTableRow(mcp);
             }
@@ -96,10 +104,6 @@ public class MenuFlexTable extends FlexTable
     	// delete it from the menu proxy
         List<MenuCategoryProxy> cats = menuProxy.getCategories();
         cats.remove(row - 1);
-        
-        // delete it from the table
-        removeRow(row);
-        //TODO change it to removeAllRows and reprint the table
     }
     
     /**
@@ -113,7 +117,7 @@ public class MenuFlexTable extends FlexTable
         int row = this.getRowCount();
         
         TextBox catTitle = new TextBox();
-        catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(catTitle, menuCatProxy));
+        catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(menuCatProxy));
         setWidget(row, 0, catTitle);
         
         Button deleteCatButton = new Button("delete");
@@ -159,6 +163,7 @@ public class MenuFlexTable extends FlexTable
         public void onClick(ClickEvent event)
         {
             deleteCategory(row);
+            redraw();
         }
     }
   
@@ -167,7 +172,6 @@ public class MenuFlexTable extends FlexTable
      */
     private class CategoryTitleKeyPressHandler implements KeyPressHandler
     {
-        private final TextBox titleBox;
         private final MenuCategoryProxy cat;
         
         /**
@@ -175,16 +179,16 @@ public class MenuFlexTable extends FlexTable
          * @param titleBox is the title box to get the text from.
          * @param cat is the category to set its title.
          */
-        public CategoryTitleKeyPressHandler(TextBox titleBox, MenuCategoryProxy cat)
+        public CategoryTitleKeyPressHandler(MenuCategoryProxy cat)
         {
-            this.titleBox = titleBox;
             this.cat = cat;
         }
         
         @Override
         public void onKeyPress(KeyPressEvent event)
         {
-            cat.setCategoryTitle(titleBox.getText());
+            String s = ((TextBox) event.getSource()).getText();
+            cat.setCategoryTitle(s);
         }
     }
 }
