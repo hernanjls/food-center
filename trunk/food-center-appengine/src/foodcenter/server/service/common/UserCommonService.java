@@ -66,18 +66,17 @@ public class UserCommonService
         return res;
     }
 
-    public static DbRestaurant getRestaurant(Long id)
+    public static DbRestaurant getRestaurant(String id)
     {
         return db.find(DbRestaurant.class, id);
     }
-
 
     public static Boolean saveRestaurant(DbRestaurant rest)
     {
         return (null != db.save(rest));
     }
 
-    public static Boolean deleteRestaurant(Long id)
+    public static Boolean deleteRestaurant(String id)
     {
         return 0 == Long.compare(0l, db.delete(DbRestaurant.class, id));
     }

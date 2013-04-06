@@ -1,13 +1,11 @@
 package foodcenter.client;
 
-import java.util.List;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -17,22 +15,28 @@ import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ValueBoxBase;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.client.panels.MenuFlexTable;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.enums.ServiceType;
+import foodcenter.service.UserCommonServiceProxy;
+import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class ManageRestaurant implements EntryPoint
 {
 	private static final String GWT_CONTINER = "gwtContainer";
-	private FoodCenterRequestFactory requestFactory = new RequestUtils().getRequestFactory();
+	private FoodCenterRequestFactory reqFactory = new RequestUtils().getRequestFactory();
+	private UserCommonServiceProxy userCommonService = reqFactory.getUserCommonService(); 
 	
 	/**************************************************************************
      * Data Objects
      **************************************************************************/
 //	private RestaurantProxy rest = null;
+	
+	private Boolean isAdmin; 
     
     /**************************************************************************
      * Panels                                                                   
@@ -42,11 +46,11 @@ public class ManageRestaurant implements EntryPoint
 	@Override
     public void onModuleLoad()
     {
-	    
+	    isAdmin = false;
 	    RestaurantProxy rest = null;
 	    
 	    //if new :
-	    rest = requestFactory.getUserCommonService().create(RestaurantProxy.class);
+	    rest = userCommonService.create(RestaurantProxy.class);
 	    //else edit:
 	    //TODO rest = edit rest ?
 	    
@@ -55,13 +59,19 @@ public class ManageRestaurant implements EntryPoint
 	
 	private void buildMainPanel(RestaurantProxy rest)
 	{
-	    Button saveButton = new Button("save");
+		HorizontalPanel hpanel = new HorizontalPanel();
+	    
+		Button saveButton = new Button("save");
         saveButton.addClickHandler(new SaveRestClickHandler(rest));
-        mainPanel.add(saveButton);
+        saveButton.setEnabled(isAdmin);
+        hpanel.add(saveButton);
         
         Button deleteButton = new Button("delete");
-        saveButton.addClickHandler(new DeleteRestClickHandler(rest));
-        mainPanel.add(saveButton);
+        deleteButton.addClickHandler(new DeleteRestClickHandler(rest));
+        deleteButton.setEnabled(isAdmin);
+        hpanel.add(deleteButton);
+        
+        mainPanel.add(hpanel);
         
         Panel stackPanel = createStackPanel(rest);
         mainPanel.add(stackPanel);
@@ -151,13 +161,6 @@ public class ManageRestaurant implements EntryPoint
     private Panel createProfilePannel(RestaurantProxy rest)
 	{
         
-//        MenuProxy menuProxy = rest.getMenu();
-//        if (null == menuProxy)
-//        {
-//            menuProxy = requestFactory.getUserCommonService().create(MenuProxy.class);
-//            rest.setMenu(menuProxy);
-//        }
-//        return new MenuFlexTable(requestFactory, menuProxy);
 	    HorizontalPanel profile = new HorizontalPanel();
 	    Image image = RequestUtils.getImage(rest.getIconBytes()); //TODO get image bytes;
 	    if (null != image)
@@ -173,6 +176,7 @@ public class ManageRestaurant implements EntryPoint
 	    name.add(new Label("Name: "));
 	    TextBox nameBox = new TextBox();
 	    setNotNullText(nameBox, rest.getName());
+	    //TODO name KeyboardListenerAdapter
 
         name.add(nameBox);
 	    info.add(name);
@@ -182,6 +186,8 @@ public class ManageRestaurant implements EntryPoint
         phone.add(new Label("Phone: "));
         TextBox phoneBox = new TextBox();
         setNotNullText(phoneBox, rest.getPhone());
+        //TODO KeyboardListenerAdapter
+        
         phone.add(phoneBox);
         info.add(phone);
        
@@ -207,55 +213,18 @@ public class ManageRestaurant implements EntryPoint
 	    
 	    profile.add(info);
 	    
-	    
-	    
 	    return profile;
 	}
 	
 	private Panel createMenuPannel(RestaurantProxy rest)
     {
-       //create the menu pannel
-	    //HorizontalPanel menuPannel = new HorizontalPanel();
-             
-        //creates the name panel with restaurant name
-        FlexTable menu = new FlexTable();
-        
-        menu.setText(0, 0, "categories");
-        Button addCatButton = new Button("Add Category");
-        addCatButton.addClickHandler(new AddCategoryClickHandler(menu));
-        //TODO add click handler
-        
-        menu.setWidget(0, 1, addCatButton);
-        
-        for (int j=1 ; j< 4; ++j)
-        {
-            FlexTable courses = new FlexTable();
-            courses.setText(0, 0, "name");
-            courses.setText(0, 1, "price");
-            Button addCourseButton = new Button();
-            addCourseButton.setText("Add Course");
-            courses.setWidget(0, 2, addCourseButton);
-            
-            for (int i=1; i< 4; ++i)
-            {
-                TextBox nameTB = new TextBox();
-                nameTB.setText("course" + i);
-                //TODO set handler
-                TextBox priceTB = new TextBox();
-                priceTB.setText("1000");
-                //TODO set handler
-                Button delete = new Button();
-                delete.setText("delete");
-                //TODO set handler
-                courses.setWidget(i, 0, nameTB);
-                courses.setWidget(i, 1, priceTB);
-                courses.setWidget(i, 2, delete);
-            }
-            menu.setText(j, 0, "category" + j);
-            menu.setWidget(j, 1, courses);
-        }
-        
-        return menu;
+		MenuProxy menuProxy = rest.getMenu();
+		if (null == menuProxy)
+		{
+			menuProxy = userCommonService.create(MenuProxy.class);
+			rest.setMenu(menuProxy);
+		}
+		return new MenuFlexTable(userCommonService, menuProxy, isAdmin);
     }
 	
 	
@@ -271,7 +240,9 @@ public class ManageRestaurant implements EntryPoint
         @Override
         public void onClick(ClickEvent event)
         {
-            requestFactory.getUserCommonService().saveRestaurant(this.rest);
+        	userCommonService
+        		.saveRestaurant(this.rest)
+        		.fire(new AddRestaurantReciever());
         }
     }
 	
@@ -287,82 +258,44 @@ public class ManageRestaurant implements EntryPoint
         @Override
         public void onClick(ClickEvent event)
         {
-            requestFactory.getUserCommonService().deleteRestaurant(this.rest.getId());
-        }
-    }
-
-	class AddCategoryClickHandler implements ClickHandler 
-    {
-	    private final FlexTable menu;
-	    
-	    public AddCategoryClickHandler(FlexTable menu)
-	    {
-	        this.menu = menu;
-	        
-	    }
-        @Override
-        public void onClick(ClickEvent event)
-        {
-            int row = menu.getRowCount();
-            TextBox categoryName = new TextBox();
-            FlexTable coursesTable = new FlexTable();
-            if (coursesTable.getRowCount()==0){
-                coursesTable.setText(0, 0, "name");
-                coursesTable.setText(0, 1, "price");
-                Button addCourseButton = new Button();
-                addCourseButton.setText("Add Course"); //TODO add click handler    
-            }
-//            addCourseButton.addClickHandler(new AddCourseClickHandler(coursesTable));
-//            coursesTable.setWidget(0, 2, addCourseButton);
-
-            menu.setWidget(row, 0, categoryName);
-            menu.setWidget(row, 1, coursesTable);
-            
+        	userCommonService
+            	.deleteRestaurant(this.rest.getId())
+            	.fire(new DeleteRestaurantReciever());
         }
     }
 	
-	class AddCourseClickHandler implements ClickHandler 
-    {
-        private final FlexTable coursesTable;
-        
-        public AddCourseClickHandler(FlexTable coursesTable)
+	class AddRestaurantReciever extends Receiver<Boolean>
+	{
+
+		@Override
+        public void onSuccess(Boolean response)
         {
-            this.coursesTable = coursesTable;
-            
+			Window.alert("saved!!!");
         }
-        @Override
-        public void onClick(ClickEvent event)
+		
+		@Override
+		public void onFailure(ServerFailure error)
+		{
+		    Window.alert("exception: " + error.getMessage());
+		}
+		
+	}
+
+	class DeleteRestaurantReciever extends Receiver<Boolean>
+	{
+
+		@Override
+        public void onSuccess(Boolean response)
         {
-            int row = coursesTable.getRowCount();
-            TextBox categoryName = new TextBox();
-            
-            FlexTable categoryTable = new FlexTable();
-            categoryTable.setText(0, 0, "name");
-            categoryTable.setText(0, 1, "price");
-            Button addCourseButton = new Button();
-            addCourseButton.setText("Add Course"); //TODO add click handler
-//            addCourseButton.addClickHandler(handler);
-            categoryTable.setWidget(0, 2, addCourseButton);
-//            
-//            for (int i=1; i< 4; ++i)
-//            {
-//                TextBox nameTB = new TextBox();
-//                nameTB.setText("course" + i);
-//                //TODO set handler
-//                TextBox priceTB = new TextBox();
-//                priceTB.setText("1000");
-//                //TODO set handler
-//                Button delete = new Button();
-//                delete.setText("delete");
-//                //TODO set handler
-//                categoryTable.setWidget(i, 0, nameTB);
-//                categoryTable.setWidget(i, 1, priceTB);
-//                categoryTable.setWidget(i, 2, delete);
-//            }
-//            
-            coursesTable.setWidget(row, 0, categoryName);
-            coursesTable.setWidget(row, 1, categoryTable);
-            
+			Window.alert("deleted!!!");
         }
-    }
+		
+		@Override
+		public void onFailure(ServerFailure error)
+		{
+		    Window.alert("exception: " + error.getMessage());
+		}
+		
+	}
+
 }

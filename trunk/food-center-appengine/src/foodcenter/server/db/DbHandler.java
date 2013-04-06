@@ -19,7 +19,7 @@ public interface DbHandler
      * @param name is the restaurant name
      * @return the restaurant id
      */
-    public Long createRestaurant(String name);
+    public String createRestaurant(String name);
     
     
     
@@ -44,9 +44,9 @@ public interface DbHandler
 
     public List<String> getGcmRegistered();
 
-    public <T extends DbObject> T find(Class<T> clazz, Long id);
+    public <T extends DbObject> T find(Class<T> clazz, String id);
     
-    public <T extends DbObject> Long delete(Class<T> clazz, Long id);
+    public <T extends DbObject> Long delete(Class<T> clazz, String id);
     
     public <T extends DbObject> T save(T object);
     

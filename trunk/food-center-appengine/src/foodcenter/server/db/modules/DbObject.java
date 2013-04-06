@@ -2,6 +2,7 @@ package foodcenter.server.db.modules;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -22,7 +23,8 @@ public abstract class DbObject implements StoreCallback, Serializable
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Long id;
+    @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
+    private String id;
     
     @Persistent()
     private Integer version = 0;
@@ -41,7 +43,7 @@ public abstract class DbObject implements StoreCallback, Serializable
         this.version++;
     };
     
-    public final Long getId()
+    public final String getId()
     {
         return id;
     }

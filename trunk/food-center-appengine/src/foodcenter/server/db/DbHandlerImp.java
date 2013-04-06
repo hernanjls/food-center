@@ -41,7 +41,7 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends DbObject> Long delete(Class<T> clazz, Long id)
+    public <T extends DbObject> Long delete(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         
@@ -65,7 +65,7 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends DbObject> T find(Class<T> clazz, Long id)
+    public <T extends DbObject> T find(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
@@ -115,7 +115,8 @@ public class DbHandlerImp implements DbHandler
         }
     }
 
-    public Long createRestaurant(String name)
+    @Override
+    public String createRestaurant(String name)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
