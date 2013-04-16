@@ -7,7 +7,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 @PersistenceCapable
-public class DbMenu extends DbObject
+public class DbMenu extends AbstractDbObject
 {
     /**
 	 * 
@@ -31,6 +31,5 @@ public class DbMenu extends DbObject
     {
         this.categories = categories;
     }
-
 
 }
