@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable
-public class DbRestaurant extends DbObject
+public class DbRestaurant extends AbstractDbObject
 {
     /**
      * 

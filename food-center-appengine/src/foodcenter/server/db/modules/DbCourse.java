@@ -5,7 +5,7 @@ import javax.jdo.annotations.Persistent;
 
 
 @PersistenceCapable
-public class DbCourse extends DbObject
+public class DbCourse extends AbstractDbObject
 {
     /**
 	 * 

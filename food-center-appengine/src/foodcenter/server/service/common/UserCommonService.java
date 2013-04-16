@@ -1,23 +1,17 @@
 package foodcenter.server.service.common;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.labs.repackaged.com.google.common.primitives.Bytes;
 
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
 import foodcenter.server.db.modules.DbRestaurant;
-import foodcenter.service.enums.ServiceType;
 
 public class UserCommonService
 {

@@ -5,7 +5,7 @@ import javax.jdo.annotations.Persistent;
 
 
 @PersistenceCapable
-public class DbMsg extends DbObject
+public class DbMsg extends AbstractDbObject
 {	    
     
     /**

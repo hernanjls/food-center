@@ -13,7 +13,7 @@ import javax.jdo.listener.StoreCallback;
 
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
-public abstract class DbObject implements StoreCallback, Serializable
+public abstract class AbstractDbObject implements StoreCallback, Serializable
 {
     
     /**
@@ -29,7 +29,7 @@ public abstract class DbObject implements StoreCallback, Serializable
     @Persistent()
     private Integer version = 0;
     
-    public DbObject()
+    public AbstractDbObject()
     {
         // empty ctor
     }
@@ -52,5 +52,5 @@ public abstract class DbObject implements StoreCallback, Serializable
     {  
         return version;  
     }
-
+    
 }

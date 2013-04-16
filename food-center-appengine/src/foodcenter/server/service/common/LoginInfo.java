@@ -3,10 +3,10 @@ package foodcenter.server.service.common;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import foodcenter.server.db.modules.DbObject;
+import foodcenter.server.db.modules.AbstractDbObject;
 
 @PersistenceCapable
-public class LoginInfo extends DbObject
+public class LoginInfo extends AbstractDbObject
 {
 
 	/**

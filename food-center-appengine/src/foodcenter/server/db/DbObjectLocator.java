@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
 
-import foodcenter.server.db.modules.DbObject;
+import foodcenter.server.db.modules.AbstractDbObject;
 
-public class DbObjectLocator extends Locator<DbObject, String>
+public class DbObjectLocator extends Locator<AbstractDbObject, String>
 {
     private DbHandler db;
     private Logger logger;
@@ -19,7 +19,7 @@ public class DbObjectLocator extends Locator<DbObject, String>
     }
 
     @Override
-    public DbObject create(Class<? extends DbObject> clazz)
+    public AbstractDbObject create(Class<? extends AbstractDbObject> clazz)
     {
         try
         {
@@ -33,19 +33,19 @@ public class DbObjectLocator extends Locator<DbObject, String>
     }
 
     @Override
-    public DbObject find(Class<? extends DbObject> clazz, String id)
+    public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
     {
         return db.find(clazz, id);
     }
 
     @Override
-    public Class<DbObject> getDomainType()
+    public Class<AbstractDbObject> getDomainType()
     {
         return null;
     }
 
     @Override
-    public String getId(DbObject domainObject)
+    public String getId(AbstractDbObject domainObject)
     {
         return domainObject.getId();
     }
@@ -57,7 +57,7 @@ public class DbObjectLocator extends Locator<DbObject, String>
     }
 
     @Override
-    public Object getVersion(DbObject domainObject)
+    public Object getVersion(AbstractDbObject domainObject)
     {
         return domainObject.getVersion();
     }

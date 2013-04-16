@@ -4,7 +4,7 @@ import javax.jdo.annotations.PersistenceCapable;
 
 
 @PersistenceCapable
-public class DbCompanyBranch extends DbObject
+public class DbCompanyBranch extends AbstractDbObject
 {
     /**
 	 * 

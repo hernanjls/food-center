@@ -32,6 +32,11 @@ public class MenuFlexTable extends FlexTable
         this.menuProxy = menuProxy;
         this.isAdmin = isAdmin;
         
+        if (null == this.menuProxy.getCategories())
+        {
+            this.menuProxy.setCategories(new LinkedList<MenuCategoryProxy>());
+        }
+        
         redraw();
     }
     
@@ -45,12 +50,9 @@ public class MenuFlexTable extends FlexTable
         
         // Print all the categories if exits
         List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        if (null != cats)
+        for (MenuCategoryProxy mcp : cats)
         {
-            for (MenuCategoryProxy mcp : cats)
-            {
-                printCategoryTableRow(mcp);
-            }
+            printCategoryTableRow(mcp);
         }
     }
     
@@ -79,11 +81,6 @@ public class MenuFlexTable extends FlexTable
     private void addCategory()
     {
     	List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        if (null == cats)
-        {
-        	cats = new LinkedList<MenuCategoryProxy>();
-        	menuProxy.setCategories(cats);
-        }
         
         // create a blank category
         MenuCategoryProxy menuCatProxy = requestContext.create(MenuCategoryProxy.class);
@@ -175,8 +172,6 @@ public class MenuFlexTable extends FlexTable
         private final MenuCategoryProxy cat;
         
         /**
-         * 
-         * @param titleBox is the title box to get the text from.
          * @param cat is the category to set its title.
          */
         public CategoryTitleKeyPressHandler(MenuCategoryProxy cat)

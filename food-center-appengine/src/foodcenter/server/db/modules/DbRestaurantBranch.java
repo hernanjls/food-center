@@ -8,12 +8,15 @@ import javax.jdo.annotations.Persistent;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable
-public class DbRestaurantBranch extends DbObject
+public class DbRestaurantBranch extends AbstractDbGeoObject
 {
     /**
      * 
      */
     private static final long serialVersionUID = 2314058106724557278L;
+    
+    @Persistent
+    private String name;
     
     @Persistent
     private DbRestaurant restaurant;
@@ -35,14 +38,122 @@ public class DbRestaurantBranch extends DbObject
     
     @Persistent
     private DbMenu menu;
-    
-    @Persistent
-    private DbLocation location;
-    
+        
     @Persistent
     private List<ServiceType> services;
     
     @Persistent
     private String phone;
+    
+    public DbRestaurantBranch()
+    {
+        //empty ctor
+        super();
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public DbRestaurant getRestaurant()
+    {
+        return restaurant;
+    }
+
+    public void setRestaurant(DbRestaurant restaurant)
+    {
+        this.restaurant = restaurant;
+    }
+
+    public List<DbUser> getAdmins()
+    {
+        return admins;
+    }
+
+    public void setAdmins(List<DbUser> admins)
+    {
+        this.admins = admins;
+    }
+
+    public List<DbUser> getWaiters()
+    {
+        return waiters;
+    }
+
+    public void setWaiters(List<DbUser> waiters)
+    {
+        this.waiters = waiters;
+    }
+
+    public List<DbUser> getChefs()
+    {
+        return chefs;
+    }
+
+    public void setChefs(List<DbUser> chefs)
+    {
+        this.chefs = chefs;
+    }
+
+    public List<DbTable> getTables()
+    {
+        return tables;
+    }
+
+    public void setTables(List<DbTable> tables)
+    {
+        this.tables = tables;
+    }
+
+    public List<DbCart> getOrders()
+    {
+        return orders;
+    }
+
+    public void setOrders(List<DbCart> orders)
+    {
+        this.orders = orders;
+    }
+
+    public DbMenu getMenu()
+    {
+        return menu;
+    }
+
+    public void setMenu(DbMenu menu)
+    {
+        this.menu = menu;
+    }
+
+    public List<ServiceType> getServices()
+    {
+        return services;
+    }
+
+    public void setServices(List<ServiceType> services)
+    {
+        this.services = services;
+    }
+
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
+    }
+
+    public static long getSerialversionuid()
+    {
+        return serialVersionUID;
+    }
     
 }

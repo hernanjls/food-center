@@ -11,8 +11,13 @@ import javax.jdo.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.GeocellQuery;
+import com.beoui.geocell.model.Point;
+
+import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.server.db.modules.DbMsg;
-import foodcenter.server.db.modules.DbObject;
+import foodcenter.server.db.modules.AbstractDbObject;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUserGcm;
 
@@ -22,7 +27,7 @@ public class DbHandlerImp implements DbHandler
 
     
     @Override
-    public <T extends DbObject> T save(T object)
+    public <T extends AbstractDbObject> T save(T object)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
@@ -41,11 +46,9 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends DbObject> Long delete(Class<T> clazz, String id)
+    public <T extends AbstractDbObject> Long delete(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        
-        
         try
         {
             Query q = pm.newQuery(clazz);
@@ -65,7 +68,7 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends DbObject> T find(Class<T> clazz, String id)
+    public <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
@@ -88,7 +91,7 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends DbObject> List<T> findN(Class<T> clazz, Integer n)
+    public <T extends AbstractDbObject> List<T> findN(Class<T> clazz, Integer n)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
@@ -100,6 +103,29 @@ public class DbHandlerImp implements DbHandler
             List<T> res = (List<T>) q.execute();
 
             return res;
+        }
+        catch (Exception e)
+        {
+            logger.error("unexpected exeption", e);
+            return null;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
+    
+    
+    @Override
+    public <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz, Integer maxResults, Double centerLat, Double centerLng, Double radiusMeters)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        try
+        {
+            Point center = new Point(centerLat, centerLng);
+            GeocellQuery baseQuery = new GeocellQuery();
+            return GeocellManager.proximitySearch(center, maxResults, radiusMeters, clazz, baseQuery, pm);
+            
         }
         catch (Exception e)
         {

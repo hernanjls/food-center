@@ -22,6 +22,7 @@ public interface RestaurantProxy extends EntityProxy
 	public List<ServiceType> getServices();
 	public void setServices(List<ServiceType> services);
 	public List<RestaurantBranchProxy> getBranches();
+	public void setBranches(List<RestaurantBranchProxy> branches);
 	public List<UserProxy> getAdmins();
 	
 }

@@ -7,7 +7,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 @PersistenceCapable
-public class DbMenuCategory extends DbObject
+public class DbMenuCategory extends AbstractDbObject
 {
     /**
 	 * 
@@ -44,6 +44,13 @@ public class DbMenuCategory extends DbObject
     public void setCourses(List<DbCourse> courses)
     {
         this.courses = courses;
+    }
+
+    @Override
+    public AbstractDbObject clone() throws CloneNotSupportedException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
