@@ -86,6 +86,32 @@ public class DbHandlerImp implements DbHandler
         }
         return null;
     }
+    
+    @Override
+    public <T extends DbObject> List<T> findN(Class<T> clazz, Integer n)
+    {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+        try
+        {
+            Query q = pm.newQuery(clazz);
+            q.setRange(0, n); // limit query for the 1st result
+
+            @SuppressWarnings("unchecked")
+            List<T> res = (List<T>) q.execute();
+
+            return res;
+        }
+        catch (Exception e)
+        {
+            logger.error("unexpected exeption", e);
+            return null;
+        }
+        finally
+        {
+            pm.close();
+        }
+    }
+    
     @Override
     public DbRestaurant searchRestaurantByName(String name)
     {
