@@ -45,25 +45,7 @@ public class UserCommonService
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
-        List<DbRestaurant> res = new LinkedList<DbRestaurant>();
-        DbRestaurant a = new DbRestaurant("My Mock Restaurant long name");
-        a.setServices(Arrays.asList(ServiceType.values()));
-        try
-        {
-            byte[] bytes = FileUtils.readFileToByteArray(new File("images/pizza-delivery.png"));
-            List<Byte> list = Bytes.asList(bytes);
-            a.setIconBytes(list);
-        }
-        catch (Throwable e)
-        {
-            logger.error(e.getMessage(), e);
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        res.add(a);
-        res.add(a);
-        return res;
+        return db.findN(DbRestaurant.class, 10);
     }
 
     public static DbRestaurant getRestaurant(String id)
