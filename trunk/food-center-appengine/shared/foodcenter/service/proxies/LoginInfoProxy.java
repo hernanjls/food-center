@@ -8,6 +8,7 @@ public interface LoginInfoProxy extends EntityProxy
 {
 	public String getNickName();
 	public String getEmail();
+	public void setEmail(String email);
 	public String getUserId();
 	public Boolean isAdmin();
 	public String getLogoutUrl();

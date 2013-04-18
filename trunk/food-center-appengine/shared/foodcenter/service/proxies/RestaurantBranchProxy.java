@@ -52,12 +52,16 @@ public interface RestaurantBranchProxy extends GeoLocationProxy, EntityProxy
 
     public void setPhone(String phone);
         
+    @Override
     public Double getLat();
     
+    @Override
     public Double getLng();
     
+    @Override
     public List<Double> getGeoLocation();
     
+    @Override
     public void setGeoLocation(List<Double> latLng);
     
     
