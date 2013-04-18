@@ -62,6 +62,7 @@ public class AdminPannel  extends HorizontalPanel
         addAdminButton.addClickHandler(new AddAdminHandler());
         this.setCellHorizontalAlignment(addAdminButton, ALIGN_RIGHT);
         res.add(createNamePanel());
+        res.add(addAdminButton);
     }
 
     public void addAdmin()
