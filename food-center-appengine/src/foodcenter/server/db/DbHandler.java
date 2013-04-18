@@ -56,9 +56,9 @@ public interface DbHandler
     public <T extends AbstractDbObject> T find(Class<T> clazz, String id);
     
     /**
-     * fetch from the DB the 1st n objects.
+     * Search the DB the fpr up to maxResults objects.
      * @param clazz is the class type to search for.
-     * @param maxResults is the limit.
+     * @param maxResults is the maximum results to retrieve.
      * @return a list of up to maxResults objects from the DB, null on error.
      * 
      * @see {@link AbstractDbObject}
