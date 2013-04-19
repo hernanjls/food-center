@@ -1,4 +1,4 @@
-package foodcenter.server.service.admin;
+package foodcenter.server.service;
 
 import java.util.List;
 import java.util.logging.Level;

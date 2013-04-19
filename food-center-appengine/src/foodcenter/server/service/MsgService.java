@@ -1,4 +1,4 @@
-package foodcenter.server.service.msg;
+package foodcenter.server.service;
 
 import java.util.List;
 

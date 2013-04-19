@@ -6,15 +6,17 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
-import foodcenter.service.proxies.LoginInfoProxy;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.proxies.UserProxy;
 
 
-@ServiceName(value="foodcenter.server.service.common.UserCommonService")
+@ServiceName(value="foodcenter.server.service.UserCommonService")
 public interface UserCommonServiceProxy extends RequestContext
 {
 	
-	public Request<LoginInfoProxy> getLoginInfo();
+    public Request<UserProxy> getDbUser(String email);
+    
+	public Request<UserProxy> getLoginInfo();
 	
 	public Request<List<RestaurantProxy>> getDefaultRestaurants();
 	

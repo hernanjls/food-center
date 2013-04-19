@@ -56,6 +56,34 @@ public interface DbHandler
     public <T extends AbstractDbObject> T find(Class<T> clazz, String id);
     
     /**
+     * @param clazz          - is the class to fetch from the DB.
+     * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
+     *                         Ex: "lastName == lastNameParam"
+     * @param declaredParams - Declare the list of parameters query execution. <br>
+     *                         The parameter declaration is a String containing <br>
+     *                         one or more query parameter declarations separated with commas. <br>
+     *                         Ex: "String value, Int x"
+     * @param values
+     * @param maxResults     - max results to get
+     * @return list of objects, or null on failure
+     */
+    public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults);
+    
+    /**
+     * @param clazz          - is the class to fetch from the DB.
+     * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
+     *                         Ex: "lastName == lastNameParam"
+     * @param declaredParams - Declare the list of parameters query execution. <br>
+     *                         The parameter declaration is a String containing <br>
+     *                         one or more query parameter declarations separated with commas. <br>
+     *                         Ex: "String value, Int x"
+     * @param values
+     * @param maxResults     - max results to get
+     * @return list of objects, or null on failure
+     */
+    public <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values);
+    
+    /**
      * Search the DB the fpr up to maxResults objects.
      * @param clazz is the class type to search for.
      * @param maxResults is the maximum results to retrieve.
@@ -63,7 +91,7 @@ public interface DbHandler
      * 
      * @see {@link AbstractDbObject}
      */
-    public <T extends AbstractDbObject> List<T> findN(Class<T> clazz, Integer maxResults);
+    public <T extends AbstractDbObject> List<T> find(Class<T> clazz, int maxResults);
     
     /**
      * 

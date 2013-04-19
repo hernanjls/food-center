@@ -21,7 +21,7 @@ import foodcenter.client.handlers.RemoveMsgHandler;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
-import foodcenter.service.proxies.LoginInfoProxy;
+import foodcenter.service.proxies.UserProxy;
 import foodcenter.service.proxies.MsgProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
@@ -347,7 +347,7 @@ public class FoodCenterImp implements EntryPoint, FoodCenter, RestaurantListShow
 
 }
 
-class LoginInfoReciever extends Receiver<LoginInfoProxy>
+class LoginInfoReciever extends Receiver<UserProxy>
 {
 
 	private final FoodCenter module;
@@ -358,7 +358,7 @@ class LoginInfoReciever extends Receiver<LoginInfoProxy>
 	}
 
 	@Override
-	public void onSuccess(LoginInfoProxy response)
+	public void onSuccess(UserProxy response)
 	{
 		StringBuilder builder = new StringBuilder();
 		builder.append("hellow ");

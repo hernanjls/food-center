@@ -1,4 +1,4 @@
-package foodcenter.server.service.gcm;
+package foodcenter.server.service;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
