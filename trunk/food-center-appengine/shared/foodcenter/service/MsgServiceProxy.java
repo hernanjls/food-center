@@ -8,7 +8,7 @@ import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 import foodcenter.service.proxies.MsgProxy;
 
-@ServiceName(value="foodcenter.server.service.msg.MsgService")
+@ServiceName(value="foodcenter.server.service.MsgService")
 public interface MsgServiceProxy extends RequestContext
 {
 

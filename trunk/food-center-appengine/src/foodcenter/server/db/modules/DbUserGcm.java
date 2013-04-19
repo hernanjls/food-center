@@ -5,6 +5,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * @deprecated use {@link DbUser} instead
+ */
 @Entity
 public class DbUserGcm
 {

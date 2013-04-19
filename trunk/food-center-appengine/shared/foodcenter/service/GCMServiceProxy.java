@@ -4,7 +4,7 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
-@ServiceName("foodcenter.server.service.gcm.GCMService")
+@ServiceName("foodcenter.server.service.GCMService")
 public interface GCMServiceProxy extends RequestContext
 {
 

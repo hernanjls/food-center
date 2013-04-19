@@ -1,4 +1,4 @@
-package foodcenter.server.service.common;
+package foodcenter.server.service;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import com.google.appengine.api.utils.SystemProperty;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
 import foodcenter.server.db.modules.DbRestaurant;
+import foodcenter.server.db.modules.DbUser;
 
 public class UserCommonService
 {
@@ -21,9 +22,15 @@ public class UserCommonService
     private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
     private static DbHandler db = new DbHandlerImp();
 
-    public static LoginInfo getLoginInfo()
+    public static DbUser getDbUser(String email)
     {
-        LoginInfo res = new LoginInfo();
+        logger.info("getDbUser is called");
+        return db.find(DbUser.class, "email == emailP", "String emailP", new Object[]{email});
+    }
+    
+    public static DbUser getLoginInfo()
+    {
+        DbUser res = new DbUser();
 
         res.setAdmin(userService.isUserAdmin());
         res.setEmail(userService.getCurrentUser().getEmail());
@@ -39,7 +46,7 @@ public class UserCommonService
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
-        return db.findN(DbRestaurant.class, 10);
+        return db.find(DbRestaurant.class, 10);
     }
 
     public static DbRestaurant getRestaurant(String id)

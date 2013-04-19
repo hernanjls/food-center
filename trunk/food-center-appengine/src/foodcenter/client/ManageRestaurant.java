@@ -1,5 +1,8 @@
 package foodcenter.client;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,17 +19,18 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import foodcenter.client.panels.restaurant.BranchesFlexTable;
 import foodcenter.client.panels.restaurant.MenuFlexTable;
 import foodcenter.client.panels.restaurant.ProfilePannel;
+import foodcenter.client.panels.restaurant.UsersPannel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.proxies.UserProxy;
 
 public class ManageRestaurant implements EntryPoint
 {
 	private static final String GWT_CONTINER = "gwtContainer";
-	private FoodCenterRequestFactory reqFactory = new RequestUtils().getRequestFactory();
-	private UserCommonServiceProxy userCommonService = reqFactory.getUserCommonService(); 
+	private UserCommonServiceProxy userCommonService = RequestUtils.getRequestFactory().getUserCommonService(); 
 	
 	/**************************************************************************
      * Data Objects
@@ -83,17 +87,13 @@ public class ManageRestaurant implements EntryPoint
         Panel profilePanel = new ProfilePannel(rest, isAdmin);
         Panel menuPanel = createMenuPannel(rest);
         Panel adminsPanel = createAdminPannel(rest);
-        Panel waitersPanel = createWaitersPannel(rest);
-        Panel chefsPanel = createChefsPannel(rest);
-        Panel branchesPanel = createBranchesPannel(rest);
+        Panel branchesPanel = new BranchesFlexTable(userCommonService, rest, isAdmin);
         
         
         // TODO fix order
         stackPanel.add(profilePanel, "Profile");
         stackPanel.add(menuPanel, "Menu");
         stackPanel.add(adminsPanel, "Admins");
-        stackPanel.add(waitersPanel, "Waiters");
-        stackPanel.add(chefsPanel, "Chefs");
         stackPanel.add(branchesPanel, "Braches");
 
 //      requestFactory.getUserCommonService().getRestaurant(0L); //TODO get id from somewhere
@@ -101,32 +101,17 @@ public class ManageRestaurant implements EntryPoint
         return stackPanel;
 
 	}
-	private Panel createWaitersPannel(RestaurantProxy rest)
-    {
-        // TODO Auto-generated method stub
-	    VerticalPanel panel = new VerticalPanel();
-        return panel;
-    }
-
-    private Panel createChefsPannel(RestaurantProxy rest)
-    {
-        // TODO Auto-generated method stub
-        VerticalPanel panel = new VerticalPanel();
-        return panel;
-    }
-
-    private Panel createBranchesPannel(RestaurantProxy rest)
-    {
-        return new BranchesFlexTable(userCommonService, rest, isAdmin);
-//        return new VerticalPanel();
-    }
-
-
+ 
     private Panel createAdminPannel(RestaurantProxy rest)
     {
-        // TODO Auto-generated method stub
-        VerticalPanel profile = new VerticalPanel();
-        return profile;
+        List<UserProxy> admins = rest.getAdmins(); 
+        if (null == admins)
+        {
+            admins = new LinkedList<UserProxy>();
+            rest.setAdmins(admins);
+        }
+        return new UsersPannel(admins, isAdmin);
+        
     }
 	
 	private Panel createMenuPannel(RestaurantProxy rest)

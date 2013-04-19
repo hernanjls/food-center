@@ -40,7 +40,7 @@ public class MenuFlexTable extends FlexTable
         redraw();
     }
     
-    public final void redraw()
+    public void redraw()
     {
         // Clear all the rows of this table
         removeAllRows();

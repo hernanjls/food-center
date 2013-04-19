@@ -11,9 +11,9 @@ import foodcenter.service.FoodCenterRequestFactory;
 
 public class RequestUtils
 {
-    private FoodCenterRequestFactory requestFactory = null;
+    private static FoodCenterRequestFactory requestFactory = null;
     
-    public FoodCenterRequestFactory getRequestFactory()
+    public static FoodCenterRequestFactory getRequestFactory()
     {
         if (null == requestFactory)
         {

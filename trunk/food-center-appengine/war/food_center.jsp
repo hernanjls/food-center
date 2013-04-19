@@ -2,8 +2,8 @@
 
 <%@page import="org.slf4j.Logger" %>
 <%@page import="org.slf4j.LoggerFactory" %>
-<%@page import="foodcenter.server.service.common.UserCommonService" %>
-<%@page import="foodcenter.server.service.common.LoginInfo" %>
+<%@page import="foodcenter.server.service.UserCommonService" %>
+<%@page import="foodcenter.server.db.modules.DbUser" %>
 
 <!doctype html>
 <!-- The DOCTYPE declaration above will set the     -->
@@ -41,14 +41,14 @@
   <body>
     <%
         Logger logger = LoggerFactory.getLogger(getClass());
-        LoginInfo info = UserCommonService.getLoginInfo();    
-        String nickName = info.getNickName();
-        String userId = info.getUserId();
-        String role = info.isAdmin() ? "Admin" : "User";        
-        String email = info.getEmail();        
-        String logoutUrl = info.getLogoutUrl();
+            DbUser info = UserCommonService.getLoginInfo();    
+            String nickName = info.getNickName();
+            String userId = info.getUserId();
+            String role = info.isAdmin() ? "Admin" : "User";        
+            String email = info.getEmail();        
+            String logoutUrl = info.getLogoutUrl();
 
-        logger.debug("loggged in: " + email);
+            logger.debug("loggged in: " + email);
     %>
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">

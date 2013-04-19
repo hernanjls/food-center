@@ -91,28 +91,64 @@ public class DbHandlerImp implements DbHandler
     }
     
     @Override
-    public <T extends AbstractDbObject> List<T> findN(Class<T> clazz, Integer maxResults)
+    public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
         {
             Query q = pm.newQuery(clazz);
-            q.setRange(0, maxResults); // limit query for the 1st result
-
+            if (null != baseQuery)
+            {
+                q.setFilter(baseQuery);
+            }
+            if (null != declaredParams && null != values)
+            {
+                q.declareParameters(declaredParams);
+            }
+            if (null != maxResults)
+            {
+                q.setRange(0, maxResults); // limit query for the 1st result
+            }
+            
+            if (null != values)
+            {
+                @SuppressWarnings("unchecked")
+                List<T> res = (List<T>) q.executeWithArray(values);
+                return res;
+            }
+            
             @SuppressWarnings("unchecked")
             List<T> res = (List<T>) q.execute();
-
             return res;
+            
+        }
+        catch (JDOObjectNotFoundException e)
+        {
+            logger.info(e.getMessage());
         }
         catch (Exception e)
         {
-            logger.error("unexpected exeption", e);
-            return null;
+            logger.error(e.getMessage(), e);
         }
         finally
         {
             pm.close();
         }
+        return null;
+    }
+    
+    @Override
+    public <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values)
+    {
+        List<T> res = find(clazz, baseQuery, declaredParams, values, 1);
+        return res.isEmpty() ? null : res.get(1);
+    }
+    
+    
+    @Override
+    public <T extends AbstractDbObject> List<T> find(Class<T> clazz, int maxResults)
+    {
+        return find(clazz, null, null, null, maxResults);
     }
     
     
@@ -141,30 +177,7 @@ public class DbHandlerImp implements DbHandler
     @Override
     public DbRestaurant searchRestaurantByName(String name)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
-        try
-        {
-
-            Query q = pm.newQuery(DbRestaurant.class);
-            q.setFilter("name == value"); // where DbRestaurant.name = 'value'
-            q.declareParameters("String value");
-            q.setRange(0, 1); // limit query for the 1st result
-
-            @SuppressWarnings("unchecked")
-            List<DbRestaurant> res = (List<DbRestaurant>) q.execute(name); // with name as value
-
-            return res.isEmpty() ? null : res.get(0);
-
-        }
-        catch (Exception e)
-        {
-            logger.error("unexpected exeption", e);
-            return null;
-        }
-        finally
-        {
-            pm.close();
-        }
+        return find(DbRestaurant.class, "name == value", "String value", new Object[]{name});        
     }
 
     @Override
