@@ -37,11 +37,11 @@ public class UserCommonService
         DbUser res = new DbUser();
         if(isNewUser(res))
         {
-        	logger.info("User already exsists");
         	return res;
         }
         else 
         {
+        	logger.info("User already exsists");
         	return res;
         }
         
@@ -57,19 +57,15 @@ public class UserCommonService
 //        return res;
     }
 
-    public static boolean findUserByEmail(String email)
+    public static boolean isNewEmail(String email)
     {
-    	return  (null != db.find(DbUser.class, email));
+    	return  (null == db.find(DbUser.class, email));
     	
     }
     public static boolean isNewUser(DbUser user)
     {
     	
-    	if(findUserByEmail(user.getEmail()))
-    	{
-    		return false;
-    	}
-    	else
+    	if(isNewEmail(user.getEmail()))
     	{
     		 
     	        user.setAdmin(userService.isUserAdmin());
@@ -83,6 +79,10 @@ public class UserCommonService
     	        db.save(user);
     	        return true;
 
+    	}
+    	else
+    	{
+    		return false;
     	}
     }
     public static List<DbRestaurant> getDefaultRestaurants()

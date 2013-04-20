@@ -7,8 +7,6 @@ import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.persistence.Transient;
-
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.annotations.Geocells;
 import com.beoui.geocell.annotations.Latitude;

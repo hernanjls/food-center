@@ -258,6 +258,7 @@ public class DbHandlerImp implements DbHandler
         }
     }
 
+    @Override
     public void gcmRegister(String email, String regId)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();

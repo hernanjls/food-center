@@ -8,6 +8,7 @@ import javax.persistence.Id;
 /**
  * @deprecated use {@link DbUser} instead
  */
+@Deprecated
 @Entity
 public class DbUserGcm
 {

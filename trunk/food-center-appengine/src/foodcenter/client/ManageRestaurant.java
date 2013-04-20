@@ -21,7 +21,6 @@ import foodcenter.client.panels.restaurant.MenuFlexTable;
 import foodcenter.client.panels.restaurant.ProfilePannel;
 import foodcenter.client.panels.restaurant.UsersPannel;
 import foodcenter.client.service.RequestUtils;
-import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantProxy;

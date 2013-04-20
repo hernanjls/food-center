@@ -60,7 +60,7 @@ public class AddMsgHandler implements KeyPressHandler, ClickHandler
 		foodCenter.getMsgTextBox().setText("");
 
 		// add the msg to the db, and to the table on service success.
-		reqUtils.getRequestFactory().msgService().createMsg(msg).fire(new AddMsgRecieverk(msg));
+		RequestUtils.getRequestFactory().msgService().createMsg(msg).fire(new AddMsgRecieverk(msg));
 
 	}
 
