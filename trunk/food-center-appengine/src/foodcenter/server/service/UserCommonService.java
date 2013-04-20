@@ -30,19 +30,60 @@ public class UserCommonService
     
     public static DbUser getLoginInfo()
     {
+    	
+    	    	// find user by email
+    	        // if user exists update and return user
+    	        // else save a new user to the db and return it
         DbUser res = new DbUser();
-
-        res.setAdmin(userService.isUserAdmin());
-        res.setEmail(userService.getCurrentUser().getEmail());
-
-        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
-        res.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
-        res.setNickName(userService.getCurrentUser().getNickname());
-        res.setUserId(userService.getCurrentUser().getUserId());
-        logger.info("Login info: " + res.getEmail());
-        return res;
+        if(isNewUser(res))
+        {
+        	logger.info("User already exsists");
+        	return res;
+        }
+        else 
+        {
+        	return res;
+        }
+        
+//
+//        res.setAdmin(userService.isUserAdmin());
+//        res.setEmail(userService.getCurrentUser().getEmail());
+//
+//        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+//        res.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
+//        res.setNickName(userService.getCurrentUser().getNickname());
+//        res.setUserId(userService.getCurrentUser().getUserId());
+//        logger.info("Login info: " + res.getEmail());
+//        return res;
     }
 
+    public static boolean findUserByEmail(String email)
+    {
+    	return  (null != db.find(DbUser.class, email));
+    	
+    }
+    public static boolean isNewUser(DbUser user)
+    {
+    	
+    	if(findUserByEmail(user.getEmail()))
+    	{
+    		return false;
+    	}
+    	else
+    	{
+    		 
+    	        user.setAdmin(userService.isUserAdmin());
+    	        user.setEmail(userService.getCurrentUser().getEmail());
+
+    	        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+    	        user.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
+    	        user.setNickName(userService.getCurrentUser().getNickname());
+    	        user.setUserId(userService.getCurrentUser().getUserId());
+    	        logger.info("Login info: " + user.getEmail());
+    	        return true;
+
+    	}
+    }
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
