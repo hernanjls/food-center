@@ -12,6 +12,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import foodcenter.client.panels.RestaurantBranchPanel;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
+import foodcenter.service.proxies.RestaurantProxy;
 
 /**
  * Panel which represents a {@link MenuProxy}
@@ -21,12 +22,14 @@ public class BranchesFlexTable extends FlexTable
     
     private final RequestContext requestContext;
     private final Boolean isAdmin;
+    private final RestaurantProxy rest;
     private List<RestaurantBranchProxy> branches;
     
-    public BranchesFlexTable(RequestContext requestContext, List<RestaurantBranchProxy> branches, Boolean isAdmin)
+    public BranchesFlexTable(RequestContext requestContext, RestaurantProxy rest, List<RestaurantBranchProxy> branches, Boolean isAdmin)
     {
         super();
         this.requestContext = requestContext;
+        this.rest = rest;
         
         this.isAdmin = isAdmin;
         this.branches = branches;
@@ -176,53 +179,13 @@ public class BranchesFlexTable extends FlexTable
         }
     }
   
-    
-//    private class GeoKeyPressHandler implements KeyPressHandler
-//    {
-//        private final GeoLocationProxy geoProxy;
-//        private final Boolean isLng;
-//        /**
-//         * 
-//         * @param geoProxy is the restaurant to set
-//         * @param isLng on true lng, otherwise lat
-//         */
-//        public GeoKeyPressHandler(GeoLocationProxy geoProxy, Boolean isLng)
-//        {
-//            this.geoProxy = geoProxy;
-//            this.isLng = isLng;
-//        }
-//        
-//        @Override
-//        public void onKeyPress(KeyPressEvent event)
-//        {
-//            try
-//            {
-//                String s = ((TextBox) event.getSource()).getText();
-//                Double val = Double.parseDouble(s);
-//                if (isLng)
-//                {
-//                    geoProxy.setLng(val);
-//                }
-//                else
-//                {
-//                    geoProxy.setLat(val);
-//                }
-//            }
-//            catch (Throwable e)
-//            {
-//                // casting exception
-//            }
-//        }
-//    }
-    
+        
     private class OnEditBranchPopupClose implements Runnable
     {
         private final RestaurantBranchProxy branch;
         private final PopupPanel popup;
         private final boolean isNew;
         private int row;
-        
-        
         
         public OnEditBranchPopupClose(RestaurantBranchProxy branch, PopupPanel popup, boolean isNew, int row)
         {
@@ -238,6 +201,7 @@ public class BranchesFlexTable extends FlexTable
             popup.hide();
             if (isNew)
             {
+                this.branch.setRestaurant(rest);
                 branches.add(branch);
             }
             printRestaurntBranchTableRow(branch, row);

@@ -14,7 +14,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import foodcenter.client.panels.restaurant.BranchesFlexTable;
 import foodcenter.client.panels.restaurant.MenuFlexTable;
-import foodcenter.client.panels.restaurant.ProfilePannel;
+import foodcenter.client.panels.restaurant.RestaurantProfilePannel;
 import foodcenter.client.panels.restaurant.UsersPannel;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -72,7 +72,7 @@ public class RestaurantPanel extends VerticalPanel
         StackPanel stackPanel = new StackPanel();
 
         // profile pannel
-        Panel profilePanel = new ProfilePannel(rest, isAdmin);
+        Panel profilePanel = new RestaurantProfilePannel(rest, isAdmin);
         Panel menuPanel = createMenuPannel();
         Panel adminsPanel = createAdminPannel();
         Panel branchesPanel = createBranchesPanel();
@@ -97,7 +97,7 @@ public class RestaurantPanel extends VerticalPanel
             branches = new LinkedList<RestaurantBranchProxy>();
             rest.setBranches(branches);
         }
-        BranchesFlexTable res = new BranchesFlexTable(requestContext, branches, isAdmin);
+        BranchesFlexTable res = new BranchesFlexTable(requestContext, rest, branches, isAdmin);
         return res;
     }
     
@@ -130,10 +130,6 @@ public class RestaurantPanel extends VerticalPanel
         @Override
         public void onClick(ClickEvent event)
         {
-//            UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService();
-//            requestContext.append(service);
-//            service.saveRestaurant(rest).to(new AddRestaurantReciever());
-//            requestContext.fire();
             if (null != onSave)
             {
                 onSave.run();
@@ -152,25 +148,5 @@ public class RestaurantPanel extends VerticalPanel
             }
         }
     }
-
-//    class AddRestaurantReciever extends Receiver<Boolean>
-//    {
-//
-//        @Override
-//        public void onSuccess(Boolean response)
-//        {
-//            if (null != onSave)
-//            {
-//                onSave.run();
-//            }
-//        }
-//
-//        @Override
-//        public void onFailure(ServerFailure error)
-//        {
-//            Window.alert("exception: " + error.getMessage());
-//        }
-//
-//    }
 
 }

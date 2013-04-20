@@ -16,8 +16,8 @@ import com.beoui.geocell.model.GeocellQuery;
 import com.beoui.geocell.model.Point;
 
 import foodcenter.server.db.modules.AbstractDbGeoObject;
-import foodcenter.server.db.modules.DbMsg;
 import foodcenter.server.db.modules.AbstractDbObject;
+import foodcenter.server.db.modules.DbMsg;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUserGcm;
 
@@ -141,7 +141,7 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values)
     {
         List<T> res = find(clazz, baseQuery, declaredParams, values, 1);
-        return res.isEmpty() ? null : res.get(1);
+        return res.isEmpty() ? null : res.get(0);
     }
     
     
@@ -178,30 +178,6 @@ public class DbHandlerImp implements DbHandler
     public DbRestaurant searchRestaurantByName(String name)
     {
         return find(DbRestaurant.class, "name == value", "String value", new Object[]{name});        
-    }
-
-    @Override
-    public String createRestaurant(String name)
-    {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
-
-        DbRestaurant r = new DbRestaurant(name);
-
-        try
-        {
-            logger.info("createing a new restaurant with name " + name);
-            pm.makePersistent(r);
-            return r.getId();
-        }
-        catch (Exception e)
-        {
-            logger.error("unexpected exeption", e);
-            return null;
-        }
-        finally
-        {
-            pm.close();
-        }
     }
 
     @Override

@@ -5,6 +5,8 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable
@@ -20,12 +22,15 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     private DbRestaurant restaurant;
     
     @Persistent
+    @Unowned
     private List<DbUser> admins;
     
     @Persistent
+    @Unowned
     private List<DbUser> waiters;
     
     @Persistent
+    @Unowned
     private List<DbUser> chefs;
     
     @Persistent

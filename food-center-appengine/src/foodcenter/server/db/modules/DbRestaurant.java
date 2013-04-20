@@ -8,6 +8,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable
@@ -35,6 +37,7 @@ public class DbRestaurant extends AbstractDbObject
     private List<DbRestaurantBranch> branches = new LinkedList<DbRestaurantBranch>();
     
     @Persistent
+    @Unowned
     private List<DbUser> admins = new LinkedList<DbUser>();
     
     @Persistent
