@@ -1,18 +1,21 @@
 package foodcenter.service.proxies;
 
-import java.util.List;
 
 
 public interface GeoLocationProxy
 {
 
     public Double getLat();
+    
+    public void setLat(Double lat);
 
     public Double getLng();
-
-    public List<Double> getGeoLocation();
     
-    public void setGeoLocation(List<Double> latLng);
+    public void setLng(Double lng);
+    
+    public void setAddress(String address);
+    
+    public String getAddress();
     
 
 }

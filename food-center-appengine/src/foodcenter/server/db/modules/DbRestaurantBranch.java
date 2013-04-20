@@ -15,8 +15,6 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
      */
     private static final long serialVersionUID = 2314058106724557278L;
     
-    @Persistent
-    private String name;
     
     @Persistent
     private DbRestaurant restaurant;
@@ -51,15 +49,6 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
         super();
     }
 
-    public String getName()
-    {
-        return name;
-    }
-    
-    public void setName(String name)
-    {
-        this.name = name;
-    }
     
     public DbRestaurant getRestaurant()
     {

@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.panels.PanelUtils;
+import foodcenter.client.ClientUtils;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -69,7 +69,7 @@ public class ProfilePannel extends HorizontalPanel
         res.add(new Label("Name: "));
 
         TextBox nameBox = new TextBox();
-        PanelUtils.setNotNullText(nameBox, rest.getName());
+        ClientUtils.setNotNullText(nameBox, rest.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox, rest));
 
         res.add(nameBox);
@@ -84,7 +84,7 @@ public class ProfilePannel extends HorizontalPanel
 
         res.add(new Label("Phone: "));
         TextBox phoneBox = new TextBox();
-        PanelUtils.setNotNullText(phoneBox, rest.getPhone());
+        ClientUtils.setNotNullText(phoneBox, rest.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox, rest));
         res.add(phoneBox);
 
