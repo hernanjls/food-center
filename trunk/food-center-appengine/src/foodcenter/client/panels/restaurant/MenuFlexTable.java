@@ -114,6 +114,7 @@ public class MenuFlexTable extends FlexTable
         int row = this.getRowCount();
         
         TextBox catTitle = new TextBox();
+        catTitle.setText(menuCatProxy.getCategoryTitle());
         catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(menuCatProxy));
         setWidget(row, 0, catTitle);
         
@@ -123,7 +124,6 @@ public class MenuFlexTable extends FlexTable
         deleteCatButton.setEnabled(isAdmin);
         
         setWidget(row, 1, deleteCatButton);
-        
         
         CoursesFlexTable coursesTable = new CoursesFlexTable(requestContext, menuCatProxy, isAdmin);
         setWidget(row, 2, coursesTable);

@@ -12,10 +12,6 @@ public interface RestaurantBranchProxy extends GeoLocationProxy, EntityProxy
 {
     public String getId();
     
-    public String getName();
-    
-    public void setName(String name);
-
     public RestaurantProxy getRestaurant();
 
     public void setRestaurant(RestaurantProxy restaurant);
@@ -51,19 +47,5 @@ public interface RestaurantBranchProxy extends GeoLocationProxy, EntityProxy
     public String getPhone();
 
     public void setPhone(String phone);
-        
-    @Override
-    public Double getLat();
-    
-    @Override
-    public Double getLng();
-    
-    @Override
-    public List<Double> getGeoLocation();
-    
-    @Override
-    public void setGeoLocation(List<Double> latLng);
-    
-    
     
 }

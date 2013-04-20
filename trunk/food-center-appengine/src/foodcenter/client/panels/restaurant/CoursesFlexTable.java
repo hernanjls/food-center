@@ -28,9 +28,10 @@ public class CoursesFlexTable extends FlexTable
         this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
         this.isAdmin = isAdmin;
-
+        
         createHeader();
         List<CourseProxy> courses = menuCatProxy.getCourses();
+        
         if (null == courses)
         {
             courses = new LinkedList<CourseProxy>();
@@ -71,9 +72,17 @@ public class CoursesFlexTable extends FlexTable
         int row = getRowCount();
 
         TextBox name = new TextBox();
+        name.setText(courseProxy.getName());
         name.addKeyUpHandler(new CourseNameKeyUpHandler(name, courseProxy));
+        
         TextBox price = new TextBox();
+        Double coursePrice = courseProxy.getPrice();
+        if (null != coursePrice)
+        {
+            price.setText(coursePrice.toString());
+        }
         price.addKeyUpHandler(new CoursePriceKeyUpHandler(price, courseProxy));
+        
         Button delete = new Button("delete");
         delete.addClickHandler(new DeleteCourseClickHandler(row));
 
@@ -153,7 +162,7 @@ public class CoursesFlexTable extends FlexTable
             }
             catch (Exception e)
             {
-                // TODO log e
+                // TODO javascript log parse double error ?
             }
             course.setPrice(price);
         }

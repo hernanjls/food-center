@@ -9,9 +9,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.service.RequestUtils;
+import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.proxies.UserProxy;
 
 public class UsersPannel extends FlexTable
@@ -117,7 +119,8 @@ public class UsersPannel extends FlexTable
         @Override
         public void onClick(ClickEvent event)
         {
-            RequestUtils.getRequestFactory().getUserCommonService().getDbUser(emailTextBox.getText()).fire(new AddUserReceiver());
+            UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService(); 
+            service.getDbUser(emailTextBox.getText()).fire(new AddUserReceiver());
         }
     }
 

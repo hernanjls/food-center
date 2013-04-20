@@ -1,21 +1,17 @@
 package foodcenter.client.panels.restaurant;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
-import foodcenter.service.proxies.GeoLocationProxy;
+import foodcenter.client.panels.RestaurantBranchPanel;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
-import foodcenter.service.proxies.RestaurantProxy;
 
 /**
  * Panel which represents a {@link MenuProxy}
@@ -24,22 +20,16 @@ public class BranchesFlexTable extends FlexTable
 {
     
     private final RequestContext requestContext;
-    RestaurantProxy restaurnat;
     private final Boolean isAdmin;
-    List<RestaurantBranchProxy> branches;
+    private List<RestaurantBranchProxy> branches;
     
-    public BranchesFlexTable(RequestContext requestContext, RestaurantProxy restaurnat, Boolean isAdmin)
+    public BranchesFlexTable(RequestContext requestContext, List<RestaurantBranchProxy> branches, Boolean isAdmin)
     {
         super();
         this.requestContext = requestContext;
-        this.restaurnat = restaurnat;
+        
         this.isAdmin = isAdmin;
-        this.branches = this.restaurnat.getBranches();
-        if (null == this.branches)
-        {
-            this.branches = new LinkedList<RestaurantBranchProxy>();
-            this.restaurnat.setBranches(branches);
-        }
+        this.branches = branches;
         redraw();
     }
     
@@ -52,12 +42,11 @@ public class BranchesFlexTable extends FlexTable
         printTableHeader();   
         
         // Print all the branches if exits
-        List<RestaurantBranchProxy> branches = restaurnat.getBranches();
-        int idx = 0;
+        int row = getRowCount();
         for (RestaurantBranchProxy rbp : branches)
         {
-            printRestaurntBranchTableRow(rbp, idx);
-            idx++;
+            printRestaurntBranchTableRow(rbp, row);
+            row++;
         }
     }
     
@@ -68,89 +57,37 @@ public class BranchesFlexTable extends FlexTable
     private void printTableHeader()
     {
     	// set column 0
-        setText(0, 0, "Branch Name");
+        setText(0, 0, "Address");
         
-        // set column 1
-        setText(0, 1, "latitude");
-        setText(0, 2, "longitude");
         
+        // set column 1        
         Button addBranchButton = new Button("Add Branch");
         addBranchButton.addClickHandler(new AddBranchClickHandler());
         addBranchButton.setEnabled(isAdmin);
-        
-        // set column 3
-        setWidget(0, 3, addBranchButton);
+        setWidget(0, 1, addBranchButton);
     }
     
     /**
-     * adds a new blank category
-     * the category will be added to the menu proxy, 
-     * and to the flex table 
-     */
-    private void addBranch()
-    {
-    	
-        // create an empty branch
-        RestaurantBranchProxy restBranchProxy = requestContext.create(RestaurantBranchProxy.class);
-        
-        // fill the branch with default values
-        restBranchProxy.setRestaurant(restaurnat);
-//        restBranchProxy.setMenu(restaurnat.getMenu()); //TODO FIXME clone the menu!!!
-        restBranchProxy.setServices(restaurnat.getServices());
-        
-        // add it to the menu proxy
-        int idx = branches.size();
-        branches.add(restBranchProxy);
-        
-        // print its table row
-        printRestaurntBranchTableRow(restBranchProxy, idx);
-    }
-    
-    /**
-     * Deletes the category from the table and from the menu proxy
-     * @param index is item index in the list
-     */
-    private void deleteBranch(int index)
-    {
-    	// delete it from the branches list
-        branches.remove(index);
-    }
-    
-    /**
-     * Adds a new row to the table
-     * this row holds the category information
+     * print the branch to the table row
      * 
-     * @param restBranchProxy is the category to print as row
+     * @param row is the row to set
+     * @param branch is the category to print as row
      */
-    private void printRestaurntBranchTableRow(RestaurantBranchProxy restBranchProxy, int idx)
+    private void printRestaurntBranchTableRow(RestaurantBranchProxy branch, int row)
     {
-        int row = getRowCount();
         
-        TextBox branchName = new TextBox();
-        branchName.addKeyPressHandler(new BranchNameKeyPressHandler(restBranchProxy));
-        setWidget(row, 0, branchName);
-        
-        TextBox branchLat = new TextBox();
-        branchLat.addKeyPressHandler(new GeoKeyPressHandler(restBranchProxy, false));
-        setWidget(row, 1, branchLat);
-        
-        TextBox branchLng = new TextBox();
-        branchLng.addKeyPressHandler(new GeoKeyPressHandler(restBranchProxy, true));
-        setWidget(row, 2, branchLng);
-        
+        setText(row, 0, branch.getAddress());
         
         Button editBranchButton = new Button("edit");
-        editBranchButton.addClickHandler(new EditRestaurantBranchClickHandler(idx));
+        editBranchButton.addClickHandler(new EditRestaurantBranchClickHandler(branch, row));
         editBranchButton.setEnabled(isAdmin);
-        setWidget(row, 3, editBranchButton);
+        setWidget(row, 1, editBranchButton);
         
         
         Button deleteBranchButton = new Button("X");
-        deleteBranchButton.addClickHandler(new DeleteRestaurantBranchClickHandler(idx));
+        deleteBranchButton.addClickHandler(new DeleteRestaurantBranchClickHandler(branch));
         deleteBranchButton.setEnabled(isAdmin);
-        setWidget(row, 4, deleteBranchButton);
-        
-        
+        setWidget(row, 2, deleteBranchButton);
         
     }
 
@@ -159,29 +96,59 @@ public class BranchesFlexTable extends FlexTable
      */
     private class AddBranchClickHandler implements ClickHandler
     {
+        
         @Override
         public void onClick(ClickEvent event)
         {
-            addBranch();
+            
+            // construct a new branch, it will be edited by the rest branch panel
+            RestaurantBranchProxy branch = requestContext.create(RestaurantBranchProxy.class);
+            
+            // get the next row of the table
+            int row = getRowCount();
+            
+            // construct a popup to show the rest branch panel
+            PopupPanel popup = new PopupPanel(false); // dont close on outside click
+            
+            // construct on close runnable
+            OnEditBranchPopupClose onClose = new OnEditBranchPopupClose(branch, popup, true, row);
+            
+            // construct the panel and add it to the popup
+            RestaurantBranchPanel branchPanel = new RestaurantBranchPanel(requestContext, branch, isAdmin, onClose); 
+            popup.add(branchPanel);
+            popup.setTitle("Add Branch");
+            popup.setPopupPosition(10, 80);
+            
+            // show the new popup content
+            popup.show();
+            
         }
     }
   
     private class EditRestaurantBranchClickHandler implements ClickHandler
     {
-        private final int index;
-        
+        private final RestaurantBranchProxy branch;
+        private final int row;
         /**
          * @param index - is the index on the list to delete
          */
-        public EditRestaurantBranchClickHandler(int index)
+        public EditRestaurantBranchClickHandler(RestaurantBranchProxy branch, int row)
         {
-            this.index = index;
+            this.branch = branch;
+            this.row = row;
         }
         
         @Override
         public void onClick(ClickEvent event)
         {
-          //TODO edit the branch - redirect to edit page
+            PopupPanel popup = new PopupPanel(false); // dont close on outside click
+            OnEditBranchPopupClose onClose = new OnEditBranchPopupClose(branch, popup, false, row);
+            RestaurantBranchPanel branchPanel = new RestaurantBranchPanel(requestContext, branch, isAdmin, onClose); 
+            
+            popup.add(branchPanel);
+            popup.setTitle("Add Branch");
+            popup.setPopupPosition(10, 80);
+            popup.show();
             return;
         }
     }
@@ -191,76 +158,92 @@ public class BranchesFlexTable extends FlexTable
      */
     private class DeleteRestaurantBranchClickHandler implements ClickHandler
     {
-        private final int index;
+        private final RestaurantBranchProxy branch;
         
         /**
          * @param index - is the index on the list to delete
          */
-        public DeleteRestaurantBranchClickHandler(int index)
-        {
-            this.index = index;
-        }
-        
-        @Override
-        public void onClick(ClickEvent event)
-        {
-            deleteBranch(index);
-            redraw();
-        }
-    }
-  
-    /**
-     * This class will set the title of the category when key is pressed
-     */
-    private class BranchNameKeyPressHandler implements KeyPressHandler
-    {
-        private final RestaurantBranchProxy branch;
-        
-        /**
-         * @param cat is the category to set its title.
-         */
-        public BranchNameKeyPressHandler(RestaurantBranchProxy branch)
+        public DeleteRestaurantBranchClickHandler(RestaurantBranchProxy branch)
         {
             this.branch = branch;
         }
         
         @Override
-        public void onKeyPress(KeyPressEvent event)
+        public void onClick(ClickEvent event)
         {
-            String s = ((TextBox) event.getSource()).getText();
-            branch.setName(s);
+            branches.remove(branch);
+            redraw();
         }
     }
+  
     
-    private class GeoKeyPressHandler implements KeyPressHandler
+//    private class GeoKeyPressHandler implements KeyPressHandler
+//    {
+//        private final GeoLocationProxy geoProxy;
+//        private final Boolean isLng;
+//        /**
+//         * 
+//         * @param geoProxy is the restaurant to set
+//         * @param isLng on true lng, otherwise lat
+//         */
+//        public GeoKeyPressHandler(GeoLocationProxy geoProxy, Boolean isLng)
+//        {
+//            this.geoProxy = geoProxy;
+//            this.isLng = isLng;
+//        }
+//        
+//        @Override
+//        public void onKeyPress(KeyPressEvent event)
+//        {
+//            try
+//            {
+//                String s = ((TextBox) event.getSource()).getText();
+//                Double val = Double.parseDouble(s);
+//                if (isLng)
+//                {
+//                    geoProxy.setLng(val);
+//                }
+//                else
+//                {
+//                    geoProxy.setLat(val);
+//                }
+//            }
+//            catch (Throwable e)
+//            {
+//                // casting exception
+//            }
+//        }
+//    }
+    
+    private class OnEditBranchPopupClose implements Runnable
     {
-        private final GeoLocationProxy geoProxy;
-        private final int idx;
-        /**
-         * 
-         * @param geoProxy is the restaurant to set
-         * @param isLng on true lng, otherwise lat
-         */
-        public GeoKeyPressHandler(GeoLocationProxy geoProxy, Boolean isLng)
+        private final RestaurantBranchProxy branch;
+        private final PopupPanel popup;
+        private final boolean isNew;
+        private int row;
+        
+        
+        
+        public OnEditBranchPopupClose(RestaurantBranchProxy branch, PopupPanel popup, boolean isNew, int row)
         {
-            this.geoProxy = geoProxy;
-            idx = isLng ? 1 : 0;
+            this.branch = branch;
+            this.popup = popup;
+            this.isNew = isNew;
+            this.row = row;
         }
         
         @Override
-        public void onKeyPress(KeyPressEvent event)
+        public void run()
         {
-            List<Double> latLng = geoProxy.getGeoLocation();
-            try
+            popup.hide();
+            if (isNew)
             {
-                String s = ((TextBox) event.getSource()).getText();
-                Double val = Double.parseDouble(s);
-                latLng.set(idx, val);
+                branches.add(branch);
             }
-            catch (Throwable e)
-            {
-                // casting exception
-            }
+            printRestaurntBranchTableRow(branch, row);
+            
+            
         }
+        
     }
 }

@@ -41,14 +41,13 @@
   <body>
     <%
         Logger logger = LoggerFactory.getLogger(getClass());
-            DbUser info = UserCommonService.getLoginInfo();    
-            String nickName = info.getNickName();
-            String userId = info.getUserId();
-            String role = info.isAdmin() ? "Admin" : "User";        
-            String email = info.getEmail();        
-            String logoutUrl = info.getLogoutUrl();
-
-            logger.debug("loggged in: " + email);
+        DbUser info = UserCommonService.getLoginInfo();    
+        String nickName = info.getNickName();
+        String userId = info.getUserId();
+        String role = info.isAdmin() ? "Admin" : "User";        
+        String email = info.getEmail();        
+        String logoutUrl = info.getLogoutUrl();
+        logger.debug("loggged in: " + email);
     %>
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">

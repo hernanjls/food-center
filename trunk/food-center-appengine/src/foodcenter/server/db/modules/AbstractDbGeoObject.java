@@ -1,12 +1,12 @@
 package foodcenter.server.db.modules;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.annotations.Geocells;
 import com.beoui.geocell.annotations.Latitude;
@@ -30,6 +30,8 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject
     @Geocells
     private List<String> geoCells;
     
+    @Persistent
+    private String address;
     /**
      * 
      */
@@ -38,7 +40,8 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject
     public AbstractDbGeoObject()
     {
         super();
-        setGeoLocation(0,0);
+        setLat(0.0);
+        setLng(0.0);
     }
 
     public Double getLat()
@@ -47,44 +50,40 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject
     }
 
 
+    public void setLat(Double lat)
+    {
+        this.lat = lat;
+    }
+    
     public Double getLng()
     {
         return lng;
     }
 
+    public void setLng(Double lng)
+    {
+        this.lng = lng;
+    }
 
     public List<String> getGeoCells()
     {
         return geoCells;
     }
 
-    public void setGeoLocation(List<Double> latLng)
+    public String getAddress()
     {
-        if (null == latLng || latLng.size() != 2)
-        {
-            return;
-        }
-        
-        // parse latitude and longitude from the list
-        Double lat = latLng.get(0);
-        Double lng = latLng.get(1);
-        
-        // set the location
-        setGeoLocation(lat, lng);
-    }
-        
-    public List<Double> getGeoLocation()
-    {
-        List<Double> res = new LinkedList<Double>();
-        res.add(lat);
-        res.add(lng);
-        return res;
+        return address;
     }
 
-    private void setGeoLocation(double lat, double lng)
+    public void setAddress(String address)
     {
-        this.lat = lat;
-        this.lng = lng;
+        this.address = address;
+    }
+    
+    @Override
+    public void jdoPreStore()
+    {
+        super.jdoPreStore();
         
         Point p = new Point(lat, lng);
         this.geoCells = GeocellManager.generateGeoCell(p);
