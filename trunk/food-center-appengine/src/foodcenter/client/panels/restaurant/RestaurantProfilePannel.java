@@ -20,13 +20,13 @@ import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class ProfilePannel extends HorizontalPanel
+public class RestaurantProfilePannel extends HorizontalPanel
 {
 
     private RestaurantProxy rest;
     private Boolean isAdmin;
 
-    public ProfilePannel(RestaurantProxy rest, Boolean isAdmin)
+    public RestaurantProfilePannel(RestaurantProxy rest, Boolean isAdmin)
     {
         super();
         this.isAdmin = isAdmin;
@@ -70,7 +70,7 @@ public class ProfilePannel extends HorizontalPanel
 
         TextBox nameBox = new TextBox();
         ClientUtils.setNotNullText(nameBox, rest.getName());
-        nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox, rest));
+        nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
 
         res.add(nameBox);
 
@@ -85,7 +85,7 @@ public class ProfilePannel extends HorizontalPanel
         res.add(new Label("Phone: "));
         TextBox phoneBox = new TextBox();
         ClientUtils.setNotNullText(phoneBox, rest.getPhone());
-        phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox, rest));
+        phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
         res.add(phoneBox);
 
         return res;
@@ -122,12 +122,11 @@ public class ProfilePannel extends HorizontalPanel
     class NameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
-        private final RestaurantProxy rest;
+        
 
-        public NameKeyUpHandler(TextBox titleBox, RestaurantProxy rest)
+        public NameKeyUpHandler(TextBox titleBox)
         {
             this.titleBox = titleBox;
-            this.rest = rest;
         }
 
         @Override
@@ -141,12 +140,10 @@ public class ProfilePannel extends HorizontalPanel
     class PhoneKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
-        private final RestaurantProxy rest;
 
-        public PhoneKeyUpHandler(TextBox titleBox, RestaurantProxy rest)
+        public PhoneKeyUpHandler(TextBox titleBox)
         {
             this.titleBox = titleBox;
-            this.rest = rest;
         }
 
         @Override

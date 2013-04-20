@@ -66,7 +66,7 @@ public class ManageRestaurant implements EntryPoint
 
     }
 
-    class AddRestaurantReciever extends Receiver<Boolean>
+    class AddRestaurantReciever extends Receiver<RestaurantProxy>
     {
         private final PopupPanel loading;
         
@@ -76,7 +76,7 @@ public class ManageRestaurant implements EntryPoint
         }
         
         @Override
-        public void onSuccess(Boolean response)
+        public void onSuccess(RestaurantProxy response)
         {
             loading.hide();
         }

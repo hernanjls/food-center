@@ -96,9 +96,9 @@ public class UserCommonService
         return db.find(DbRestaurant.class, id);
     }
 
-    public static Boolean saveRestaurant(DbRestaurant rest)
+    public static DbRestaurant saveRestaurant(DbRestaurant rest)
     {
-        return (null != db.save(rest));
+        return db.save(rest);
     }
 
     public static Boolean deleteRestaurant(String id)

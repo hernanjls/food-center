@@ -13,17 +13,7 @@ public interface DbHandler
 {
 
     
-    public DbRestaurant searchRestaurantByName(String name);
-
-    /**
-     * creates a blank restaurant
-     * @param name is the restaurant name
-     * @return the restaurant id
-     */
-    public String createRestaurant(String name);
-    
-    
-    
+    public DbRestaurant searchRestaurantByName(String name);    
     
     // deprecated (remian for example only)
     
@@ -79,7 +69,7 @@ public interface DbHandler
      *                         Ex: "String value, Int x"
      * @param values
      * @param maxResults     - max results to get
-     * @return list of objects, or null on failure
+     * @return Object matching the criteria, null if not found
      */
     public <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values);
     

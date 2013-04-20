@@ -22,7 +22,7 @@ public interface UserCommonServiceProxy extends RequestContext
 	
 	public Request<RestaurantProxy> getRestaurant(String id);
 	
-	public Request<Boolean> saveRestaurant(RestaurantProxy rest);
+	public Request<RestaurantProxy> saveRestaurant(RestaurantProxy rest);
 	
 	public Request<Boolean> deleteRestaurant(String id);
 }
