@@ -80,6 +80,7 @@ public class UserCommonService
     	        user.setNickName(userService.getCurrentUser().getNickname());
     	        user.setUserId(userService.getCurrentUser().getUserId());
     	        logger.info("Login info: " + user.getEmail());
+    	        db.save(user);
     	        return true;
 
     	}
