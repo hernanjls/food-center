@@ -28,7 +28,7 @@ public class RemoveMsgHandler implements ClickHandler
 	{
 		// Removes the msg to the db, and from the table on service success.
 		
-	    reqUtils.getRequestFactory().msgService().deleteMsg(msg).fire(new RemoveMsgReceiver(msg));
+	    RequestUtils.getRequestFactory().msgService().deleteMsg(msg).fire(new RemoveMsgReceiver(msg));
 	}
 	
 	class RemoveMsgReceiver extends Receiver<Void>
