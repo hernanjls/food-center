@@ -36,7 +36,7 @@ public interface DbHandler
     public List<String> getGcmRegistered();
 
     /**
-     * find the clazz object which matches the id
+     * find the clazz object which matches the id, and eager fetch it!
      * @param clazz is the class type to search for
      * @param id is the id of the object
      * @return the object of type clazz with the id

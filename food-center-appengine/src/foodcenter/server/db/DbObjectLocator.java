@@ -21,6 +21,7 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
     @Override
     public AbstractDbObject create(Class<? extends AbstractDbObject> clazz)
     {
+    	logger.info("Loader.create: " + clazz);
         try
         {
             return clazz.newInstance();
@@ -35,6 +36,7 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
     @Override
     public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
     {
+    	logger.info("Loader.find: " + clazz + " id: " + id);
         return db.find(clazz, id);
     }
 

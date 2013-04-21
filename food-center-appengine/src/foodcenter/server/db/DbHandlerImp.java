@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
+import javax.jdo.FetchGroup;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -71,6 +72,8 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
+        pm.getFetchPlan().setGroup(FetchGroup.ALL);
+    	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             return pm.getObjectById(clazz, id);
@@ -94,6 +97,8 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
+        pm.getFetchPlan().setGroup(FetchGroup.ALL);
+    	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             Query q = pm.newQuery(clazz);
@@ -156,6 +161,8 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz, Integer maxResults, Double centerLat, Double centerLng, Double radiusMeters)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
+        pm.getFetchPlan().setGroup(FetchGroup.ALL);
+    	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             Point center = new Point(centerLat, centerLng);
