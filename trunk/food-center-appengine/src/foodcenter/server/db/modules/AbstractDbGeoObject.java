@@ -20,11 +20,11 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject
 
     @Persistent
     @Latitude
-    private Double lat;
+    private Double lat = 0.0;
     
     @Persistent
     @Longitude
-    private Double lng;
+    private Double lng = 0.0;
     
     @Persistent
     @Geocells
@@ -40,8 +40,6 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject
     public AbstractDbGeoObject()
     {
         super();
-        setLat(0.0);
-        setLng(0.0);
     }
 
     public Double getLat()

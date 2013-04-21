@@ -46,7 +46,8 @@ public class RestaurantsListPanel extends VerticalPanel
         PopupPanel popup = new PopupPanel(false);
         popup.setWidget(new Label("Loading..."));
         popup.center();
-        service.getDefaultRestaurants().fire(new GetDefaultRestaurantsReceiver(popup));
+        //TODO deal "with" this!!!!
+        service.getDefaultRestaurants().with("menu","menu.categories","iconBytes","branches","branches.menu","branches.menu.categories","admins").fire(new GetDefaultRestaurantsReceiver(popup));
     }
     
     private void redraw(List<RestaurantProxy> rests)
@@ -79,7 +80,7 @@ public class RestaurantsListPanel extends VerticalPanel
         restsTable.setText(row, 4, table);
         
         Button edit = new Button("edit");
-        edit.addClickHandler(new UpdateRestaurantClickHandler(rest, row));
+        edit.addClickHandler(new OnClickUpdateRestaurant(rest, row));
         //TODO edit restaurnt button
         restsTable.setWidget(row, 5, edit);
         
@@ -168,7 +169,7 @@ public class RestaurantsListPanel extends VerticalPanel
             PopupPanel popup = new PopupPanel(false);
             
             int row = restsTable.getRowCount();
-            Runnable onSave = new OnSaveRestaurant(service, popup, rest, row);
+            Runnable onSave = new OnClickSaveRestaurant(service, popup, rest, row);
             Runnable onDiscard = new OnDiscardRestaurant(popup);
          
             RestaurantPanel restPanel = new RestaurantPanel(service , rest, isAdmin, onSave, onDiscard);
@@ -180,13 +181,13 @@ public class RestaurantsListPanel extends VerticalPanel
         
     }
     
-    private class UpdateRestaurantClickHandler implements ClickHandler
+    private class OnClickUpdateRestaurant implements ClickHandler
     {
 
         private final RestaurantProxy rest;
         private final int row;
         
-        public UpdateRestaurantClickHandler(RestaurantProxy rest, int row)
+        public OnClickUpdateRestaurant(RestaurantProxy rest, int row)
         {
             this.rest = rest;
             this.row = row;
@@ -201,7 +202,7 @@ public class RestaurantsListPanel extends VerticalPanel
             
             RestaurantProxy editable = service.edit(rest);
             
-            Runnable onSave = new OnSaveRestaurant(service, popup, rest, row);
+            Runnable onSave = new OnClickSaveRestaurant(service, popup, rest, row);
             Runnable onDiscard = new OnDiscardRestaurant(popup);
             
             RestaurantPanel restPanel = new RestaurantPanel(service , editable, isAdmin, onSave, onDiscard);
@@ -214,14 +215,14 @@ public class RestaurantsListPanel extends VerticalPanel
     }
     
     
-    private class OnSaveRestaurant implements Runnable
+    private class OnClickSaveRestaurant implements Runnable
     {
         private final RequestContext requestContext;
         private final PopupPanel popup;
         private final RestaurantProxy rest;
         private final int row;
 
-        public OnSaveRestaurant(RequestContext requestContext, PopupPanel popup, RestaurantProxy rest, int row)
+        public OnClickSaveRestaurant(RequestContext requestContext, PopupPanel popup, RestaurantProxy rest, int row)
         {
             this.requestContext = requestContext;
             this.popup = popup;
