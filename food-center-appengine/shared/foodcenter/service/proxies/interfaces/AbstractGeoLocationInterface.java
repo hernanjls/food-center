@@ -1,8 +1,8 @@
-package foodcenter.service.proxies;
+package foodcenter.service.proxies.interfaces;
 
 
 
-public interface GeoLocationProxy
+public interface AbstractGeoLocationInterface extends AbstractEntityInterface
 {
 
     public Double getLat();

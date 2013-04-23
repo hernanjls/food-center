@@ -10,10 +10,13 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
+import javax.persistence.Transient;
+
+import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
-public abstract class AbstractDbObject implements StoreCallback, Serializable
+public abstract class AbstractDbObject implements StoreCallback, Serializable, AbstractEntityInterface
 {
     
     /**
@@ -28,6 +31,9 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable
     
     @Persistent()
     private Integer version = 0;
+    
+    @Transient
+    private Boolean editable = false;
     
     public AbstractDbObject()
     {
@@ -51,6 +57,16 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable
     public final Integer getVersion() 
     {  
         return version;  
+    }
+
+	public Boolean isEditable()
+    {
+	    return editable;
+    }
+
+	public void setEditable(Boolean editable)
+    {
+	    this.editable = editable;
     }
     
 }

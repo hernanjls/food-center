@@ -14,7 +14,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 
-import foodcenter.service.proxies.GeoLocationProxy;
+import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 
 /**
  * 
@@ -22,7 +22,7 @@ import foodcenter.service.proxies.GeoLocationProxy;
  */
 public class GoogleMapsComposite extends Composite
 {
-    private final GeoLocationProxy proxy;
+    private final AbstractGeoLocationInterface proxy;
     private final TextBox addressBox;
     private final TextBox latBox;
     private final TextBox lngBox;
@@ -39,7 +39,7 @@ public class GoogleMapsComposite extends Composite
      * @param lat     - is the default lat to load with
      * @param lng     - is the default lng to load with
      */
-    public GoogleMapsComposite(GeoLocationProxy proxy, TextBox address, TextBox latBox, TextBox lngBox)
+    public GoogleMapsComposite(AbstractGeoLocationInterface proxy, TextBox address, TextBox latBox, TextBox lngBox)
     {
         this.proxy = proxy;
         this.addressBox = address;
