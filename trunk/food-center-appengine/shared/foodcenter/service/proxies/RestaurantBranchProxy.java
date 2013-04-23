@@ -6,9 +6,10 @@ import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyForName;
 
 import foodcenter.service.enums.ServiceType;
+import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 
 @ProxyForName(value = "foodcenter.server.db.modules.DbRestaurantBranch", locator = "foodcenter.server.db.DbObjectLocator")
-public interface RestaurantBranchProxy extends GeoLocationProxy, EntityProxy
+public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, EntityProxy
 {
     public String getId();
     

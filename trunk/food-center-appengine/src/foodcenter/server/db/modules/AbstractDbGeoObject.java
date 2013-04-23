@@ -13,9 +13,11 @@ import com.beoui.geocell.annotations.Latitude;
 import com.beoui.geocell.annotations.Longitude;
 import com.beoui.geocell.model.Point;
 
+import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
+
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
-public abstract class AbstractDbGeoObject extends AbstractDbObject
+public abstract class AbstractDbGeoObject extends AbstractDbObject implements AbstractGeoLocationInterface
 {
 
     @Persistent

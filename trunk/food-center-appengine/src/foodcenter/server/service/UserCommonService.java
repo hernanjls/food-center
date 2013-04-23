@@ -35,26 +35,26 @@ public class UserCommonService
     	        // if user exists update and return user
     	        // else save a new user to the db and return it
         DbUser res = new DbUser();
-        if(isNewUser(res))
-        {
-        	return res;
-        }
-        else 
-        {
-        	logger.info("User already exsists");
-        	return res;
-        }
+//        if(isNewUser(res))
+//        {
+//        	return res;
+//        }
+//        else 
+//        {
+//        	logger.info("User already exsists");
+//        	return res;
+//        }
         
 //
-//        res.setAdmin(userService.isUserAdmin());
-//        res.setEmail(userService.getCurrentUser().getEmail());
-//
-//        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
-//        res.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
-//        res.setNickName(userService.getCurrentUser().getNickname());
-//        res.setUserId(userService.getCurrentUser().getUserId());
-//        logger.info("Login info: " + res.getEmail());
-//        return res;
+        res.setAdmin(userService.isUserAdmin());
+        res.setEmail(userService.getCurrentUser().getEmail());
+
+        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+        res.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
+        res.setNickName(userService.getCurrentUser().getNickname());
+        res.setUserId(userService.getCurrentUser().getUserId());
+        logger.info("Login info: " + res.getEmail());
+        return res;
     }
 
     public static boolean isNewEmail(String email)

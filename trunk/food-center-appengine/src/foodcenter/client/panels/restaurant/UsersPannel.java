@@ -31,7 +31,7 @@ public class UsersPannel extends FlexTable
         this.isAdmin = isAdmin;
         this.users = users;
         newUserButton = new Button("New");
-        newUserButton.addClickHandler(new NewUserHandler());
+        newUserButton.addClickHandler(new OnClickNewUser());
         
         redraw();
         
@@ -75,7 +75,7 @@ public class UsersPannel extends FlexTable
         TextBox userEmail = new TextBox();
         
         Button addButton = new Button("Add");
-        addButton.addClickHandler(new AddUserClickHandler(userEmail));
+        addButton.addClickHandler(new OnClickAddUser(userEmail));
         
         setWidget(row, 0, userEmail);
         setWidget(row, 1, addButton);
@@ -96,7 +96,7 @@ public class UsersPannel extends FlexTable
 
     }
 
-    class NewUserHandler implements ClickHandler
+    class OnClickNewUser implements ClickHandler
     { 
         @Override
         public void onClick(ClickEvent event)
@@ -106,12 +106,12 @@ public class UsersPannel extends FlexTable
         }
     }
     
-    class AddUserClickHandler implements ClickHandler
+    class OnClickAddUser implements ClickHandler
     {
         private final TextBox emailTextBox;
         
         
-        public AddUserClickHandler(TextBox emailTextBox)
+        public OnClickAddUser(TextBox emailTextBox)
         {
             this.emailTextBox  = emailTextBox;
         }

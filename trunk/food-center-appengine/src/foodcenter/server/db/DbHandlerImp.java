@@ -31,6 +31,8 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> T save(T object)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
+        pm.getFetchPlan().setGroup(FetchGroup.ALL);
+    	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             return pm.makePersistent(object);

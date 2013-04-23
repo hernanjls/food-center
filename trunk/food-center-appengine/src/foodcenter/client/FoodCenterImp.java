@@ -1,31 +1,11 @@
 package foodcenter.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.maps.client.Maps;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.StackPanel;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.handlers.RemoveMsgHandler;
 import foodcenter.client.panels.RestaurantsListPanel;
-import foodcenter.client.service.RequestUtils;
-import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.enums.ServiceType;
-import foodcenter.service.proxies.UserProxy;
-import foodcenter.service.proxies.MsgProxy;
-import foodcenter.service.proxies.RestaurantProxy;
 
 public class FoodCenterImp implements EntryPoint
 {
@@ -38,9 +18,20 @@ public class FoodCenterImp implements EntryPoint
     @Override
     public void onModuleLoad()
     {
+    	// load the maps api!
+    	Maps.loadMapsApi(ClientUtils.GOOGLE_API_MAPS_KEY, ClientUtils.GOOGLE_API_MAPS_VER, false, new OnApiLoadRunnable());
+    	
         isAdmin = true;
-        Panel restaurants = new RestaurantsListPanel(isAdmin); 
-        RootPanel.get(FoodCenterImp.GWT_CONTINER).add(restaurants);
+    }
+    
+    private class OnApiLoadRunnable implements Runnable
+    {
+    	@Override
+	    public void run()
+	    {
+    		Panel restaurants = new RestaurantsListPanel(isAdmin); 
+            RootPanel.get(FoodCenterImp.GWT_CONTINER).add(restaurants);    
+	    }
     }
 }
 
