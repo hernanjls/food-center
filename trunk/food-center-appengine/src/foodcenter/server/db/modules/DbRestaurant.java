@@ -1,7 +1,7 @@
 package foodcenter.server.db.modules;
 
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import foodcenter.service.enums.ServiceType;
+
+
 
 @PersistenceCapable
 public class DbRestaurant extends AbstractDbObject
@@ -24,24 +26,24 @@ public class DbRestaurant extends AbstractDbObject
     @NotNull
     private String name = "";
     
-    @Persistent
+    @Persistent(defaultFetchGroup="true")
     private DbMenu menu = new DbMenu();
     
-    @Persistent
-    private List<Byte> iconBytes = new LinkedList<Byte>();
+    @Persistent(defaultFetchGroup="true")
+    private List<Byte> iconBytes = new ArrayList<Byte>();
     
     @Persistent
     private String phone = "";
     
-    @Persistent(mappedBy = "restaurant")
-    private List<DbRestaurantBranch> branches = new LinkedList<DbRestaurantBranch>();
+    @Persistent(mappedBy = "restaurant", defaultFetchGroup="true")
+    private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
     
-    @Persistent
+    @Persistent(defaultFetchGroup="true")
     @Unowned
-    private List<DbUser> admins = new LinkedList<DbUser>();
+    private List<DbUser> admins = new ArrayList<DbUser>();
     
-    @Persistent
-    private List<ServiceType> services = new LinkedList<ServiceType>();
+    @Persistent(defaultFetchGroup="true")
+    private List<ServiceType> services = new ArrayList<ServiceType>();
     
     public DbRestaurant()
     {

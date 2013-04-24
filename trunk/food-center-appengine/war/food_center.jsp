@@ -66,7 +66,7 @@
 	    <div id ="headerInformation" class="headerInformation">
 	       Hellow: 
 	       <a href="user_profile.jsp"><% out.println(nickName); %></a>
-	       You are logged in as <% out.println(role); %>  
+	       You are logged in as <a href="/_ah/admin"><% out.println(role); %></a>  
 	    </div>
 	    <div id="logout" class="logout">
 	        <a href="<% out.println(logoutUrl); %>">logout</a>
