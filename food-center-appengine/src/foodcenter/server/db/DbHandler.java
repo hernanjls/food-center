@@ -48,27 +48,32 @@ public interface DbHandler
     /**
      * @param clazz          - is the class to fetch from the DB.
      * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
-     *                         Ex: "lastName == lastNameParam"
+     *                         Ex: "lastName == lastNameParam".<br>
+     *                         if null - no base query will be added
      * @param declaredParams - Declare the list of parameters query execution. <br>
      *                         The parameter declaration is a String containing <br>
      *                         one or more query parameter declarations separated with commas. <br>
-     *                         Ex: "String value, Int x"
-     * @param values
-     * @param maxResults     - max results to get
-     * @return list of objects, or null on failure
+     *                         Ex: "String value, Int x".<br>
+     *                         if null or valus are null, no declared parameters nor values will be used.
+     * @param values		 - the values for the declared parameters.<br>
+     * 						   if null or declared params are null, no declared parameters nor values will be used.
+     * @param maxResults     - max results to get, if null, no limit is taken
+     * @return list of all objects matching, or null on failure
      */
     public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults);
     
     /**
      * @param clazz          - is the class to fetch from the DB.
      * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
-     *                         Ex: "lastName == lastNameParam"
+     *                         Ex: "lastName == lastNameParam".<br>
+     *                         if null - no base query will be added
      * @param declaredParams - Declare the list of parameters query execution. <br>
      *                         The parameter declaration is a String containing <br>
      *                         one or more query parameter declarations separated with commas. <br>
-     *                         Ex: "String value, Int x"
-     * @param values
-     * @param maxResults     - max results to get
+     *                         Ex: "String value, Int x".<br>
+     *                         if null or valus are null, no declared parameters nor values will be used.
+     * @param values		 - the values for the declared parameters.<br>
+     * 						   if null or declared params are null, no declared parameters nor values will be used.
      * @return Object matching the criteria, null if not found
      */
     public <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values);

@@ -1,5 +1,6 @@
 package foodcenter.server.db.modules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -12,142 +13,140 @@ import foodcenter.service.enums.ServiceType;
 @PersistenceCapable
 public class DbRestaurantBranch extends AbstractDbGeoObject
 {
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 2314058106724557278L;
-    
-    
-    @Persistent
-    private DbRestaurant restaurant;
-    
-    @Persistent
-    @Unowned
-    private List<DbUser> admins;
-    
-    @Persistent
-    @Unowned
-    private List<DbUser> waiters;
-    
-    @Persistent
-    @Unowned
-    private List<DbUser> chefs;
-    
-    @Persistent
-    private List<DbTable> tables;
-    
-    @Persistent
-    private List<DbCart> orders;
-    
-    @Persistent
-    private DbMenu menu;
-        
-    @Persistent
-    private List<ServiceType> services;
-    
-    @Persistent
-    private String phone;
-    
-    public DbRestaurantBranch()
-    {
-        //empty ctor
-        super();
-    }
+	private static final long serialVersionUID = 2314058106724557278L;
 
-    
-    public DbRestaurant getRestaurant()
-    {
-        return restaurant;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private DbRestaurant restaurant;
 
-    public void setRestaurant(DbRestaurant restaurant)
-    {
-        this.restaurant = restaurant;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	@Unowned
+	private List<DbUser> admins = new ArrayList<DbUser>();;
 
-    public List<DbUser> getAdmins()
-    {
-        return admins;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	@Unowned
+	private List<DbUser> waiters = new ArrayList<DbUser>();;
 
-    public void setAdmins(List<DbUser> admins)
-    {
-        this.admins = admins;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	@Unowned
+	private List<DbUser> chefs = new ArrayList<DbUser>();
 
-    public List<DbUser> getWaiters()
-    {
-        return waiters;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private List<DbTable> tables = new ArrayList<DbTable>();
 
-    public void setWaiters(List<DbUser> waiters)
-    {
-        this.waiters = waiters;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private List<DbCart> orders = new ArrayList<DbCart>();
 
-    public List<DbUser> getChefs()
-    {
-        return chefs;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private DbMenu menu;
 
-    public void setChefs(List<DbUser> chefs)
-    {
-        this.chefs = chefs;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private List<ServiceType> services = new ArrayList<ServiceType>();
 
-    public List<DbTable> getTables()
-    {
-        return tables;
-    }
+	@Persistent(defaultFetchGroup = "true")
+	private String phone;
 
-    public void setTables(List<DbTable> tables)
-    {
-        this.tables = tables;
-    }
+	public DbRestaurantBranch()
+	{
+		// empty ctor
+		super();
+	}
 
-    public List<DbCart> getOrders()
-    {
-        return orders;
-    }
+	public DbRestaurant getRestaurant()
+	{
+		return restaurant;
+	}
 
-    public void setOrders(List<DbCart> orders)
-    {
-        this.orders = orders;
-    }
+	public void setRestaurant(DbRestaurant restaurant)
+	{
+		this.restaurant = restaurant;
+	}
 
-    public DbMenu getMenu()
-    {
-        return menu;
-    }
+	public List<DbUser> getAdmins()
+	{
+		return admins;
+	}
 
-    public void setMenu(DbMenu menu)
-    {
-        this.menu = menu;
-    }
+	public void setAdmins(List<DbUser> admins)
+	{
+		this.admins = admins;
+	}
 
-    public List<ServiceType> getServices()
-    {
-        return services;
-    }
+	public List<DbUser> getWaiters()
+	{
+		return waiters;
+	}
 
-    public void setServices(List<ServiceType> services)
-    {
-        this.services = services;
-    }
+	public void setWaiters(List<DbUser> waiters)
+	{
+		this.waiters = waiters;
+	}
 
-    public String getPhone()
-    {
-        return phone;
-    }
+	public List<DbUser> getChefs()
+	{
+		return chefs;
+	}
 
-    public void setPhone(String phone)
-    {
-        this.phone = phone;
-    }
+	public void setChefs(List<DbUser> chefs)
+	{
+		this.chefs = chefs;
+	}
 
-    public static long getSerialversionuid()
-    {
-        return serialVersionUID;
-    }
-    
+	public List<DbTable> getTables()
+	{
+		return tables;
+	}
+
+	public void setTables(List<DbTable> tables)
+	{
+		this.tables = tables;
+	}
+
+	public List<DbCart> getOrders()
+	{
+		return orders;
+	}
+
+	public void setOrders(List<DbCart> orders)
+	{
+		this.orders = orders;
+	}
+
+	public DbMenu getMenu()
+	{
+		return menu;
+	}
+
+	public void setMenu(DbMenu menu)
+	{
+		this.menu = menu;
+	}
+
+	public List<ServiceType> getServices()
+	{
+		return services;
+	}
+
+	public void setServices(List<ServiceType> services)
+	{
+		this.services = services;
+	}
+
+	public String getPhone()
+	{
+		return phone;
+	}
+
+	public void setPhone(String phone)
+	{
+		this.phone = phone;
+	}
+
+	public static long getSerialversionuid()
+	{
+		return serialVersionUID;
+	}
+
 }

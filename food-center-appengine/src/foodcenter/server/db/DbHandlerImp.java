@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
-import javax.jdo.FetchGroup;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -31,8 +30,6 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> T save(T object)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        pm.getFetchPlan().setGroup(FetchGroup.ALL);
-    	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             return pm.makePersistent(object);
@@ -74,11 +71,12 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        pm.getFetchPlan().setGroup(FetchGroup.ALL);
     	pm.getFetchPlan().setMaxFetchDepth(-1);
+    	T res = null;
         try
         {
-            return pm.getObjectById(clazz, id);
+            res =  pm.getObjectById(clazz, id);
+            return pm.detachCopy(res);
         }
         catch (JDOObjectNotFoundException e)
         {
@@ -86,6 +84,7 @@ public class DbHandlerImp implements DbHandler
         }
         catch (Exception e)
         {
+        	
             logger.error(e.getMessage(), e);
         }
         finally
@@ -95,11 +94,11 @@ public class DbHandlerImp implements DbHandler
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        pm.getFetchPlan().setGroup(FetchGroup.ALL);
     	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
@@ -107,27 +106,29 @@ public class DbHandlerImp implements DbHandler
             if (null != baseQuery)
             {
                 q.setFilter(baseQuery);
-            }
-            if (null != declaredParams && null != values)
-            {
-                q.declareParameters(declaredParams);
+                
+                if (null != declaredParams && null != values)
+                {
+                    q.declareParameters(declaredParams);
+                }
             }
             if (null != maxResults)
             {
                 q.setRange(0, maxResults); // limit query for the 1st result
             }
             
-            if (null != values)
+            List<T> attached = null;
+            if (null != declaredParams && null != values)
             {
-                @SuppressWarnings("unchecked")
-                List<T> res = (List<T>) q.executeWithArray(values);
-                return res;
+                attached = (List<T>) q.executeWithArray(values);
+            }
+            else
+            {
+	            attached = (List<T>) q.execute();
             }
             
-            @SuppressWarnings("unchecked")
-            List<T> res = (List<T>) q.execute();
-            return res;
-            
+            //detach the objects
+            return (List<T>) pm.detachCopyAll(attached);
         }
         catch (JDOObjectNotFoundException e)
         {
@@ -163,14 +164,13 @@ public class DbHandlerImp implements DbHandler
     public <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz, Integer maxResults, Double centerLat, Double centerLng, Double radiusMeters)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
-        pm.getFetchPlan().setGroup(FetchGroup.ALL);
     	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             Point center = new Point(centerLat, centerLng);
             GeocellQuery baseQuery = new GeocellQuery();
-            return GeocellManager.proximitySearch(center, maxResults, radiusMeters, clazz, baseQuery, pm);
-            
+            List<T> attached = GeocellManager.proximitySearch(center, maxResults, radiusMeters, clazz, baseQuery, pm);
+            return (List<T>) pm.detachCopyAll(attached);
         }
         catch (Exception e)
         {
