@@ -1,5 +1,6 @@
 package foodcenter.server.db;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -23,6 +24,7 @@ import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbMenuCategory;
 import foodcenter.server.db.modules.DbRestaurant;
+import foodcenter.server.db.modules.DbRestaurantBranch;
 
 public class DbHandlerTest
 {
@@ -71,6 +73,7 @@ public class DbHandlerTest
 		return r;
 	}
 
+	
 	@After
 	public void tearDown()
 	{
@@ -151,6 +154,35 @@ public class DbHandlerTest
 			assertNotNull(result.get(i).getMenu().getCategories());
 			assertTrue(result.get(i).getMenu().getCategories().size() != 0);
 		}
+	}
+	
+	@Test
+	public void multipleBranchesTest()
+	{
+		DbRestaurant r = rests[0];
+		DbRestaurantBranch b1 = new DbRestaurantBranch();
+		DbRestaurantBranch b2 = new DbRestaurantBranch();
+		
+		b1.setAddress("addr");
+		b2.setAddress("addr2");
+		
+		r.getBranches().add(b1);
+		
+		
+		r = db.save(r);
+		
+		DbRestaurant result = db.find(DbRestaurant.class, r.getId());
+		
+		assertNotNull(result.getBranches());
+		assertEquals(1, result.getBranches().size());
+		
+		result.getBranches().add(b2);
+		result = db.save(result);
+		
+		result = db.find(DbRestaurant.class, r.getId());
+		assertNotNull(result.getBranches());
+		assertEquals(2, result.getBranches().size());
+		
 	}
 }
 
