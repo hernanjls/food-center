@@ -126,9 +126,12 @@ public class DbHandlerImp implements DbHandler
             {
 	            attached = (List<T>) q.execute();
             }
-            
-            //detach the objects
-            return (List<T>) pm.detachCopyAll(attached);
+            if (null != attached)
+            {
+	            //detach the objects
+            	Object o = pm.detachCopyAll(attached);
+	            return (List<T>) o;
+            }
         }
         catch (JDOObjectNotFoundException e)
         {
@@ -170,17 +173,21 @@ public class DbHandlerImp implements DbHandler
             Point center = new Point(centerLat, centerLng);
             GeocellQuery baseQuery = new GeocellQuery();
             List<T> attached = GeocellManager.proximitySearch(center, maxResults, radiusMeters, clazz, baseQuery, pm);
-            return (List<T>) pm.detachCopyAll(attached);
+            if (null != attached)
+            {
+	            //detach the objects
+	            return (List<T>) pm.detachCopyAll(attached);
+            }
         }
         catch (Exception e)
         {
             logger.error("unexpected exeption", e);
-            return null;
         }
         finally
         {
             pm.close();
         }
+        return null;
     }
     
     @Override

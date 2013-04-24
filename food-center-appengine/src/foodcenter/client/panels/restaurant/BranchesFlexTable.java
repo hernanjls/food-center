@@ -201,7 +201,6 @@ public class BranchesFlexTable extends FlexTable
             popup.hide();
             if (isNew)
             {
-                this.branch.setRestaurant(rest);
                 branches.add(branch);
             }
             printRestaurntBranchTableRow(branch, row);
