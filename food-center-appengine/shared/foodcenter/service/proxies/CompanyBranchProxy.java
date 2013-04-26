@@ -8,36 +8,29 @@ import com.google.web.bindery.requestfactory.shared.ProxyForName;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 
-@ProxyForName(value = "foodcenter.server.db.modules.DbRestaurantBranch", locator = "foodcenter.server.db.DbObjectLocator")
-public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, EntityProxy
+@ProxyForName(value = "foodcenter.server.db.modules.DbCompanyBranch", locator = "foodcenter.server.db.DbObjectLocator")
+public interface CompanyBranchProxy extends AbstractGeoLocationInterface, EntityProxy
 {
-    public RestaurantProxy getRestaurant();
 
-    public void setRestaurant(RestaurantProxy restaurant);
+    public CompanyProxy getCompany();
+
+    public void setCompany(CompanyProxy company);
 
     public List<String> getAdmins();
 
     public void setAdmins(List<String> admins);
 
-    public List<String> getWaiters();
+    public List<String> getEmployees();
 
-    public void setWaiters(List<String> waiters);
+    public void setEmployees(List<String> employees);
 
-    public List<String> getChefs();
-
-    public void setChefs(List<String> chefs);
-
-    public List<TableProxy> getTables();
-
-    public void setTables(List<TableProxy> tables);
+    // public List<String> getOrders();
+    //
+    // public void setOrders(List<String> orders);
 
     public List<CartProxy> getOrders();
 
     public void setOrders(List<CartProxy> orders);
-
-    public MenuProxy getMenu();
-
-    public void setMenu(MenuProxy menu);
 
     public List<ServiceType> getServices();
 
