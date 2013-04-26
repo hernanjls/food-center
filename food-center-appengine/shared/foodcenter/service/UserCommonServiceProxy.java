@@ -16,7 +16,7 @@ public interface UserCommonServiceProxy extends RequestContext
 	
     public Request<UserProxy> getDbUser(String email);
     
-	public Request<UserProxy> getLoginInfo();
+	public Request<UserProxy> login(String gcmKey);
 	
 	public Request<List<RestaurantProxy>> getDefaultRestaurants();
 	

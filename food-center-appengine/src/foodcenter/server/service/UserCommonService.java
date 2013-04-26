@@ -25,66 +25,44 @@ public class UserCommonService
     public static DbUser getDbUser(String email)
     {
         logger.info("getDbUser is called");
-        return db.find(DbUser.class, "email == emailP", "String emailP", new Object[]{email});
+        return db.find(DbUser.class, "email == emailP", "String emailP", new Object[] { email });
     }
-    
-    public static DbUser getLoginInfo()
+
+    public static DbUser login(String gcmKey)
     {
-    	
-    	    	// find user by email
-    	        // if user exists update and return user
-    	        // else save a new user to the db and return it
-        DbUser res = new DbUser();
-//        if(isNewUser(res))
-//        {
-//        	return res;
-//        }
-//        else 
-//        {
-//        	logger.info("User already exsists");
-//        	return res;
-//        }
+
+        // find user by email
+        // if user exists update and return user
+        // else save a new user to the db and return it
+        DbUser user = getDbUser(userService.getCurrentUser().getEmail());
+        if (null == user)
+        {
+            String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+            
+            user = new DbUser();
+
+            user.setEmail(userService.getCurrentUser().getEmail());
+            user.setAdmin(userService.isUserAdmin());
+            user.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
+            user.setNickName(userService.getCurrentUser().getNickname());
+            user.setUserId(userService.getCurrentUser().getUserId());
+            logger.info("Login info: " + user.getEmail());
+        }
+        else
+        {
+            logger.info("User already exsists");
+            user.setAdmin(userService.isUserAdmin());
+        }
         
-//
-        res.setAdmin(userService.isUserAdmin());
-        res.setEmail(userService.getCurrentUser().getEmail());
-
-        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
-        res.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
-        res.setNickName(userService.getCurrentUser().getNickname());
-        res.setUserId(userService.getCurrentUser().getUserId());
-        logger.info("Login info: " + res.getEmail());
-        return res;
+        if (null != gcmKey)
+        {
+            user.setGcmKey(gcmKey);
+        }
+        
+        db.save(user);
+        return user;
     }
 
-    public static boolean isNewEmail(String email)
-    {
-    	return  (null == db.find(DbUser.class, email));
-    	
-    }
-    public static boolean isNewUser(DbUser user)
-    {
-    	
-    	if(isNewEmail(user.getEmail()))
-    	{
-    		 
-    	        user.setAdmin(userService.isUserAdmin());
-    	        user.setEmail(userService.getCurrentUser().getEmail());
-
-    	        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
-    	        user.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
-    	        user.setNickName(userService.getCurrentUser().getNickname());
-    	        user.setUserId(userService.getCurrentUser().getUserId());
-    	        logger.info("Login info: " + user.getEmail());
-    	        db.save(user);
-    	        return true;
-
-    	}
-    	else
-    	{
-    		return false;
-    	}
-    }
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
