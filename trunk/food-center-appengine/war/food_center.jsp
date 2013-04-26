@@ -43,7 +43,7 @@
   <body>
     <%
         Logger logger = LoggerFactory.getLogger(getClass());
-        DbUser info = UserCommonService.getLoginInfo();    
+        DbUser info = UserCommonService.login(null);    
         String nickName = info.getNickName();
         String userId = info.getUserId();
         String role = info.isAdmin() ? "Admin" : "User";        
@@ -60,7 +60,6 @@
 	        out.println("branches[0]->menu->cats " + res.getBranches().get(0).getMenu().getCategories());
 	        out.println("branches[0]->menu->cat[0] " + res.getBranches().get(0).getMenu().getCategories().get(0).getCategoryTitle());
         */
-        
     %>
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">

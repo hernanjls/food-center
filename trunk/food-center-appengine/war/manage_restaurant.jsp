@@ -41,15 +41,15 @@
   <body>
     <%
         Logger logger = LoggerFactory.getLogger(getClass());
-            logger.info("loaded: manage_restaurant.jsp");   
-            DbUser info = UserCommonService.getLoginInfo();    
-            String nickName = info.getNickName();
-            String userId = info.getUserId();
-            String role = info.isAdmin() ? "Admin" : "User";        
-            String email = info.getEmail();        
-            String logoutUrl = info.getLogoutUrl();
+        logger.info("loaded: manage_restaurant.jsp");   
+        DbUser info = UserCommonService.login(null);    
+        String nickName = info.getNickName();
+        String userId = info.getUserId();
+        String role = info.isAdmin() ? "Admin" : "User";        
+        String email = info.getEmail();        
+        String logoutUrl = info.getLogoutUrl();
 
-            logger.debug("loggged in: " + email);
+        logger.debug("loggged in: " + email);
     %>
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">

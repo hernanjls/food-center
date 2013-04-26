@@ -116,7 +116,7 @@ public class DbHandlerTest
 
 		result = db.find(DbRestaurant.class, r.getId());
 		assertNotNull(result.getBranches());
-		assertEquals(2, result.getBranches().size());
+		assertEquals(3, result.getBranches().size());
 	}
 
 	@Test
