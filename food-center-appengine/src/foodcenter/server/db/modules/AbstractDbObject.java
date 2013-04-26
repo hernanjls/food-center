@@ -12,6 +12,8 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 import javax.persistence.Transient;
 
+import com.google.appengine.api.datastore.Key;
+
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
 @PersistenceCapable
@@ -29,7 +31,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
     @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
     private String id;
     
-    @Persistent()
+    @Persistent
     private Integer version = 0;
     
     @Transient
@@ -49,16 +51,19 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
         this.version++;
     };
     
-    public final String getId()
+    @Override
+    public String getId()
     {
         return id;
     }
     
-    public final Integer getVersion() 
+    @Override
+    public Integer getVersion() 
     {  
         return version;  
     }
-
+    
+    @Override
 	public Boolean isEditable()
     {
 	    return editable;

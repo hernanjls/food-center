@@ -96,10 +96,10 @@ public class RestaurantBranchPanel extends VerticalPanel
 
     private Panel createAdminPannel()
     {
-        List<UserProxy> admins = branch.getAdmins();
+        List<String> admins = branch.getAdmins();
         if (null == admins)
         {
-            admins = new LinkedList<UserProxy>();
+            admins = new LinkedList<String>();
             branch.setAdmins(admins);
         }
         return new UsersPannel(admins, isAdmin);
@@ -108,10 +108,10 @@ public class RestaurantBranchPanel extends VerticalPanel
     
     private Panel createWaitersPannel()
     {
-        List<UserProxy> users = branch.getWaiters();
+        List<String> users = branch.getWaiters();
         if (null == users)
         {
-            users = new LinkedList<UserProxy>();
+            users = new LinkedList<String>();
             branch.setWaiters(users);
         }
         return new UsersPannel(users, isAdmin);
@@ -119,10 +119,10 @@ public class RestaurantBranchPanel extends VerticalPanel
     
     private Panel createChefsPannel()
     {
-        List<UserProxy> users = branch.getChefs();
+        List<String> users = branch.getChefs();
         if (null == users)
         {
-            users = new LinkedList<UserProxy>();
+            users = new LinkedList<String>();
             branch.setChefs(users);
         }
         return new UsersPannel(users, isAdmin);

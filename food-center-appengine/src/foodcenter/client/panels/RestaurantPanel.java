@@ -103,10 +103,10 @@ public class RestaurantPanel extends VerticalPanel
     
     private Panel createAdminPannel()
     {
-        List<UserProxy> admins = rest.getAdmins();
+        List<String> admins = rest.getAdmins();
         if (null == admins)
         {
-            admins = new LinkedList<UserProxy>();
+            admins = new LinkedList<String>();
             rest.setAdmins(admins);
         }
         return new UsersPannel(admins, isAdmin);

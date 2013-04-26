@@ -17,17 +17,17 @@ public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, Ent
 
     public void setRestaurant(RestaurantProxy restaurant);
 
-    public List<UserProxy> getAdmins();
+    public List<String> getAdmins();
 
-    public void setAdmins(List<UserProxy> admins);
+    public void setAdmins(List<String> admins);
 
-    public List<UserProxy> getWaiters();
+    public List<String> getWaiters();
 
-    public void setWaiters(List<UserProxy> waiters);
+    public void setWaiters(List<String> waiters);
 
-    public List<UserProxy> getChefs();
+    public List<String> getChefs();
 
-    public void setChefs(List<UserProxy> chefs);
+    public void setChefs(List<String> chefs);
 
     public List<TableProxy> getTables();
 

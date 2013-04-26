@@ -3,14 +3,31 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import com.google.appengine.datanucleus.annotations.Unowned;
-
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
+//@FetchGroup(name = "DbRestaurantBranch", members = { //
+//	@Persistent(name = "menu"),//
+//	@Persistent(name = "admins"), //
+//	@Persistent(name = "waiters"), //
+//	@Persistent(name = "chefs"), //
+//	@Persistent(name = "tables"), //
+//	@Persistent(name = "orders")
+//	
+//})
+@FetchGroups(value = { //
+	@FetchGroup(name = "DbRestaurantBranch_menu", members = { @Persistent(name = "menu") }), //
+    @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
+    @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "waiters") }), //
+    @FetchGroup(name = "DbRestaurantBranch_chefs", members = { @Persistent(name = "chefs") }), //
+    @FetchGroup(name = "DbDbRestaurantBranch_tables", members = { @Persistent(name = "tables") }), //
+    @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
+})
 public class DbRestaurantBranch extends AbstractDbGeoObject
 {
 	/**
@@ -18,34 +35,31 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
      */
 	private static final long serialVersionUID = 2314058106724557278L;
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent()
 	private DbRestaurant restaurant;
 
-	@Persistent(defaultFetchGroup = "true")
-	@Unowned
-	private List<DbUser> admins = new ArrayList<DbUser>();;
+	@Persistent
+	private List<String> admins = new ArrayList<String>();	//emails
 
-	@Persistent(defaultFetchGroup = "true")
-	@Unowned
-	private List<DbUser> waiters = new ArrayList<DbUser>();;
+	@Persistent
+	private List<String> waiters = new ArrayList<String>();	//emails
 
-	@Persistent(defaultFetchGroup = "true")
-	@Unowned
-	private List<DbUser> chefs = new ArrayList<DbUser>();
+	@Persistent
+	private List<String> chefs = new ArrayList<String>();	//emails
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private List<DbTable> tables = new ArrayList<DbTable>();
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private List<DbCart> orders = new ArrayList<DbCart>();
 
-	@Persistent(defaultFetchGroup = "true")
-	private DbMenu menu;
+	@Persistent
+	private DbMenu menu = new DbMenu();
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private List<ServiceType> services = new ArrayList<ServiceType>();
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	private String phone;
 
 	public DbRestaurantBranch()
@@ -64,32 +78,32 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 		this.restaurant = restaurant;
 	}
 
-	public List<DbUser> getAdmins()
+	public List<String> getAdmins()
 	{
 		return admins;
 	}
 
-	public void setAdmins(List<DbUser> admins)
+	public void setAdmins(List<String> admins)
 	{
 		this.admins = admins;
 	}
 
-	public List<DbUser> getWaiters()
+	public List<String> getWaiters()
 	{
 		return waiters;
 	}
 
-	public void setWaiters(List<DbUser> waiters)
+	public void setWaiters(List<String> waiters)
 	{
 		this.waiters = waiters;
 	}
 
-	public List<DbUser> getChefs()
+	public List<String> getChefs()
 	{
 		return chefs;
 	}
 
-	public void setChefs(List<DbUser> chefs)
+	public void setChefs(List<String> chefs)
 	{
 		this.chefs = chefs;
 	}

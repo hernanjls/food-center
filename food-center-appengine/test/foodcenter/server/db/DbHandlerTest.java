@@ -1,8 +1,8 @@
 package foodcenter.server.db;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -49,30 +49,19 @@ public class DbHandlerTest
 
 	private DbRestaurant createRest(String name)
 	{
-		DbCourse course = new DbCourse();
-		course.setName("course");
-		course.setPrice(12.2);
-
-		List<DbCourse> courses = new LinkedList<DbCourse>();
-		courses.add(course);
-
-		DbMenuCategory c = new DbMenuCategory();
-		c.setCategoryTitle("x");
-		c.setCourses(courses);
-
-		List<DbMenuCategory> cats = new LinkedList<DbMenuCategory>();
-		cats.add(c);
-
-		DbMenu menu = new DbMenu();
-		menu.setCategories(cats);
 
 		DbRestaurant r = new DbRestaurant();
+
+		DbMenuCategory category = new DbMenuCategory("x");
+		DbCourse course = new DbCourse("course", 12.2);
+
+		r.getMenu().getCategories().add(category);
+		r.getMenu().getCategories().get(0).getCourses().add(course);
 		r.setName(name);
-		r.setMenu(menu);
 
 		return r;
 	}
-
+	
 	
 	@After
 	public void tearDown()
@@ -80,55 +69,64 @@ public class DbHandlerTest
 		helper.tearDown();
 	}
 
+	public void validateRestaurant(DbRestaurant ref, DbRestaurant o, boolean isValidateId, boolean isValidateName)
+	{
+		assertNotNull(o);
+		if (isValidateId)
+		{
+			assertEquals(ref.getId(), o.getId());
+		}
+		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(o));
+		
+		assertNotNull(o.getName());
+		if (isValidateName)
+		{
+			assertEquals(ref.getName(), o.getName());
+		}
+		
+		assertNotNull(o.getMenu());
+		if (isValidateId)
+		{
+			assertNotNull(o.getMenu().getId());
+		}
+		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(o.getMenu()));
+		
+		
+		assertNotNull(o.getMenu().getCategories());
+		assertNotSame(0, o.getMenu().getCategories().size());
+		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(o.getMenu().getCategories().get(0)));
+
+		assertNotSame(0, o.getMenu().getCategories().get(0).getCourses().size());
+		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(o.getMenu().getCategories().get(0).getCourses().get(0)));
+	}
+	
 	@Test
 	public void saveFindTest()
 	{
 		DbRestaurant r = rests[0];
+		validateRestaurant(r, r, false, false);
 		
-		// make sure all the rest fields are valid
-		assertNotNull(r.getMenu());
-		assertNotNull(r.getMenu().getCategories());
-		assertTrue(r.getMenu().getCategories().size() != 0);
-
 		// save the restaurant 
 		db.save(r);
-
-		DbRestaurant f = db.find(DbRestaurant.class, r.getId());
+		validateRestaurant(r, r, true, true);
 		
-		assertNotNull(f);
-		assertEquals(r.getId(), f.getId());
-		assertNotNull(f.getMenu());
-		assertNotNull(f.getMenu().getCategories());
-		assertTrue(f.getMenu().getCategories().size() != 0);
-
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu()));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0)));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0).getCourses().get(0)));
+		
+		DbRestaurant f = db.find(DbRestaurant.class, r.getId());
+		validateRestaurant(r, f, true, true);
+		
+		
+		f = db.save(f);
+		validateRestaurant(r, f, true, true);
 		
 		
 		f.setName("xzczcx" + Math.random());
+		System.out.println("Object state: " + JDOHelper.getObjectState(f) + ", r: " + JDOHelper.getObjectState(r));
 		f = db.save(f);
+		validateRestaurant(r, f, true, false);
 		
-		assertNotNull(f);
-		assertEquals(r.getId(), f.getId());
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu()));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0)));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0).getCourses().get(0)));
 		
-
 		f = db.find(DbRestaurant.class, r.getId());
-
-		assertNotNull(f.getMenu());
-		assertNotNull(f.getMenu().getCategories());
-		assertTrue(f.getMenu().getCategories().size() != 0);
-
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu()));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0)));
-		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(f.getMenu().getCategories().get(0).getCourses().get(0)));
-
+		validateRestaurant(r, f, true, false);
 	}
 
 	@Test
@@ -143,16 +141,7 @@ public class DbHandlerTest
 		
 		for (int i=0; i< NUM_RESTS; ++i)
 		{
-			assertNotNull(result.get(i));
-			
-			assertEquals(rests[i].getId(), result.get(i).getId());
-			assertEquals(result.get(i).getName(), rests[i].getName());
-			
-			assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(result.get(i)));
-			
-			assertNotNull(result.get(i).getMenu());
-			assertNotNull(result.get(i).getMenu().getCategories());
-			assertTrue(result.get(i).getMenu().getCategories().size() != 0);
+			validateRestaurant(rests[i], result.get(i), true, true);
 		}
 	}
 	
@@ -167,8 +156,7 @@ public class DbHandlerTest
 		b2.setAddress("addr2");
 		
 		r.getBranches().add(b1);
-		
-		
+	
 		r = db.save(r);
 		
 		DbRestaurant result = db.find(DbRestaurant.class, r.getId());
@@ -182,7 +170,69 @@ public class DbHandlerTest
 		result = db.find(DbRestaurant.class, r.getId());
 		assertNotNull(result.getBranches());
 		assertEquals(2, result.getBranches().size());
+	}
+	
+	@Test
+	public void restaurantWithMenuAndBranchMenuTest()
+	{
+		DbRestaurant r = new DbRestaurant("test");
 		
+		for (int i = 0; i< 2; ++i)
+		{
+			DbMenuCategory mc = new DbMenuCategory("cat" + i);
+			mc.getCourses().add(new DbCourse("course1_" + i, 13.4));
+			mc.getCourses().add(new DbCourse("course2_" + i, 13.4));
+			r.getMenu().getCategories().add(mc);
+		}
+
+		for (int i=0; i<2 ; ++i)		//add 2 branches
+		{
+			DbRestaurantBranch b = new DbRestaurantBranch();
+			b.setAddress("addr");
+			for (int j=0; j<2; ++j)		// 2 categories for each branch
+			{
+				DbMenuCategory mc = new DbMenuCategory("branchcat" + i);
+				for (int k=0; k< 2; ++k)	// 2 courses for each category
+				{
+					mc.getCourses().add(new DbCourse("course1_" + i + j + k, 13.4 + 5 * Math.random()));
+				}
+				b.getMenu().getCategories().add(mc);
+			}
+			r.getBranches().add(b);
+				
+		}
+
+		assertEquals(2, r.getMenu().getCategories().size());
+		db.save(r);
+		
+		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
+		validateRestaurant(r, res, true, true);
+		
+		assertNotNull(res.getMenu());
+		assertNotNull(res.getMenu().getCategories());
+		assertEquals(2, res.getMenu().getCategories().size());
+		
+		for (int i =0; i<2; ++i)
+		{
+			assertNotNull(res.getMenu().getCategories().get(i));
+			assertNotNull(res.getMenu().getCategories().get(i).getCourses());
+			assertEquals(2, res.getMenu().getCategories().get(i).getCourses().size());
+		}
+		
+
+		for (int i=0; i<2 ; ++i)
+		{
+			assertNotNull(res.getBranches().get(i).getMenu());
+			assertNotNull(res.getBranches().get(i).getMenu().getCategories());
+			assertEquals(2, res.getBranches().get(i).getMenu().getCategories().size());
+			
+			for (int j=0; j<2; ++j)
+			{
+				assertNotNull(res.getBranches().get(i).getMenu().getCategories().get(j));
+				assertNotNull(res.getBranches().get(i).getMenu().getCategories().get(j).getCourses());
+				assertEquals(2, res.getBranches().get(i).getMenu().getCategories().get(j).getCourses().size());		
+			}
+		}
 	}
 }
 
