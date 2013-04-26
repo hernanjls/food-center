@@ -18,6 +18,8 @@ public interface UserCommonServiceProxy extends RequestContext
     
 	public Request<UserProxy> login(String gcmKey);
 	
+	public Request<Void> logout();
+	
 	public Request<List<RestaurantProxy>> getDefaultRestaurants();
 	
 	public Request<RestaurantProxy> getRestaurant(String id);

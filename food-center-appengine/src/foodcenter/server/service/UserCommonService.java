@@ -63,6 +63,19 @@ public class UserCommonService
         return user;
     }
 
+    public static void logout()
+    {
+        DbUser user = getDbUser(userService.getCurrentUser().getEmail());;
+        if (null == user)
+        {
+            return;
+            
+        }
+        user.setGcmKey("");
+        db.save(user);
+    }
+
+
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
