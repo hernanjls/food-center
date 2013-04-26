@@ -11,6 +11,7 @@ import com.google.appengine.api.utils.SystemProperty;
 
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandlerImp;
+import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUser;
 
@@ -96,4 +97,27 @@ public class UserCommonService
     {
         return 0 == Long.compare(0l, db.delete(DbRestaurant.class, id));
     }
+    
+    
+    public static List<DbCompany> getDefaultCompanies()
+    {
+        logger.info("getDefaultCompanies is called");
+        return db.find(DbCompany.class, 10);
+    }
+    public static DbCompany getCompany(String id)
+    {
+        return db.find(DbCompany.class, id);
+    }
+
+    public static DbCompany saveCompany(DbCompany comp)
+    {
+        return db.save(comp);
+    }
+
+    public static Boolean deleteCompany(String id)
+    {
+        return 0 == Long.compare(0l, db.delete(DbCompany.class, id));
+    }
+
+    
 }

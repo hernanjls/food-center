@@ -1,19 +1,122 @@
 package foodcenter.server.db.modules;
 
-import javax.jdo.annotations.PersistenceCapable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+
+import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable="true")
-public class DbCompanyBranch extends AbstractDbObject
+//@FetchGroup(name = "DbCompanyBranch", members = { //
+//@Persistent(name = "menu"),//
+//@Persistent(name = "admins"), //
+//@Persistent(name = "employees"), //
+//@Persistent(name = "orders")
+//
+//})
+@FetchGroups(value = { //
+  @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
+  @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "employees") }), //
+  @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
+})
+public class DbCompanyBranch extends AbstractDbGeoObject
 {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5543026953456550227L;
 
-	public DbCompanyBranch()
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5913714255915329286L;
+
+    @Persistent()
+    private DbCompany company;
+
+    @Persistent
+    private List<String> admins = new ArrayList<String>(); // emails
+
+    @Persistent
+    private List<String> employees = new ArrayList<String>(); // emails
+
+    @Persistent
+    private List<DbCart> orders = new ArrayList<DbCart>();
+
+    @Persistent
+    private List<ServiceType> services = new ArrayList<ServiceType>();
+
+    @Persistent
+    private String phone;
+
+    public DbCompanyBranch()
     {
+        // empty ctor
         super();
     }
 
+    public DbCompany getCompany()
+    {
+        return company;
+    }
+
+    public void setCompany(DbCompany company)
+    {
+        this.company = company;
+    }
+
+    public List<String> getAdmins()
+    {
+        return admins;
+    }
+
+    public void setAdmins(List<String> admins)
+    {
+        this.admins = admins;
+    }
+
+    public List<String> getEmployees()
+    {
+        return employees;
+    }
+
+    public void setEmployees(List<String> employees)
+    {
+        this.employees = employees;
+    }
+
+    public List<DbCart> getOrders()
+    {
+        return orders;
+    }
+
+    public void setOrders(List<DbCart> orders)
+    {
+        this.orders = orders;
+    }
+
+    public List<ServiceType> getServices()
+    {
+        return services;
+    }
+
+    public void setServices(List<ServiceType> services)
+    {
+        this.services = services;
+    }
+
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
+    }
+
+    public static long getSerialversionuid()
+    {
+        return serialVersionUID;
+    }
 }
