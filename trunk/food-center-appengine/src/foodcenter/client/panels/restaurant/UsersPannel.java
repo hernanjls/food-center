@@ -21,11 +21,11 @@ public class UsersPannel extends FlexTable
 
     
     private final Boolean isAdmin;
-    private final List<UserProxy> users;
+    private final List<String> users;
     
     private final Button newUserButton; 
 
-    public UsersPannel(List<UserProxy> users, Boolean isAdmin)
+    public UsersPannel(List<String> users, Boolean isAdmin)
     {
         super();
         this.isAdmin = isAdmin;
@@ -48,7 +48,7 @@ public class UsersPannel extends FlexTable
         
         // Print all the categories if exits
         int idx = 0;
-        for (UserProxy up : users)
+        for (String up : users)
         {
             printUserRow(up, idx);
             ++idx;
@@ -83,7 +83,7 @@ public class UsersPannel extends FlexTable
     }
 
 
-    public void printUserRow(UserProxy userProxy, int idx)
+    public void printUserRow(String email, int idx)
     {
         int row = getRowCount();
         
@@ -91,7 +91,7 @@ public class UsersPannel extends FlexTable
         delete.addClickHandler(new DeleteUserClickHandler(idx));
         delete.setEnabled(isAdmin);
         
-        setText(row, 0, userProxy.getEmail());
+        setText(row, 0, email);
         setWidget(row, 1, delete);
 
     }
@@ -132,7 +132,7 @@ public class UsersPannel extends FlexTable
         {
             if (null != response)
             {
-                users.add(response);
+                users.add(response.getEmail());
                 redraw();
             }
             else

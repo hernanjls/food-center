@@ -2,7 +2,7 @@ package foodcenter.server.db.modules;
 
 import javax.jdo.annotations.PersistenceCapable;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class DbTable extends AbstractDbObject
 {
     

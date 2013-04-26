@@ -1,130 +1,140 @@
 package foodcenter.server.db.modules;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
-import com.google.appengine.datanucleus.annotations.Unowned;
-
 import foodcenter.service.enums.ServiceType;
 
+@PersistenceCapable(detachable = "true")
+//@FetchGroup(name = "DbRestaurant", members = { //
+//	@Persistent(name = "menu"), //
+//	@Persistent(name = "iconBytes"), //
+//	@Persistent(name = "branches"),  //
+//	@Persistent(name = "admins"), //
+//	@Persistent(name = "services") //
+//})
 
-
-@PersistenceCapable
+@FetchGroups(value = { //
+	@FetchGroup(name = "DbRestaurant_menu", members = { @Persistent(name = "menu") }), //
+    @FetchGroup(name = "DbRestaurant_iconBytes", members = { @Persistent(name = "iconBytes") }), //
+    @FetchGroup(name = "DbRestaurant_branches", members = { @Persistent(name = "branches") }), //
+    @FetchGroup(name = "DbRestaurant_admins", members = { @Persistent(name = "admins") }), //
+    @FetchGroup(name = "DbRestaurant_services", members = { @Persistent(name = "services") }), //
+})
 public class DbRestaurant extends AbstractDbObject
 {
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 6705094027232991722L;
+	private static final long serialVersionUID = 6705094027232991722L;
 
-    @Persistent
-    @NotNull
-    private String name = "";
-    
-    @Persistent(defaultFetchGroup="true")
-    private DbMenu menu = new DbMenu();
-    
-    @Persistent(defaultFetchGroup="true")
-    private List<Byte> iconBytes = new ArrayList<Byte>();
-    
-    @Persistent
-    private String phone = "";
-    
-    @Persistent(mappedBy = "restaurant", defaultFetchGroup="true")
-    private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
-    
-    @Persistent(defaultFetchGroup="true")
-    @Unowned
-    private List<DbUser> admins = new ArrayList<DbUser>();
-    
-    @Persistent(defaultFetchGroup="true")
-    private List<ServiceType> services = new ArrayList<ServiceType>();
-    
-    public DbRestaurant()
-    {
-        super();
-    }
-    
-    public DbRestaurant(String name)
-    {
-        this();
-        this.name = name;
-    }
+	@Persistent
+	@NotNull
+	private String name = "";
 
-    public String getName()
-    {
-        return name;
-    }
+	@Persistent
+	private DbMenu menu = new DbMenu();
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+	@Persistent
+	private List<Byte> iconBytes = new ArrayList<Byte>();
 
-    public DbMenu getMenu()
-    {
-        return menu;
-    }
+	@Persistent
+	private String phone = "";
 
-    public void setMenu(DbMenu menu)
-    {
-        this.menu = menu;
-    }
+	@Persistent(mappedBy = "restaurant")
+	private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
 
-    public List<Byte> getIconBytes()
-    {
-        return iconBytes;
-    }
+	@Persistent
+	private List<String> admins = new ArrayList<String>(); // emails
 
-    public void setIconBytes(List<Byte> iconBytes)
-    {
-        this.iconBytes = iconBytes;
-    }
+	@Persistent
+	private List<ServiceType> services = new ArrayList<ServiceType>();
 
-    public String getPhone()
-    {
-        return phone;
-    }
+	public DbRestaurant()
+	{
+		super();
+	}
 
-    public void setPhone(String phone)
-    {
-        this.phone = phone;
-    }
+	public DbRestaurant(String name)
+	{
+		this();
+		this.name = name;
+	}
 
-    public List<DbRestaurantBranch> getBranches()
-    {
-        return branches;
-    }
+	public String getName()
+	{
+		return name;
+	}
 
-    public void setBranches(List<DbRestaurantBranch> branches)
-    {
-        this.branches = branches;
-    }
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 
-    public List<DbUser> getAdmins()
-    {
-        return admins;
-    }
+	public DbMenu getMenu()
+	{
+		return menu;
+	}
 
-    public void setAdmins(List<DbUser> admins)
-    {
-        this.admins = admins;
-    }
+	public void setMenu(DbMenu menu)
+	{
+		this.menu = menu;
+	}
+
+	public List<Byte> getIconBytes()
+	{
+		return iconBytes;
+	}
+
+	public void setIconBytes(List<Byte> iconBytes)
+	{
+		this.iconBytes = iconBytes;
+	}
+
+	public String getPhone()
+	{
+		return phone;
+	}
+
+	public void setPhone(String phone)
+	{
+		this.phone = phone;
+	}
+
+	public List<DbRestaurantBranch> getBranches()
+	{
+		return branches;
+	}
+
+	public void setBranches(List<DbRestaurantBranch> branches)
+	{
+		this.branches = branches;
+	}
+
+	public List<String> getAdmins()
+	{
+		return admins;
+	}
+
+	public void setAdmins(List<String> admins)
+	{
+		this.admins = admins;
+	}
 
 	public List<ServiceType> getServices()
-    {
-	    return services;
-    }
+	{
+		return services;
+	}
 
 	public void setServices(List<ServiceType> services)
-    {
-	    this.services = services;
-    }
-    
+	{
+		this.services = services;
+	}
 
 }

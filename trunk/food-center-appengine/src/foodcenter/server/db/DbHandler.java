@@ -3,6 +3,7 @@ package foodcenter.server.db;
 import java.util.List;
 
 import com.beoui.geocell.GeocellManager;
+import com.google.appengine.api.datastore.Key;
 
 import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.server.db.modules.DbMsg;
@@ -10,9 +11,7 @@ import foodcenter.server.db.modules.AbstractDbObject;
 import foodcenter.server.db.modules.DbRestaurant;
 
 public interface DbHandler
-{
-
-    
+{   
     public DbRestaurant searchRestaurantByName(String name);    
     
     // deprecated (remian for example only)

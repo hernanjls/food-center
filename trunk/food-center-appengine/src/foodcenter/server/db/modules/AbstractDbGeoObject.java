@@ -28,7 +28,7 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject implements Ab
 	@Longitude
 	private Double lng = 0.0;
 
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent
 	@Geocells
 	private List<String> geoCells;
 

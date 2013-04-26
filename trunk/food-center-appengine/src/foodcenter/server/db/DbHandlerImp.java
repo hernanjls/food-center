@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
+import javax.jdo.FetchGroup;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -26,13 +28,22 @@ public class DbHandlerImp implements DbHandler
     private Logger logger = LoggerFactory.getLogger(DbHandlerImp.class);
 
     
+    private PersistenceManager getPersistenceManager()
+    {
+    	PersistenceManager pm = PMF.get().getPersistenceManager();
+    	pm.getFetchPlan().addGroup(FetchGroup.ALL);
+    	pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+    	return pm;
+    }
+    
     @Override
     public <T extends AbstractDbObject> T save(T object)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try
         {
-            return pm.makePersistent(object);
+            T res = pm.makePersistent(object);
+            return res;
         }
         catch (Throwable e)
         {
@@ -70,13 +81,13 @@ public class DbHandlerImp implements DbHandler
     @Override
     public <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
-    	pm.getFetchPlan().setMaxFetchDepth(-1);
+        PersistenceManager pm = getPersistenceManager();
     	T res = null;
         try
-        {
+    	{
             res =  pm.getObjectById(clazz, id);
-            return pm.detachCopy(res);
+            pm.detachCopy(res);
+            return res;
         }
         catch (JDOObjectNotFoundException e)
         {
@@ -84,7 +95,6 @@ public class DbHandlerImp implements DbHandler
         }
         catch (Exception e)
         {
-        	
             logger.error(e.getMessage(), e);
         }
         finally
@@ -98,8 +108,7 @@ public class DbHandlerImp implements DbHandler
     @Override
     public <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
-    	pm.getFetchPlan().setMaxFetchDepth(-1);
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             Query q = pm.newQuery(clazz);
@@ -128,9 +137,13 @@ public class DbHandlerImp implements DbHandler
             }
             if (null != attached)
             {
-	            //detach the objects
-            	Object o = pm.detachCopyAll(attached);
-	            return (List<T>) o;
+            	if (0 != attached.size())
+            	{
+    	            //detach the objects
+                	pm.detachCopyAll(attached);
+            	}
+        		return attached;
+	            
             }
         }
         catch (JDOObjectNotFoundException e)
@@ -166,7 +179,7 @@ public class DbHandlerImp implements DbHandler
     @Override
     public <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz, Integer maxResults, Double centerLat, Double centerLng, Double radiusMeters)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
     	pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {

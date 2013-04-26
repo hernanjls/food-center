@@ -51,8 +51,16 @@ public class RestaurantsListPanel extends VerticalPanel
 		popup.setWidget(new Label("Loading..."));
 		popup.center();
 		// TODO deal "with" this!!!!
-		service.getDefaultRestaurants().with("menu", "menu.categories", "menu.categories.courses", "iconBytes", "branches", "branches.menu", "branches.menu.categories",
-		    "branches.menu.categories.courses", "admins").fire(new GetDefaultRestaurantsReceiver(popup));
+		service.getDefaultRestaurants().with("menu", //
+											 "menu.categories",	// 
+											 "menu.categories.courses",	// 
+											 "iconBytes", 	//
+											 "branches", 	//
+											 "branches.menu", 	//
+											 "branches.menu.categories",	//
+											 "branches.menu.categories.courses",	// 
+											 "admins")	//
+											 .fire(new GetDefaultRestaurantsReceiver(popup));
 	}
 
 	private void redraw(List<RestaurantProxy> rests)

@@ -5,7 +5,7 @@ import javax.jdo.annotations.Persistent;
 import javax.persistence.Transient;
 
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class DbUser extends AbstractDbObject
 {
 

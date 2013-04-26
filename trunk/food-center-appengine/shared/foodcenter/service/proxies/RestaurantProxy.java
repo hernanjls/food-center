@@ -24,6 +24,6 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
 	public void setServices(List<ServiceType> services);
 	public List<RestaurantBranchProxy> getBranches();
 	public void setBranches(List<RestaurantBranchProxy> branches);
-	public List<UserProxy> getAdmins();
-	public void setAdmins(List<UserProxy> admins);
+	public List<String> getAdmins();
+	public void setAdmins(List<String> admins);
 }
