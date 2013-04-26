@@ -101,5 +101,24 @@ public class UserCommonServiceTest
         user = db.find(DbUser.class, "email == emailP", "String emailP", new Object[]{email});
         assertEquals(gcmKey2, user.getGcmKey());
     }
-    
+
+    /**
+     * checks that logout removes GCM key from the server
+     */
+    @Test
+    public void logoutTest()
+    {
+        String gcmKey = "hila";
+        // login with GCM key
+        DbUser user = UserCommonService.login(gcmKey);
+        
+        // logout
+        UserCommonService.logout();
+   
+        // make sure the GCM key was removed
+        user = db.find(DbUser.class, "email == emailP", "String emailP", new Object[]{email});
+        assertNotNull(user);
+        assertEquals("" , user.getGcmKey());   
+    }
 }
+    
