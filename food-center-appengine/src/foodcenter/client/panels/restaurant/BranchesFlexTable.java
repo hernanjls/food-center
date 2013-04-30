@@ -1,5 +1,6 @@
 package foodcenter.client.panels.restaurant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -10,6 +11,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import foodcenter.client.panels.RestaurantBranchPanel;
+import foodcenter.client.service.RequestUtils;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -45,11 +47,14 @@ public class BranchesFlexTable extends FlexTable
         printTableHeader();   
         
         // Print all the branches if exits
-        int row = getRowCount();
-        for (RestaurantBranchProxy rbp : branches)
+        if (null != branches)
         {
-            printRestaurntBranchTableRow(rbp, row);
-            row++;
+        	int row = getRowCount();
+	        for (RestaurantBranchProxy rbp : branches)
+	        {
+	            printRestaurntBranchTableRow(rbp, row);
+	            row++;
+	        }
         }
     }
     
@@ -105,7 +110,7 @@ public class BranchesFlexTable extends FlexTable
         {
             
             // construct a new branch, it will be edited by the rest branch panel
-            RestaurantBranchProxy branch = requestContext.create(RestaurantBranchProxy.class);
+            RestaurantBranchProxy branch = RequestUtils.createRestaurantBranchProxy(requestContext);
             
             // get the next row of the table
             int row = getRowCount();

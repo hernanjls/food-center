@@ -1,5 +1,6 @@
 package foodcenter.client.panels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,6 +21,9 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.enums.ServiceType;
+import foodcenter.service.proxies.MenuCategoryProxy;
+import foodcenter.service.proxies.MenuProxy;
+import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestaurantsListPanel extends VerticalPanel
@@ -68,11 +72,15 @@ public class RestaurantsListPanel extends VerticalPanel
 		restsTable.removeAllRows();
 		printRestaurantsTableHeader();
 
-		int row = restsTable.getRowCount();
-		for (RestaurantProxy r : rests)
+		
+		if (null != rests)
 		{
-			printRestaurantRow(r, row);
-			row++;
+			int row = restsTable.getRowCount();
+			for (RestaurantProxy r : rests)
+			{
+				printRestaurantRow(r, row);
+				row++;
+			}
 		}
 	}
 
@@ -174,7 +182,7 @@ public class RestaurantsListPanel extends VerticalPanel
 		{
 			UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService();
 
-			RestaurantProxy rest = service.create(RestaurantProxy.class);
+			RestaurantProxy rest = RequestUtils.createRestaurantProxy(service);
 
 			PopupPanel popup = new PopupPanel(false);
 
@@ -211,6 +219,7 @@ public class RestaurantsListPanel extends VerticalPanel
 			PopupPanel popup = new PopupPanel(false);
 
 			RestaurantProxy editable = service.edit(rest);
+			//TODO check for nulls on empty lists
 
 			Runnable onSave = new OnClickSaveRestaurant(service, popup, rest, row);
 			Runnable onDiscard = new OnDiscardRestaurant(popup);

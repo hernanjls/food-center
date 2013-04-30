@@ -48,10 +48,13 @@ public class UsersPannel extends FlexTable
         
         // Print all the categories if exits
         int idx = 0;
-        for (String up : users)
+        if (null != users)
         {
-            printUserRow(up, idx);
-            ++idx;
+	        for (String up : users)
+	        {
+	            printUserRow(up, idx);
+	            ++idx;
+	        }
         }
     }
     

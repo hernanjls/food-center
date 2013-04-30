@@ -137,11 +137,8 @@ public class DbHandlerImp implements DbHandler
             }
             if (null != attached)
             {
-            	if (0 != attached.size())
-            	{
-    	            //detach the objects
-                	pm.detachCopyAll(attached);
-            	}
+	            //detach the objects
+            	pm.detachCopyAll(attached);
         		return attached;
 	            
             }

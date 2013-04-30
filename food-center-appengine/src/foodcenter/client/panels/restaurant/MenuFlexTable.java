@@ -1,5 +1,6 @@
 package foodcenter.client.panels.restaurant;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
+import foodcenter.client.service.RequestUtils;
+import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
 
@@ -32,10 +35,6 @@ public class MenuFlexTable extends FlexTable
         this.menuProxy = menuProxy;
         this.isAdmin = isAdmin;
         
-        if (null == this.menuProxy.getCategories())
-        {
-            this.menuProxy.setCategories(new LinkedList<MenuCategoryProxy>());
-        }
         
         redraw();
     }
@@ -50,10 +49,13 @@ public class MenuFlexTable extends FlexTable
         
         // Print all the categories if exits
         List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        for (MenuCategoryProxy mcp : cats)
+        if (null != cats)
         {
-            printCategoryTableRow(mcp);
-        }
+	        for (MenuCategoryProxy mcp : cats)
+	        {
+	            printCategoryTableRow(mcp);
+	        }
+    	}
     }
     
     /**
@@ -80,13 +82,12 @@ public class MenuFlexTable extends FlexTable
      */
     private void addCategory()
     {
-    	List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        
         // create a blank category
-        MenuCategoryProxy menuCatProxy = requestContext.create(MenuCategoryProxy.class);
+        MenuCategoryProxy menuCatProxy = RequestUtils.createMenuCategoryProxy(requestContext);
         
         // add it to the menu proxy
-        cats.add(menuCatProxy);
+        //FIXME null when there were no categories in the 1st place....
+        menuProxy.getCategories().add(menuCatProxy);
         
         // print its table row
         printCategoryTableRow(menuCatProxy);
@@ -101,6 +102,7 @@ public class MenuFlexTable extends FlexTable
     	// delete it from the menu proxy
         List<MenuCategoryProxy> cats = menuProxy.getCategories();
         cats.remove(row - 1);
+        redraw();
     }
     
     /**
