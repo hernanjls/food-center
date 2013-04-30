@@ -66,10 +66,10 @@ public class RestaurantBranchPanel extends VerticalPanel
         StackPanel res = new StackPanel();
        
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch);
-        Panel menuPanel = createMenuPanel();
-        Panel adminsPanel = createAdminPannel();
-        Panel waitersPanel = createWaitersPannel();
-        Panel chefsPanel = createChefsPannel();
+        Panel menuPanel = new MenuFlexTable(requestContext, branch.getMenu(), isAdmin);
+        Panel adminsPanel = new UsersPannel(branch.getAdmins(), isAdmin);;
+        Panel waitersPanel = new UsersPannel(branch.getWaiters(), isAdmin);
+        Panel chefsPanel = new UsersPannel(branch.getChefs(), isAdmin);
 
         res.add(locationPanel, "Location");
         res.add(menuPanel, "Menu");
@@ -82,52 +82,6 @@ public class RestaurantBranchPanel extends VerticalPanel
         return res;
 
     }
-
-    private Panel createMenuPanel()
-    {
-        MenuProxy menuProxy = branch.getMenu();
-        if (null == menuProxy)
-        {
-            menuProxy = requestContext.create(MenuProxy.class);
-            branch.setMenu(menuProxy);
-        }
-        return new MenuFlexTable(requestContext, menuProxy, isAdmin);
-    }
-
-    private Panel createAdminPannel()
-    {
-        List<String> admins = branch.getAdmins();
-        if (null == admins)
-        {
-            admins = new LinkedList<String>();
-            branch.setAdmins(admins);
-        }
-        return new UsersPannel(admins, isAdmin);
-
-    }
-    
-    private Panel createWaitersPannel()
-    {
-        List<String> users = branch.getWaiters();
-        if (null == users)
-        {
-            users = new LinkedList<String>();
-            branch.setWaiters(users);
-        }
-        return new UsersPannel(users, isAdmin);
-    }
-    
-    private Panel createChefsPannel()
-    {
-        List<String> users = branch.getChefs();
-        if (null == users)
-        {
-            users = new LinkedList<String>();
-            branch.setChefs(users);
-        }
-        return new UsersPannel(users, isAdmin);
-    }
-    
     
     private class CloseClickHandler implements ClickHandler
     {

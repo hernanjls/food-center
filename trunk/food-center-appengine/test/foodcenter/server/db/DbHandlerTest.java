@@ -93,6 +93,23 @@ public class DbHandlerTest
 	}
 
 	@Test
+	public void addMenuCategoryTest()
+	{
+		DbRestaurant r = createRest("test", 2, 2, 2, 2, 2);	
+		db.save(r);
+		
+		DbRestaurantBranch toAdd = new DbRestaurantBranch();
+		toAdd.setAddress("safdasda");
+		r.getBranches().add(toAdd);
+		
+		db.save(r);
+		assertEquals(3, r.getBranches().size());
+		
+		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
+		assertEquals(3, res.getBranches().size());
+	}
+	
+	@Test
 	public void multipleBranchesTest()
 	{
 		DbRestaurant r = rests[0];
@@ -122,80 +139,100 @@ public class DbHandlerTest
 	@Test
 	public void restaurantWithMenuAndBranchMenuTest()
 	{
-		DbRestaurant r = new DbRestaurant("test");
+		
+		int menuCats = 3;
+		int menuCatCourses = 4;
+		int numBranches = 2;
+		int numBranchMenuCats = 3;
+		int numBranchMenuCatCourses = 8;
+		DbRestaurant r = createRest("rest", // 
+									menuCats, // 
+									menuCatCourses, // 
+									numBranches, //
+									numBranchMenuCats, // 
+									numBranchMenuCatCourses); 
 
-		for (int i = 0; i < 2; ++i)
-		{
-			DbMenuCategory mc = new DbMenuCategory("cat" + i);
-			mc.getCourses().add(new DbCourse("course1_" + i, 13.4));
-			mc.getCourses().add(new DbCourse("course2_" + i, 13.4));
-			r.getMenu().getCategories().add(mc);
-		}
-
-		for (int i = 0; i < 2; ++i) // add 2 branches
-		{
-			DbRestaurantBranch b = new DbRestaurantBranch();
-			b.setAddress("addr");
-			for (int j = 0; j < 2; ++j) // 2 categories for each branch
-			{
-				DbMenuCategory mc = new DbMenuCategory("branchcat" + i);
-				for (int k = 0; k < 2; ++k) // 2 courses for each category
-				{
-					mc.getCourses().add(new DbCourse("course1_" + i + j + k, 13.4 + 5 * Math.random()));
-				}
-				b.getMenu().getCategories().add(mc);
-			}
-			r.getBranches().add(b);
-
-		}
-
-		assertEquals(2, r.getMenu().getCategories().size());
+		assertEquals(menuCats, r.getMenu().getCategories().size());
 		db.save(r);
 
 		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
 		validateRestaurant(r, res, true, true);
 
-		assertNotNull(res.getMenu());
-		assertNotNull(res.getMenu().getCategories());
-		assertEquals(2, res.getMenu().getCategories().size());
-
-		for (int i = 0; i < 2; ++i)
-		{
-			assertNotNull(res.getMenu().getCategories().get(i));
-			assertNotNull(res.getMenu().getCategories().get(i).getCourses());
-			assertEquals(2, res.getMenu().getCategories().get(i).getCourses().size());
-		}
-
-		for (int i = 0; i < 2; ++i)
-		{
-			assertNotNull(res.getBranches().get(i).getMenu());
-			assertNotNull(res.getBranches().get(i).getMenu().getCategories());
-			assertEquals(2, res.getBranches().get(i).getMenu().getCategories().size());
-
-			for (int j = 0; j < 2; ++j)
-			{
-				assertNotNull(res.getBranches().get(i).getMenu().getCategories().get(j));
-				assertNotNull(res.getBranches().get(i).getMenu().getCategories().get(j).getCourses());
-				assertEquals(2, res.getBranches().get(i).getMenu().getCategories().get(j).getCourses().size());
-			}
-		}
+		validateRestHirarchy(res, //
+							 menuCats, //
+							 menuCatCourses, //
+							 numBranches, //
+							 numBranchMenuCats, //
+							 numBranchMenuCatCourses);
 	}
 
 	@Test
-	public void addMenuCategoryTest()
+	public void restaurantWithMenuAndBranchMenuAddBranchTest()
 	{
-		DbRestaurant r = createRest("test", 2, 2, 2, 2, 2);	
-		db.save(r);
 		
-		DbRestaurantBranch toAdd = new DbRestaurantBranch();
-		toAdd.setAddress("safdasda");
-		r.getBranches().add(toAdd);
-		
+		int menuCats = 3;
+		int menuCatCourses = 4;
+		int numBranches = 2;
+		int numBranchMenuCats = 3;
+		int numBranchMenuCatCourses = 8;
+		DbRestaurant r = createRest("rest", // 
+									menuCats, // 
+									menuCatCourses, // 
+									numBranches, //
+									numBranchMenuCats, // 
+									numBranchMenuCatCourses); 
 		db.save(r);
-		assertEquals(3, r.getBranches().size());
+
+		r = db.find(DbRestaurant.class, r.getId());
+		
+		DbRestaurant r2 = createRest("rest", // 
+									 menuCats, // 
+									 menuCatCourses, // 
+									 numBranches, //
+									 numBranchMenuCats, // 
+									 numBranchMenuCatCourses);
+		
+		r.getBranches().add(r2.getBranches().get(0));
+		db.save(r);
 		
 		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
-		assertEquals(3, res.getBranches().size());
+		
+		validateRestHirarchy(res, //
+							 menuCats, //
+							 menuCatCourses, //
+							 numBranches + 1, //
+							 numBranchMenuCats, //
+							 numBranchMenuCatCourses);
+	}
+	
+	@Test
+	public void findWithLessThanMaxResults()
+	{
+		int menuCats = 3;
+		int menuCatCourses = 4;
+		int numBranches = 2;
+		int numBranchMenuCats = 3;
+		int numBranchMenuCatCourses = 8;
+		DbRestaurant r = createRest("rest", // 
+									menuCats, // 
+									menuCatCourses, // 
+									numBranches, //
+									numBranchMenuCats, // 
+									numBranchMenuCatCourses);
+		
+		DbRestaurant r2 = createRest("rest", // 
+						  0, // 
+						  menuCatCourses, // 
+						  numBranches, //
+						  0, // 
+						  numBranchMenuCatCourses);
+		
+		db.save(r);
+		db.save(r2);
+		
+		List<DbRestaurant> list = db.find(DbRestaurant.class, 10);
+		assertNotNull(list);
+		
 	}
 
 	private DbRestaurant createRest(String name, //
@@ -271,6 +308,51 @@ public class DbHandlerTest
 		assertEquals(ObjectState.TRANSIENT, JDOHelper.getObjectState(o.getMenu().getCategories().get(0).getCourses().get(0)));
 	}
 
+	private void validateRestHirarchy(DbRestaurant rest, // 
+									  int menuCats, //
+									  int menuCatCourses, // 
+									  int numBranches, //
+									  int numBranchMenuCats, //
+									  int numBranchMenuCatCourses)
+	{
+		// validate rest menu
+		assertNotNull(rest.getMenu());
+		assertNotNull(rest.getMenu().getCategories());
+		assertEquals(menuCats, rest.getMenu().getCategories().size());
+		
+		for (int i=0; i<menuCats; ++i)
+		{
+			assertNotNull(rest.getMenu().getCategories().get(i).getCourses());
+			assertEquals(menuCatCourses, rest.getMenu().getCategories().get(i).getCourses().size());
+			for (int j=0; j<menuCatCourses; ++j)
+			{
+				assertNotNull(rest.getMenu().getCategories().get(i).getCourses().get(j));
+			}
+		}
+
+		//validate branches
+		assertNotNull(rest.getBranches());
+		assertEquals(numBranches, rest.getBranches().size());
+		for (int i = 0; i < numBranches; ++i)
+		{
+			assertNotNull(rest.getBranches().get(i));
+			assertNotNull(rest.getBranches().get(i).getMenu());
+			assertNotNull(rest.getBranches().get(i).getMenu().getCategories());
+			assertEquals(numBranchMenuCats, rest.getBranches().get(i).getMenu().getCategories().size());
+			for (int j=0; j<numBranchMenuCats; ++j)
+			{
+				assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j));
+				assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j).getCourses());
+				assertEquals(numBranchMenuCatCourses, rest.getBranches().get(i).getMenu().getCategories().get(j).getCourses().size());
+				for (int k=0; k<numBranchMenuCatCourses; ++k)
+				{
+					assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j).getCourses().get(k));
+				}
+				
+			}
+		}
+	}
+	
 }
 
 class DbRestaurantComparator implements Comparator<DbRestaurant>

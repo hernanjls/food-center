@@ -73,9 +73,9 @@ public class RestaurantPanel extends VerticalPanel
 
         // profile pannel
         Panel profilePanel = new RestaurantProfilePannel(rest, isAdmin);
-        Panel menuPanel = createMenuPannel();
-        Panel adminsPanel = createAdminPannel();
-        Panel branchesPanel = createBranchesPanel();
+        Panel menuPanel = new MenuFlexTable(requestContext, rest.getMenu(), isAdmin);
+        Panel adminsPanel = new UsersPannel(rest.getAdmins(), isAdmin);
+        Panel branchesPanel =  new BranchesFlexTable(requestContext, rest, rest.getBranches(), isAdmin);
 
         // TODO fix order
         stackPanel.add(profilePanel, "Profile");
@@ -88,42 +88,7 @@ public class RestaurantPanel extends VerticalPanel
         return stackPanel;
 
     }
-    
-    private Panel createBranchesPanel()
-    {
-        List<RestaurantBranchProxy> branches = rest.getBranches();
-        if (null == branches)
-        {
-            branches = new LinkedList<RestaurantBranchProxy>();
-            rest.setBranches(branches);
-        }
-        BranchesFlexTable res = new BranchesFlexTable(requestContext, rest, branches, isAdmin);
-        return res;
-    }
-    
-    private Panel createAdminPannel()
-    {
-        List<String> admins = rest.getAdmins();
-        if (null == admins)
-        {
-            admins = new LinkedList<String>();
-            rest.setAdmins(admins);
-        }
-        return new UsersPannel(admins, isAdmin);
-
-    }
-
-    private Panel createMenuPannel()
-    {
-        MenuProxy menuProxy = rest.getMenu();
-        if (null == menuProxy)
-        {
-            menuProxy = requestContext.create(MenuProxy.class);
-            rest.setMenu(menuProxy);
-        }
-        return new MenuFlexTable(requestContext, menuProxy, isAdmin);
-    }
-    
+        
     
     class SaveRestClickHandler implements ClickHandler
     {

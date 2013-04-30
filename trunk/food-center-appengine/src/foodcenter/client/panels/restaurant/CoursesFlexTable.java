@@ -30,17 +30,14 @@ public class CoursesFlexTable extends FlexTable
         this.isAdmin = isAdmin;
         
         createHeader();
-        List<CourseProxy> courses = menuCatProxy.getCourses();
         
-        if (null == courses)
+        List<CourseProxy> courses = menuCatProxy.getCourses();
+        if (null != courses)
         {
-            courses = new LinkedList<CourseProxy>();
-            menuCatProxy.setCourses(courses);
-        }
-
-        for (CourseProxy cp : courses)
-        {
-            printCourseRow(cp);
+            for (CourseProxy cp : courses)
+            {
+                printCourseRow(cp);
+            }
         }
     }
 
