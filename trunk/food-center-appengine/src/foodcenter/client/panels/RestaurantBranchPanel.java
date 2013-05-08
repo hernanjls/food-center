@@ -1,8 +1,5 @@
 package foodcenter.client.panels;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -15,9 +12,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import foodcenter.client.panels.restaurant.MenuFlexTable;
 import foodcenter.client.panels.restaurant.UsersPannel;
 import foodcenter.client.panels.restaurant.branch.RestaurantBranchLocationVerticalPanel;
-import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
-import foodcenter.service.proxies.UserProxy;
 
 public class RestaurantBranchPanel extends VerticalPanel
 {
@@ -67,7 +62,7 @@ public class RestaurantBranchPanel extends VerticalPanel
        
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch);
         Panel menuPanel = new MenuFlexTable(requestContext, branch.getMenu(), isAdmin);
-        Panel adminsPanel = new UsersPannel(branch.getAdmins(), isAdmin);;
+        Panel adminsPanel = new UsersPannel(branch.getAdmins(), isAdmin);
         Panel waitersPanel = new UsersPannel(branch.getWaiters(), isAdmin);
         Panel chefsPanel = new UsersPannel(branch.getChefs(), isAdmin);
 

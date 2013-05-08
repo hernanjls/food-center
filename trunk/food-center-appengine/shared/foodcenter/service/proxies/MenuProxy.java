@@ -13,5 +13,5 @@ public interface MenuProxy extends EntityProxy, AbstractEntityInterface
     public List<MenuCategoryProxy> getCategories();
     
     public void setCategories(List<MenuCategoryProxy> categories);
-
+	
 }

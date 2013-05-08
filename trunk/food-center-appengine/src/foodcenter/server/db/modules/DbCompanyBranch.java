@@ -3,35 +3,27 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable="true")
-//@FetchGroup(name = "DbCompanyBranch", members = { //
-//@Persistent(name = "menu"),//
-//@Persistent(name = "admins"), //
-//@Persistent(name = "employees"), //
-//@Persistent(name = "orders")
-//
+
+//@FetchGroups(value = { //
+//  @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
+//  @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "employees") }), //
+//  @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
 //})
-@FetchGroups(value = { //
-  @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
-  @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "employees") }), //
-  @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
-})
 public class DbCompanyBranch extends AbstractDbGeoObject
 {
 
     /**
-     * 
-     */
-    private static final long serialVersionUID = -5913714255915329286L;
+	 * 
+	 */
+    private static final long serialVersionUID = 1303969414427455468L;
 
-    @Persistent()
+	@Persistent()
     private DbCompany company;
 
     @Persistent

@@ -42,6 +42,7 @@
   <!--                                           -->
   <body>
     <%
+    /*
         Logger logger = LoggerFactory.getLogger(getClass());
         DbUser info = UserCommonService.login(null);    
         String nickName = info.getNickName();
@@ -50,6 +51,7 @@
         String email = info.getEmail();        
         String logoutUrl = info.getLogoutUrl();
         logger.debug("loggged in: " + email);
+        */
         /*
 	        DbHandlerImp db = new DbHandlerImp();
 	        DbRestaurant res = db.find(DbRestaurant.class, "agtmb29kLWNlbnRlcnISCxIMRGJSZXN0YXVyYW50GAIM");
@@ -64,11 +66,11 @@
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">
 	       Hellow: 
-	       <a href="user_profile.jsp"><% out.println(nickName); %></a>
-	       You are logged in as <a href="/_ah/admin"><% out.println(role); %></a>  
+	       <a href="user_profile.jsp"><% /* out.println(nickName); */%></a>
+	       You are logged in as <a href="/_ah/admin"><% /* out.println(role); */ %></a>  
 	    </div>
 	    <div id="logout" class="logout">
-	        <a href="<% out.println(logoutUrl); %>">logout</a>
+	        <a href="<% /* out.println(logoutUrl); */ %>">logout</a>
 	    </div>
     </div>
     

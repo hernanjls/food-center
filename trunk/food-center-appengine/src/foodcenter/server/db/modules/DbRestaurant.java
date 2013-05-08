@@ -3,8 +3,6 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
@@ -12,27 +10,20 @@ import javax.validation.constraints.NotNull;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
-//@FetchGroup(name = "DbRestaurant", members = { //
-//	@Persistent(name = "menu"), //
-//	@Persistent(name = "iconBytes"), //
-//	@Persistent(name = "branches"),  //
-//	@Persistent(name = "admins"), //
-//	@Persistent(name = "services") //
+//@FetchGroups(value = { //
+//	@FetchGroup(name = "DbRestaurant_menu", members = { @Persistent(name = "menu") }), //
+//    @FetchGroup(name = "DbRestaurant_iconBytes", members = { @Persistent(name = "iconBytes") }), //
+//    @FetchGroup(name = "DbRestaurant_branches", members = { @Persistent(name = "branches") }), //
+//    @FetchGroup(name = "DbRestaurant_admins", members = { @Persistent(name = "admins") }), //
+//    @FetchGroup(name = "DbRestaurant_services", members = { @Persistent(name = "services") }), //
 //})
-
-@FetchGroups(value = { //
-	@FetchGroup(name = "DbRestaurant_menu", members = { @Persistent(name = "menu") }), //
-    @FetchGroup(name = "DbRestaurant_iconBytes", members = { @Persistent(name = "iconBytes") }), //
-    @FetchGroup(name = "DbRestaurant_branches", members = { @Persistent(name = "branches") }), //
-    @FetchGroup(name = "DbRestaurant_admins", members = { @Persistent(name = "admins") }), //
-    @FetchGroup(name = "DbRestaurant_services", members = { @Persistent(name = "services") }), //
-})
 public class DbRestaurant extends AbstractDbObject
 {
+
 	/**
-     * 
-     */
-	private static final long serialVersionUID = 6705094027232991722L;
+	 * 
+	 */
+    private static final long serialVersionUID = -9053099508081246189L;
 
 	@Persistent
 	@NotNull
@@ -47,7 +38,7 @@ public class DbRestaurant extends AbstractDbObject
 	@Persistent
 	private String phone = "";
 
-	@Persistent(mappedBy = "restaurant")
+	@Persistent //(mappedBy = "restaurant")
 	private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
 
 	@Persistent

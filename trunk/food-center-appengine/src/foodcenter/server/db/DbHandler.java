@@ -112,7 +112,8 @@ public interface DbHandler
     public <T extends AbstractDbObject> Long delete(Class<T> clazz, String id);
     
     /**
-     * Saves / updates the object to the DB
+     * Saves / updates the object to the DB, <br>
+     * also commits the current transaction, and creates a new one
      * @param object is the object to persist.
      * @return the persisted object
      * 

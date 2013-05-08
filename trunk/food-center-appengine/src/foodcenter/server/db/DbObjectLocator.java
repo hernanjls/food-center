@@ -16,12 +16,13 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
     {
         this.db = new DbHandlerImp();
         logger = LoggerFactory.getLogger(getClass());
+        logger.trace("new DbObjectLocator()");
     }
 
     @Override
     public AbstractDbObject create(Class<? extends AbstractDbObject> clazz)
     {
-    	logger.info("Loader.create: " + clazz);
+    	logger.trace("Loader.create: " + clazz);
         try
         {
             return clazz.newInstance();
@@ -29,39 +30,46 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
         catch (Exception e)
         {
             logger.error("unexpected exeption", e);
-            return null;
         }
+        return null;
     }
 
     @Override
     public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
     {
-    	logger.info("Loader.find: " + clazz + " id: " + id);
+    	logger.debug("Loader.find: " + clazz + " id: " + id);
         return db.find(clazz, id);
     }
 
     @Override
     public Class<AbstractDbObject> getDomainType()
     {
+    	logger.debug("Loader.getDomainType()");
         return null;
     }
 
     @Override
     public String getId(AbstractDbObject domainObject)
     {
+    	logger.debug("Loader.getId(AbstractDbObject domainObject)");
         return domainObject.getId();
     }
 
     @Override
     public Class<String> getIdType()
     {
+    	logger.debug("Loader.getIdType()");
         return String.class;
     }
 
     @Override
     public Object getVersion(AbstractDbObject domainObject)
     {
-        return domainObject.getVersion();
+    	
+        Integer version = domainObject.getVersion();
+        logger.debug("Loader.getVersion(AbstractDbObject domainObject)= " + version);
+    	return version;
     }
-
+    
+    
 }

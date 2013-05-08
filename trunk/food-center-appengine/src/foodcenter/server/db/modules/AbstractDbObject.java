@@ -6,14 +6,13 @@ import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
-import javax.persistence.Transient;
 
-import com.google.appengine.api.datastore.Key;
-
+import foodcenter.server.db.DbHandlerImp;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
 @PersistenceCapable
@@ -21,12 +20,13 @@ import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 public abstract class AbstractDbObject implements StoreCallback, Serializable, AbstractEntityInterface
 {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8572051412245793349L;
 
-    @PrimaryKey
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = 7630576459671031595L;
+
+	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
     private String id;
@@ -34,7 +34,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
     @Persistent
     private Integer version = 0;
     
-    @Transient
+    @NotPersistent
     private Boolean editable = false;
     
     public AbstractDbObject()
@@ -57,6 +57,12 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
         return id;
     }
     
+    
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+    
     @Override
     public Integer getVersion() 
     {  
@@ -74,4 +80,8 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
 	    this.editable = editable;
     }
     
+	public void persist()
+	{
+		new DbHandlerImp().save(this);
+	}
 }
