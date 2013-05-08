@@ -20,6 +20,11 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 public abstract class AbstractDbGeoObject extends AbstractDbObject implements AbstractGeoLocationInterface
 {
 
+	/**
+	 * 
+	 */
+    private static final long serialVersionUID = -5675931723492541984L;
+
 	@Persistent
 	@Latitude
 	private Double lat = 0.0;
@@ -34,10 +39,6 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject implements Ab
 
 	@Persistent
 	private String address;
-	/**
-     * 
-     */
-	private static final long serialVersionUID = -2812463966981641700L;
 
 	public AbstractDbGeoObject()
 	{

@@ -3,8 +3,6 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jdo.annotations.FetchGroup;
-import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
@@ -12,29 +10,22 @@ import javax.validation.constraints.NotNull;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
-//@FetchGroup(name = "DbCompany", members = { //
-//@Persistent(name = "iconBytes"), //
-//@Persistent(name = "branches"),  //
-//@Persistent(name = "admins"), //
-//@Persistent(name = "services") //
-//})
 
-@FetchGroups(value = { //
-  @FetchGroup(name = "DbCompany_iconBytes", members = { @Persistent(name = "iconBytes") }), //
-  @FetchGroup(name = "DbCompany_branches", members = { @Persistent(name = "branches") }), //
-  @FetchGroup(name = "DbCompany_admins", members = { @Persistent(name = "admins") }), //
-  @FetchGroup(name = "DbCompany_services", members = { @Persistent(name = "services") }), //
-})
+//@FetchGroups(value = { //
+//  @FetchGroup(name = "DbCompany_iconBytes", members = { @Persistent(name = "iconBytes") }), //
+//  @FetchGroup(name = "DbCompany_branches", members = { @Persistent(name = "branches") }), //
+//  @FetchGroup(name = "DbCompany_admins", members = { @Persistent(name = "admins") }), //
+//  @FetchGroup(name = "DbCompany_services", members = { @Persistent(name = "services") }), //
+//})
 
 public class DbCompany extends AbstractDbObject
 {
-
     /**
 	 * 
 	 */
-    private static final long serialVersionUID = -6919498756425045653L;
+    private static final long serialVersionUID = -3140453310619997005L;
 
-    @Persistent
+	@Persistent
     @NotNull
     private String name = "";
 

@@ -1,14 +1,19 @@
 package foodcenter.server.db;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
 import javax.jdo.FetchGroup;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.ObjectState;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.Transaction;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.GeocellQuery;
 import com.beoui.geocell.model.Point;
+import com.google.web.bindery.requestfactory.server.SimpleRequestProcessor;
 
+import foodcenter.server.ThreadLocalPM;
 import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.server.db.modules.AbstractDbObject;
 import foodcenter.server.db.modules.DbMsg;
@@ -30,36 +37,50 @@ public class DbHandlerImp implements DbHandler
     
     private PersistenceManager getPersistenceManager()
     {
-    	PersistenceManager pm = PMF.get().getPersistenceManager();
-    	pm.getFetchPlan().addGroup(FetchGroup.ALL);
-    	pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+    	PersistenceManager pm = ThreadLocalPM.get();
+    	
     	return pm;
     }
     
     @Override
     public <T extends AbstractDbObject> T save(T object)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+//    	TODO check why it get lost here: new SimpleRequestProcessor(null).decodeInvocationArguments()
+    	logger.info("save: " + object.getClass() + "state:" + JDOHelper.getObjectState(object));
+    	PersistenceManager pm = getPersistenceManager();
         try
         {
+        	if (ObjectState.HOLLOW_PERSISTENT_NONTRANSACTIONAL == JDOHelper.getObjectState(object))
+        	{
+        		pm.makeTransient(object);
+        	}
             T res = pm.makePersistent(object);
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            tx.commit();
             return res;
         }
         catch (Throwable e)
         {
             logger.error(e.getMessage(), e);
-            return null;
+            
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
         }
         finally
         {
-            pm.close();
+        	ThreadLocalPM.get().currentTransaction().begin();
         }
+        
+        return null;
     }
     
     @Override
     public <T extends AbstractDbObject> Long delete(Class<T> clazz, String id)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             Query q = pm.newQuery(clazz);
@@ -74,7 +95,7 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
     
@@ -86,20 +107,40 @@ public class DbHandlerImp implements DbHandler
         try
     	{
             res =  pm.getObjectById(clazz, id);
-            pm.detachCopy(res);
+            if (null == res)
+            {
+            	logger.warn(clazz.toString() + " with id: " + id + " was not found" );
+            }
+            ThreadLocalPM.get().currentTransaction().commit();
+            
             return res;
         }
         catch (JDOObjectNotFoundException e)
         {
-            logger.info(e.getMessage());
+            logger.info(e.getMessage(), e);
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
         }
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
         }
         finally
         {
-            pm.close();
+        	Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
+            ThreadLocalPM.get().currentTransaction().begin();
         }
         return null;
     }
@@ -125,6 +166,10 @@ public class DbHandlerImp implements DbHandler
             {
                 q.setRange(0, maxResults); // limit query for the 1st result
             }
+            else
+            {
+            	q.setRange(0, 100);
+            }
             
             List<T> attached = null;
             if (null != declaredParams && null != values)
@@ -135,25 +180,33 @@ public class DbHandlerImp implements DbHandler
             {
 	            attached = (List<T>) q.execute();
             }
-            if (null != attached)
-            {
-	            //detach the objects
-            	pm.detachCopyAll(attached);
-        		return attached;
+            
+            ThreadLocalPM.get().currentTransaction().commit();
+            	
+    		return attached;
 	            
-            }
         }
         catch (JDOObjectNotFoundException e)
         {
             logger.info(e.getMessage());
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
         }
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
+            Transaction tx = ThreadLocalPM.get().currentTransaction();
+            if (tx.isActive())
+            {
+            	tx.rollback();
+            }
         }
         finally
         {
-            pm.close();
+            ThreadLocalPM.get().currentTransaction().begin();
         }
         return null;
     }
@@ -186,8 +239,9 @@ public class DbHandlerImp implements DbHandler
             if (null != attached)
             {
 	            //detach the objects
-	            return (List<T>) pm.detachCopyAll(attached);
+//	            return (List<T>) pm.detachCopyAll(attached);
             }
+            return attached;
         }
         catch (Exception e)
         {
@@ -195,7 +249,7 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
         return null;
     }
@@ -209,7 +263,7 @@ public class DbHandlerImp implements DbHandler
     @Override
     public void saveMsg(String email, String msg)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
 
         DbMsg m = new DbMsg(email, msg);
 
@@ -219,14 +273,14 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 
     @Override
     public long deleteMsg(String msg)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             Query q = pm.newQuery(DbMsg.class);
@@ -236,14 +290,14 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 
     @Override
     public List<DbMsg> getMsgs()
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             List<DbMsg> res = new LinkedList<DbMsg>();
@@ -256,14 +310,14 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 
     @Override
     public void gcmRegister(String email, String regId)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         DbUserGcm userGcm = new DbUserGcm(email, regId);
         try
         {
@@ -271,14 +325,14 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 
     @Override
     public long gcmUnregister(String email, String regId)
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             Query q = pm.newQuery(DbUserGcm.class);
@@ -288,14 +342,14 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 
     @Override
     public List<String> getGcmRegistered()
     {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        PersistenceManager pm = getPersistenceManager();
         try
         {
             List<String> res = new LinkedList<String>();
@@ -310,7 +364,7 @@ public class DbHandlerImp implements DbHandler
         }
         finally
         {
-            pm.close();
+//            pm.close();
         }
     }
 }

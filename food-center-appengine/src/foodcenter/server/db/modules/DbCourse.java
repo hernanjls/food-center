@@ -1,34 +1,41 @@
 package foodcenter.server.db.modules;
 
-import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @PersistenceCapable(detachable = "true")
-@FetchGroup(name = "DbCourse", members = { @Persistent(name = "category") })
+//@FetchGroup(name = "DbCourse", members = { @Persistent(name = "category") })
 public class DbCourse extends AbstractDbObject
 {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4031177620915344142L;
+    private static final long serialVersionUID = 6823279601912582912L;
 
+    private static final Logger logger = LoggerFactory.getLogger(DbCourse.class);
+    
 	@Persistent
 	private String name;
 
 	@Persistent
 	private Double price;
 
-	@Persistent
-	DbMenuCategory category;
+//	@Persistent
+//	DbMenuCategory category;
 
 	public DbCourse()
 	{
 		super();
+		logger.trace("new DbCourse()");
 	}
 	
 	public DbCourse(String name, Double price)
 	{
+		this();
 		this.name = name;
 		this.price = price;
 	}

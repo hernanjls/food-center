@@ -12,7 +12,7 @@ public class DbUser extends AbstractDbObject
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8798412992264727451L;
+    private static final long serialVersionUID = -3783620685863712560L;
 
 	@Persistent
 	private String logoutUrl;

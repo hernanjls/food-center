@@ -1,6 +1,5 @@
 package foodcenter.client.panels.restaurant;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,20 +24,28 @@ public class CoursesFlexTable extends FlexTable
     public CoursesFlexTable(RequestContext requestContext, MenuCategoryProxy menuCatProxy, Boolean isAdmin)
     {
         super();
+        
         this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
         this.isAdmin = isAdmin;
         
+        if (null == menuCatProxy)
+        {
+        	return;
+        }
+        
         createHeader();
         
         List<CourseProxy> courses = menuCatProxy.getCourses();
-        if (null != courses)
+        if (null == courses)
         {
-            for (CourseProxy cp : courses)
-            {
-                printCourseRow(cp);
-            }
+        	return;
         }
+        for (CourseProxy cp : courses)
+        {
+            printCourseRow(cp);
+        }
+        
     }
 
     private void createHeader()

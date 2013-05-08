@@ -11,9 +11,9 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 @ProxyForName(value = "foodcenter.server.db.modules.DbRestaurantBranch", locator = "foodcenter.server.db.DbObjectLocator")
 public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, EntityProxy
 {
-    public RestaurantProxy getRestaurant();
-
-    public void setRestaurant(RestaurantProxy restaurant);
+//    public RestaurantProxy getRestaurant();
+//
+//    public void setRestaurant(RestaurantProxy restaurant);
 
     public List<String> getAdmins();
 

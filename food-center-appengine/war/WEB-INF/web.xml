@@ -1,9 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-	
-    <!-- Welcome file (main page) -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!-- Welcome file (main page) -->
 	<welcome-file-list>
-	    <welcome-file>food_center.jsp</welcome-file>
+		<welcome-file>food_center.jsp</welcome-file>
 	</welcome-file-list>
+	
+	<filter>
+		<filter-name>PersistenceFilter</filter-name>
+		<filter-class>foodcenter.server.PersistenceFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>PersistenceFilter</filter-name>
+		<url-pattern>/gwtRequest</url-pattern>
+	</filter-mapping>
 	
 	<!-- GWT RequestFactory Servlet -->
 	<servlet>
@@ -11,8 +25,8 @@
 		<servlet-class>com.google.web.bindery.requestfactory.server.RequestFactoryServlet</servlet-class>
 		<init-param>
 			<param-name>symbolMapsDirectory</param-name>
-			<!-- You'll need to compile with -extras and move the symbolMaps directory to this location if you want stack trace deobfuscation 
-				to work -->
+			<!-- You'll need to compile with -extras and move the symbolMaps directory 
+				to this location if you want stack trace deobfuscation to work -->
 			<param-value>WEB-INF/classes/symbolMaps/</param-value>
 		</init-param>
 	</servlet>
@@ -22,19 +36,20 @@
 		<url-pattern>/gwtRequest</url-pattern>
 	</servlet-mapping>
 
-	
+
 	<!-- open id servlets -->
 	<!-- <servlet> <servlet-name>login_required</servlet-name> <servlet-class>foodcenter.server.servlet.LoginServlet</servlet-class> 
-		</servlet> <servlet-mapping> <servlet-name>login_required</servlet-name> <url-pattern>/_ah/login_required</url-pattern> </servlet-mapping> -->
-	
-	
+		</servlet> <servlet-mapping> <servlet-name>login_required</servlet-name> 
+		<url-pattern>/_ah/login_required</url-pattern> </servlet-mapping> -->
+
+
 	<!-- Other servlets -->
 	<servlet>
 		<servlet-name>SystemServiceServlet</servlet-name>
 		<servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
 		<init-param>
 			<param-name>services</param-name>
-			<param-value/>
+			<param-value />
 		</init-param>
 	</servlet>
 
