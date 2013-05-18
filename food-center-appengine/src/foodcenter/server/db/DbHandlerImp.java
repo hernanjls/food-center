@@ -1,19 +1,13 @@
 package foodcenter.server.db;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.Extent;
-import javax.jdo.FetchGroup;
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.ObjectState;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.GeocellQuery;
 import com.beoui.geocell.model.Point;
-import com.google.web.bindery.requestfactory.server.SimpleRequestProcessor;
 
 import foodcenter.server.ThreadLocalPM;
 import foodcenter.server.db.modules.AbstractDbGeoObject;
@@ -50,10 +43,6 @@ public class DbHandlerImp implements DbHandler
     	PersistenceManager pm = getPersistenceManager();
         try
         {
-        	if (ObjectState.HOLLOW_PERSISTENT_NONTRANSACTIONAL == JDOHelper.getObjectState(object))
-        	{
-        		pm.makeTransient(object);
-        	}
             T res = pm.makePersistent(object);
             Transaction tx = ThreadLocalPM.get().currentTransaction();
             tx.commit();
@@ -111,38 +100,19 @@ public class DbHandlerImp implements DbHandler
             {
             	logger.warn(clazz.toString() + " with id: " + id + " was not found" );
             }
-            ThreadLocalPM.get().currentTransaction().commit();
-            
-            return res;
-        }
-        catch (JDOObjectNotFoundException e)
-        {
-            logger.info(e.getMessage(), e);
-            Transaction tx = ThreadLocalPM.get().currentTransaction();
-            if (tx.isActive())
-            {
-            	tx.rollback();
-            }
+//            ThreadLocalPM.get().currentTransaction().commit();
         }
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
-            Transaction tx = ThreadLocalPM.get().currentTransaction();
-            if (tx.isActive())
-            {
-            	tx.rollback();
-            }
+//            Transaction tx = ThreadLocalPM.get().currentTransaction();
+//            if (tx.isActive())
+//            {
+//            	tx.rollback();
+//            }
+//            ThreadLocalPM.get().currentTransaction().begin();
         }
-        finally
-        {
-        	Transaction tx = ThreadLocalPM.get().currentTransaction();
-            if (tx.isActive())
-            {
-            	tx.rollback();
-            }
-            ThreadLocalPM.get().currentTransaction().begin();
-        }
-        return null;
+        return res;
     }
     
     @SuppressWarnings("unchecked")
@@ -180,20 +150,9 @@ public class DbHandlerImp implements DbHandler
             {
 	            attached = (List<T>) q.execute();
             }
-            
-            ThreadLocalPM.get().currentTransaction().commit();
             	
     		return attached;
 	            
-        }
-        catch (JDOObjectNotFoundException e)
-        {
-            logger.info(e.getMessage());
-            Transaction tx = ThreadLocalPM.get().currentTransaction();
-            if (tx.isActive())
-            {
-            	tx.rollback();
-            }
         }
         catch (Exception e)
         {
@@ -203,9 +162,6 @@ public class DbHandlerImp implements DbHandler
             {
             	tx.rollback();
             }
-        }
-        finally
-        {
             ThreadLocalPM.get().currentTransaction().begin();
         }
         return null;

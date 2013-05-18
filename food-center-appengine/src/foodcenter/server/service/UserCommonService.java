@@ -1,5 +1,6 @@
 package foodcenter.server.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.Transaction;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
+import com.google.web.bindery.requestfactory.shared.Request;
 
 import foodcenter.server.ThreadLocalPM;
 import foodcenter.server.db.DbHandler;
@@ -21,6 +23,8 @@ import foodcenter.server.db.modules.DbMenuCategory;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;
+import foodcenter.service.proxies.RestaurantBranchProxy;
+import foodcenter.service.proxies.RestaurantProxy;
 
 public class UserCommonService
 {
@@ -84,76 +88,76 @@ public class UserCommonService
 		db.save(user);
 	}
 
-	private static void loadRestaurantBranches(List<DbRestaurantBranch> branches)
-	{
-		for (DbRestaurantBranch b : branches)
-		{
-			DbMenu menu = b.getMenu();
-			if (null != menu)
-			{
-				loadMenu(menu);
-			}
-			// TODO load other things.....
-		}
-	}
+//	private static void loadRestaurantBranches(List<DbRestaurantBranch> branches)
+//	{
+//		for (DbRestaurantBranch b : branches)
+//		{
+//			DbMenu menu = b.getMenu();
+//			if (null != menu)
+//			{
+//				loadMenu(menu);
+//			}
+//			// TODO load other things.....
+//		}
+//	}
 
-	private static void loadMenuCategoryCourses(List<DbCourse> courses)
-	{
-		for (DbCourse c : courses)
-		{
-			c.getId();
-		}
-	}
+//	private static void loadMenuCategoryCourses(List<DbCourse> courses)
+//	{
+//		for (DbCourse c : courses)
+//		{
+//			c.getId();
+//		}
+//	}
 
-	private static void loadMenuCategory(List<DbMenuCategory> cats)
-	{
-		for (DbMenuCategory c : cats)
-		{
-			List<DbCourse> courses = c.getCourses();
-			if (null != courses)
-			{
-				loadMenuCategoryCourses(courses);
-			}
-		}
-	}
+//	private static void loadMenuCategory(List<DbMenuCategory> cats)
+//	{
+//		for (DbMenuCategory c : cats)
+//		{
+//			List<DbCourse> courses = c.getCourses();
+//			if (null != courses)
+//			{
+//				loadMenuCategoryCourses(courses);
+//			}
+//		}
+//	}
 
-	private static void loadMenu(DbMenu menu)
-	{
-		List<DbMenuCategory> cats = menu.getCategories();
-		if (null != cats)
-		{
-			loadMenuCategory(cats);
-		}
-	}
+//	private static void loadMenu(DbMenu menu)
+//	{
+//		List<DbMenuCategory> cats = menu.getCategories();
+//		if (null != cats)
+//		{
+//			loadMenuCategory(cats);
+//		}
+//	}
 
-	private static void loadRestaurats(List<DbRestaurant> rests)
-	{
-
-		for (DbRestaurant rest : rests)
-		{
-			DbMenu menu = rest.getMenu();
-			if (null != menu)
-			{
-				loadMenu(menu);
-			}
-
-			List<DbRestaurantBranch> branches = rest.getBranches();
-			if (null != branches)
-			{
-				loadRestaurantBranches(branches);
-			}
-		}
-
-	}
+//	private static void loadRestaurats(List<DbRestaurant> rests)
+//	{
+//
+//		for (DbRestaurant rest : rests)
+//		{
+//			DbMenu menu = rest.getMenu();
+//			if (null != menu)
+//			{
+//				loadMenu(menu);
+//			}
+//
+//			List<DbRestaurantBranch> branches = rest.getBranches();
+//			if (null != branches)
+//			{
+//				loadRestaurantBranches(branches);
+//			}
+//		}
+//
+//	}
 
 	public static List<DbRestaurant> getDefaultRestaurants()
 	{
 		logger.info("getDefaultRestaurants is called");
 		List<DbRestaurant> res = db.find(DbRestaurant.class, 10);
-		if (null != res)
-		{
-			loadRestaurats(res);
-		}
+//		if (null != res)
+//		{
+//			loadRestaurats(res);
+//		}
 		return res;
 		// Transaction tx = null;
 		// try
@@ -180,14 +184,36 @@ public class UserCommonService
 		// return null;
 	}
 
+	
 	public static DbRestaurant getRestaurant(String id)
 	{
 		return db.find(DbRestaurant.class, id);
 	}
 
+	public static DbRestaurantBranch saveRestauratnBranch(DbRestaurantBranch restBranch)
+	{
+		DbRestaurantBranch res = db.save(restBranch);
+		
+		
+		return res;
+	}
+	
+	public static void addRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
+	{
+		List<DbRestaurantBranch> branches= rest.getBranches();
+		if (null == branches)
+		{
+			branches = new ArrayList<DbRestaurantBranch>();
+			rest.setBranches(branches);
+		}
+		branches.add(branch);
+	}
+	
 	public static DbRestaurant saveRestaurant(DbRestaurant rest)
 	{
-		return db.save(rest);
+		DbRestaurant res = db.save(rest);
+		
+		return res;
 	}
 
 	public static Boolean deleteRestaurant(String id)

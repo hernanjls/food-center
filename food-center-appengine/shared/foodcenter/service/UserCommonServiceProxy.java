@@ -7,6 +7,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 import foodcenter.service.proxies.CompanyProxy;
+import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.proxies.UserProxy;
 
@@ -24,8 +25,12 @@ public interface UserCommonServiceProxy extends RequestContext
 
     public Request<RestaurantProxy> getRestaurant(String id);
 
+    public Request<RestaurantBranchProxy> saveRestauratnBranch(RestaurantBranchProxy restBranch);
+    
     public Request<RestaurantProxy> saveRestaurant(RestaurantProxy rest);
 
+    public Request<Void> addRestaurantBranch(RestaurantProxy rest, RestaurantBranchProxy branch);
+    
     public Request<Boolean> deleteRestaurant(String id);
 
     public Request<List<CompanyProxy>> getDefaultCompanies();
