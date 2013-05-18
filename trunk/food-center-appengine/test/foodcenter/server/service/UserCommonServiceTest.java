@@ -3,12 +3,14 @@ package foodcenter.server.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.service.RequestUtils;
 import foodcenter.server.AbstractGAETest;
@@ -25,14 +27,29 @@ public class UserCommonServiceTest extends AbstractGAETest
 {
 
 	private FoodCenterRequestFactory rf = null;
+
+	// variables used by tests, each test will set it
+	private int menuCats = 0;
+	private int menuCatCourses = 0;
+	private int numBranches = 0;
+	private int numBranchMenuCats = 0;
+	private int numBranchMenuCatCourses = 0;
 	
 	@Override
 	@Before
 	public void setUp()
 	{
-	    super.setUp();
-	    rf = createRF(FoodCenterRequestFactory.class);
+		super.setUp();
+		rf = createRF(FoodCenterRequestFactory.class);
+		
+		
+		menuCats = 0;
+		menuCatCourses = 0;
+		numBranches = 0;
+		numBranchMenuCats = 0;
+		numBranchMenuCatCourses = 0;
 	}
+
 	/**
 	 * checks that login service works
 	 */
@@ -140,11 +157,11 @@ public class UserCommonServiceTest extends AbstractGAETest
 	@Test
 	public void saveRestaurantServiceTest()
 	{
-		int menuCats = 3;
-		int menuCatCourses = 4;
-		int numBranches = 2;
-		int numBranchMenuCats = 3;
-		int numBranchMenuCatCourses = 8;
+		menuCats = 3;
+		menuCatCourses = 4;
+		numBranches = 2;
+		numBranchMenuCats = 3;
+		numBranchMenuCatCourses = 8;
 
 		FoodCenterRequestFactory rf = createRF(FoodCenterRequestFactory.class);
 		UserCommonServiceProxy service = rf.getUserCommonService();
@@ -158,20 +175,83 @@ public class UserCommonServiceTest extends AbstractGAETest
 			{
 				assertNotNull(response.getMenu());
 				assertNotNull(response.getMenu().getCategories());
-				assertEquals(3, response.getMenu().getCategories().size());
+				assertEquals(menuCats, response.getMenu().getCategories().size());
 
 			}
 		});
 	}
 
 	@Test
+	public void addRestaurantBranchServiceTest()
+	{	
+		numBranches = 1;
+		
+		UserCommonServiceProxy service = rf.getUserCommonService();
+
+		RestaurantProxy rest = createRest(service, "rest", menuCats, menuCatCourses, numBranches, numBranchMenuCats, numBranchMenuCatCourses);
+		
+		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(new Receiver<RestaurantProxy>()
+		{
+			@Override
+			public void onSuccess(RestaurantProxy response)
+			{
+				// tear down the pmf, because this is going to be a new RF call
+				tearDownPMF();
+				
+				UserCommonServiceProxy service = rf.getUserCommonService();
+				assertNotNull(response.getBranches());
+				assertEquals(numBranches, response.getBranches().size());
+
+				// make the restaurant editable
+				RestaurantProxy editable = service.edit(response);
+
+				// add course to the restaurant menu
+
+				RestaurantBranchProxy branch = createRestBranch(service, 0, 0);
+				branch.setAddress("Dror");
+				
+				RestaurantBranchProxy branch2 = createRestBranch(service, 0, 0);
+				branch.setAddress("Dror2");
+
+				// setup a new pmf for the new call
+				setUpPMF();
+
+				
+				service.addRestaurantBranch(editable, branch);
+				++numBranches;
+				
+				service.addRestaurantBranch(editable, branch2);
+				++numBranches;
+				
+				service.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).to(new Receiver<RestaurantProxy>()
+				{
+					@Override
+					public void onSuccess(RestaurantProxy response2)
+					{
+						assertEquals(numBranches, response2.getBranches().size());
+					}
+
+					@Override
+					public void onFailure(ServerFailure error)
+					{
+						throw new RuntimeException("failure");
+					}
+				});
+				service.fire();
+
+			}
+			
+		});
+	}
+
+	@Test
 	public void addMenuCategoryCourseToRestaurantServiceTest()
 	{
-		int menuCats = 3;
-		int menuCatCourses = 4;
-		int numBranches = 2;
-		int numBranchMenuCats = 3;
-		int numBranchMenuCatCourses = 8;
+		int menuCats = 1;
+		int menuCatCourses = 1;
+		int numBranches = 0;
+		int numBranchMenuCats = 0;
+		int numBranchMenuCatCourses = 0;
 
 		FoodCenterRequestFactory rf = createRF(FoodCenterRequestFactory.class);
 		UserCommonServiceProxy service = rf.getUserCommonService();
@@ -182,31 +262,67 @@ public class UserCommonServiceTest extends AbstractGAETest
 			@Override
 			public void onSuccess(RestaurantProxy response)
 			{
+				// tear down the pmf, because this is going to be a new RF call
 				tearDownPMF();
-				
-				
 				FoodCenterRequestFactory rf = createRF(FoodCenterRequestFactory.class);
 				UserCommonServiceProxy service = rf.getUserCommonService();
-				assertEquals(4, response.getMenu().getCategories().get(0).getCourses().size());
+				assertEquals(1, response.getMenu().getCategories().get(0).getCourses().size());
+
+				// make the restaurant editable
 				RestaurantProxy editable = service.edit(response);
+
+				// add course to the restaurant menu
 				CourseProxy course = service.create(CourseProxy.class);
 				course.setName("new");
 				course.setPrice(12.2);
 				editable.getMenu().getCategories().get(0).getCourses().add(course);
-				assertEquals(5, editable.getMenu().getCategories().get(0).getCourses().size());
-				
+				assertEquals(2, editable.getMenu().getCategories().get(0).getCourses().size());
+
+				// setup a new pmf for the new call
 				setUpPMF();
-				service.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).fire(new Receiver<RestaurantProxy>()
+
+				service.saveRestaurant(editable).fire(new Receiver<RestaurantProxy>()
 				{
 					@Override
-                    public void onSuccess(RestaurantProxy response2)
-                    {
-	                    assertEquals(5, response2.getMenu().getCategories().get(0).getCourses().size());
-                    }
+					public void onSuccess(RestaurantProxy response2)
+					{
+						assertEquals(2, response2.getMenu().getCategories().get(0).getCourses().size());
+					}
+
+					@Override
+					public void onFailure(ServerFailure error)
+					{
+						super.onFailure(error);
+					}
 				});
 
 			}
 		});
+	}
+
+	private RestaurantBranchProxy createRestBranch(UserCommonServiceProxy service, //
+	    int numBranchMenuCats, //
+	    int numBranchMenuCatCourses)
+	{
+		RestaurantBranchProxy branch = RequestUtils.createRestaurantBranchProxy(service);
+//		branch.setAddress("addr" + Math.random());
+//		for (int j = 0; j < numBranchMenuCats; ++j)
+//		{
+//
+//			MenuCategoryProxy category = RequestUtils.createMenuCategoryProxy(service);
+//			category.setCategoryTitle("branch" + Math.random());
+//
+//			branch.getMenu().getCategories().add(category);
+//			for (int k = 0; k < numBranchMenuCatCourses; ++k)
+//			{
+//				CourseProxy course = service.create(CourseProxy.class);
+//				course.setName("branch_course" + Math.random());
+//				course.setPrice(12.2 + 10 * Math.random());
+//				category.getCourses().add(course);
+//			}
+//		}
+
+		return branch;
 	}
 
 	private RestaurantProxy createRest(//
@@ -239,25 +355,13 @@ public class UserCommonServiceTest extends AbstractGAETest
 
 		for (int i = 0; i < numBranches; ++i)
 		{
-			RestaurantBranchProxy branch = RequestUtils.createRestaurantBranchProxy(service);
+			RestaurantBranchProxy branch = createRestBranch(//
+			    service, //
+			    numBranchMenuCats, //
+			    numBranchMenuCatCourses);
+
 			r.getBranches().add(branch);
-
-			branch.setAddress("addr" + Math.random());
-			for (int j = 0; j < numBranchMenuCats; ++j)
-			{
-
-				MenuCategoryProxy category = RequestUtils.createMenuCategoryProxy(service);
-				category.setCategoryTitle("branch" + Math.random());
-
-				branch.getMenu().getCategories().add(category);
-				for (int k = 0; k < numBranchMenuCatCourses; ++k)
-				{
-					CourseProxy course = service.create(CourseProxy.class);
-					course.setName("branch_course" + Math.random());
-					course.setPrice(12.2 + 10 * Math.random());
-					category.getCourses().add(course);
-				}
-			}
+//			branch.setRestaurant(r);
 		}
 
 		return r;

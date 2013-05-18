@@ -128,6 +128,8 @@ public class DbHandlerTest extends AbstractGAETest
 		DbRestaurant g2 = db.find(DbRestaurant.class, rests[2].getId());
 		validateRestaurant(rests[2], g2, true, false);
 
+		tearDownPMF();
+		setUpPMF();
 
 		List<DbRestaurant> result = db.find(DbRestaurant.class, null, null, null, null);
 		assertEquals(3, result.size());
@@ -135,7 +137,7 @@ public class DbHandlerTest extends AbstractGAETest
 
 		assertEquals(NUM_RESTS, result.size());
 
-		for (int i = 0; i < NUM_RESTS; ++i)
+		for (int i =0; i < NUM_RESTS; ++i)
 		{
 			validateRestaurant(rests[i], result.get(i), true, true);
 		}

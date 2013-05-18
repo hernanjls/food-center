@@ -15,12 +15,11 @@ import javax.jdo.listener.StoreCallback;
 import foodcenter.server.db.DbHandlerImp;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public abstract class AbstractDbObject implements StoreCallback, Serializable, AbstractEntityInterface
 {
     
-
     /**
 	 * 
 	 */
@@ -29,7 +28,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
-    private String id;
+    private String id = null;
     
     @Persistent
     private Integer version = 0;
@@ -39,7 +38,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
     
     public AbstractDbObject()
     {
-        // empty ctor
+    	// empty ctor
     }
     
     /**
