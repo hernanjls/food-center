@@ -2,7 +2,7 @@
 
 <%@page import="org.slf4j.Logger" %>
 <%@page import="org.slf4j.LoggerFactory" %>
-<%@page import="foodcenter.server.service.UserCommonService" %>
+<%@page import="foodcenter.server.service.ClientService" %>
 <%@page import="foodcenter.server.db.modules.DbUser" %>
 <%@page import="foodcenter.server.db.modules.DbRestaurant" %>
 <%@page import="foodcenter.server.db.DbHandlerImp" %>

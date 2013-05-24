@@ -1,4 +1,4 @@
-package foodcenter.service;
+package foodcenter.service.requset;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import com.google.web.bindery.requestfactory.shared.ServiceName;
 import foodcenter.service.proxies.MsgProxy;
 
 @ServiceName(value="foodcenter.server.service.MsgService")
-public interface MsgServiceProxy extends RequestContext
+public interface MsgServiceRequest extends RequestContext
 {
 
 	Request<Void> createMsg(String msg);

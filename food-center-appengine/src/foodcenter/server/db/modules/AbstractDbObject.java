@@ -12,7 +12,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.listener.StoreCallback;
 
-import foodcenter.server.db.DbHandlerImp;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
 @PersistenceCapable(detachable="true")
@@ -77,10 +76,5 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable, A
 	public void setEditable(Boolean editable)
     {
 	    this.editable = editable;
-    }
-    
-	public void persist()
-	{
-		new DbHandlerImp().save(this);
-	}
+    }    
 }
