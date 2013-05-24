@@ -38,22 +38,15 @@ public class PersistenceFilter implements Filter
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException
     {
-    	log.info("starting PersistenceManager");
-        
-    	PersistenceManager pm = PMF.get().getPersistenceManager();
-//      pm.getFetchPlan().addGroup(FetchGroup.ALL);
-//    	pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
-//    	pm.setDetachAllOnCommit(true);
-    	
-        ThreadLocalPM.set(pm);
+    	PMF.initThreadLocal();    	
         Transaction tx = null;
         try
         {
-        	tx = pm.currentTransaction();
+        	tx = PMF.get().currentTransaction();
         	tx.begin();
             chain.doFilter(req, res);
             
-            tx = pm.currentTransaction();
+            tx = PMF.get().currentTransaction();
             if (tx.isActive())
             {
             	tx.commit();
@@ -69,8 +62,8 @@ public class PersistenceFilter implements Filter
         	{
         		tx.rollback();
         	}
-            log.info("closing PersistenceManager");
-            pm.close();
+            
+            PMF.closeThreadLocal();
         }
 
     }

@@ -26,8 +26,8 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     private static final long serialVersionUID = -1838782438427806774L;
 
     
-//	@Persistent()
-//	private DbRestaurant restaurant;
+	@Persistent
+	private DbRestaurant restaurant;
 
 	@Persistent
 	private List<String> admins = new ArrayList<String>();	//emails
@@ -59,15 +59,15 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 		super();
 	}
 
-//	public DbRestaurant getRestaurant()
-//	{
-//		return restaurant;
-//	}
-//
-//	public void setRestaurant(DbRestaurant restaurant)
-//	{
-//		this.restaurant = restaurant;
-//	}
+	public DbRestaurant getRestaurant()
+	{
+		return restaurant;
+	}
+
+	public void setRestaurant(DbRestaurant restaurant)
+	{
+		this.restaurant = restaurant;
+	}
 
 	public List<String> getAdmins()
 	{

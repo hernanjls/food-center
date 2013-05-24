@@ -17,15 +17,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import foodcenter.server.AbstractGAETest;
-import foodcenter.server.ThreadLocalPM;
-import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenu;
-import foodcenter.server.db.modules.DbMenuCategory;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 
-public class DbHandlerTest extends AbstractGAETest
+public class DbHandlerTest extends AbstractDbTest
 {
 
 	private static final int NUM_RESTS = 3;
@@ -56,34 +52,34 @@ public class DbHandlerTest extends AbstractGAETest
 		validateRestaurant(r, r, false, false);
 
 		// save the restaurant
-		db.save(r);
+		DbHandler.save(r);
 		// validateRestaurant(r, r, true, true);
 
 		tearDownPMF();
 		setUpPMF();
 
-		DbRestaurant f = db.find(DbRestaurant.class, r.getId());
+		DbRestaurant f = DbHandler.find(DbRestaurant.class, r.getId());
 
 		validateRestaurant(r, f, true, true);
 
-		f = db.save(f);
+		f = DbHandler.save(f);
 		validateRestaurant(r, f, true, true);
 
 		tearDownPMF();
 		setUpPMF();
 
-		f = db.find(DbRestaurant.class, r.getId());
+		f = DbHandler.find(DbRestaurant.class, r.getId());
 		f.setName("xzczcx" + Math.random());
 		System.out.println("Object state: " + JDOHelper.getObjectState(f) + ", r: " + JDOHelper.getObjectState(r));
 
-		f = db.save(f);
+		f = DbHandler.save(f);
 
 		validateRestaurant(r, f, true, false);
 
 		tearDownPMF();
 		setUpPMF();
 
-		f = db.find(DbRestaurant.class, r.getId());
+		f = DbHandler.find(DbRestaurant.class, r.getId());
 
 		validateRestaurant(r, f, true, false);
 
@@ -92,46 +88,46 @@ public class DbHandlerTest extends AbstractGAETest
 	@Test
 	public void findManyTest()
 	{
-		db.save(rests[0]);
-		db.save(rests[1]);		
-		db.save(rests[2]);
+		DbHandler.save(rests[0]);
+		DbHandler.save(rests[1]);		
+		DbHandler.save(rests[2]);
 		
 		// make sure each restaurant can be collected using a new transaction
 		tearDownPMF();
 		setUpPMF();
 
-		DbRestaurant f0 = db.find(DbRestaurant.class, rests[0].getId());
+		DbRestaurant f0 = DbHandler.find(DbRestaurant.class, rests[0].getId());
 		validateRestaurant(rests[0], f0, true, false);
 
 		tearDownPMF();
 		setUpPMF();
 
-		DbRestaurant f1 = db.find(DbRestaurant.class, rests[1].getId());
+		DbRestaurant f1 = DbHandler.find(DbRestaurant.class, rests[1].getId());
 		validateRestaurant(rests[1], f1, true, false);
 
 		tearDownPMF();
 		setUpPMF();
 
-		DbRestaurant f2 = db.find(DbRestaurant.class, rests[2].getId());
+		DbRestaurant f2 = DbHandler.find(DbRestaurant.class, rests[2].getId());
 		validateRestaurant(rests[2], f2, true, false);
 
 		// get all rests in one transaction
 		tearDownPMF();
 		setUpPMF();
 
-		DbRestaurant g0 = db.find(DbRestaurant.class, rests[0].getId());
+		DbRestaurant g0 = DbHandler.find(DbRestaurant.class, rests[0].getId());
 		validateRestaurant(rests[0], g0, true, false);
 
-		DbRestaurant g1 = db.find(DbRestaurant.class, rests[1].getId());
+		DbRestaurant g1 = DbHandler.find(DbRestaurant.class, rests[1].getId());
 		validateRestaurant(rests[1], g1, true, false);
 
-		DbRestaurant g2 = db.find(DbRestaurant.class, rests[2].getId());
+		DbRestaurant g2 = DbHandler.find(DbRestaurant.class, rests[2].getId());
 		validateRestaurant(rests[2], g2, true, false);
 
 		tearDownPMF();
 		setUpPMF();
 
-		List<DbRestaurant> result = db.find(DbRestaurant.class, null, null, null, null);
+		List<DbRestaurant> result = DbHandler.find(DbRestaurant.class, null, null, null, null);
 		assertEquals(3, result.size());
 		Collections.sort(result, new DbRestaurantComparator());
 
@@ -143,14 +139,15 @@ public class DbHandlerTest extends AbstractGAETest
 		}
 	}
 
-	@Test
+	@SuppressWarnings("unchecked")
+    @Test
 	public void testQuery()
 	{
-		db.save(rests[0]);
+		DbHandler.save(rests[0]);
 		tearDownPMF();
 		setUpPMF();
 		
-		DbRestaurant g0 = db.find(DbRestaurant.class, rests[0].getId());
+		DbRestaurant g0 = DbHandler.find(DbRestaurant.class, rests[0].getId());
 		validateRestaurant(rests[0], g0, true, false);
 		
 		tearDownPMF();
@@ -161,11 +158,12 @@ public class DbHandlerTest extends AbstractGAETest
 		tearDownPMF();
 		setUpPMF();
 		
-		PersistenceManager pm = ThreadLocalPM.get();
+		PersistenceManager pm = PMF.get();
 		Extent<DbRestaurant> extent = pm.getExtent(DbRestaurant.class);
 		int size = 0;
-		for (DbRestaurant r : extent)
+		for (DbRestaurant r: extent)
 		{
+			assertNotNull(r);
 			++size;
 		}
 		assertEquals(1, size);
@@ -174,7 +172,7 @@ public class DbHandlerTest extends AbstractGAETest
 		tearDownPMF();
 		setUpPMF();
 		
-		pm = ThreadLocalPM.get();
+		pm = PMF.get();
 		Query q = pm.newQuery(DbRestaurant.class);
 		List<DbRestaurant> test = (List<DbRestaurant>) q.execute();
 
@@ -187,16 +185,16 @@ public class DbHandlerTest extends AbstractGAETest
 	public void addMenuCategoryTest()
 	{
 		DbRestaurant r = createRest("test", 2, 2, 2, 2, 2);
-		db.save(r);
+		DbHandler.save(r);
 
 		DbRestaurantBranch toAdd = new DbRestaurantBranch();
 		toAdd.setAddress("safdasda");
 		r.getBranches().add(toAdd);
 
-		db.save(r);
+		DbHandler.save(r);
 		assertEquals(3, r.getBranches().size());
 
-		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
+		DbRestaurant res = DbHandler.find(DbRestaurant.class, r.getId());
 		assertEquals(3, res.getBranches().size());
 	}
 
@@ -212,17 +210,17 @@ public class DbHandlerTest extends AbstractGAETest
 
 		r.getBranches().add(b1);
 
-		r = db.save(r);
+		r = DbHandler.save(r);
 
-		DbRestaurant result = db.find(DbRestaurant.class, r.getId());
+		DbRestaurant result = DbHandler.find(DbRestaurant.class, r.getId());
 
 		assertNotNull(result.getBranches());
 		assertEquals(2, result.getBranches().size());
 
 		result.getBranches().add(b2);
-		result = db.save(result);
+		result = DbHandler.save(result);
 
-		result = db.find(DbRestaurant.class, r.getId());
+		result = DbHandler.find(DbRestaurant.class, r.getId());
 		assertNotNull(result.getBranches());
 		assertEquals(3, result.getBranches().size());
 	}
@@ -244,9 +242,9 @@ public class DbHandlerTest extends AbstractGAETest
 		    numBranchMenuCatCourses);
 
 		assertEquals(menuCats, r.getMenu().getCategories().size());
-		db.save(r);
+		DbHandler.save(r);
 
-		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
+		DbRestaurant res = DbHandler.find(DbRestaurant.class, r.getId());
 		validateRestaurant(r, res, true, true);
 
 		validateRestHirarchy(res, //
@@ -272,9 +270,9 @@ public class DbHandlerTest extends AbstractGAETest
 		    numBranches, //
 		    numBranchMenuCats, //
 		    numBranchMenuCatCourses);
-		db.save(r);
+		DbHandler.save(r);
 
-		r = db.find(DbRestaurant.class, r.getId());
+		r = DbHandler.find(DbRestaurant.class, r.getId());
 
 		DbRestaurant r2 = createRest("rest", //
 		    menuCats, //
@@ -284,9 +282,9 @@ public class DbHandlerTest extends AbstractGAETest
 		    numBranchMenuCatCourses);
 
 		r.getBranches().add(r2.getBranches().get(0));
-		db.save(r);
+		DbHandler.save(r);
 
-		DbRestaurant res = db.find(DbRestaurant.class, r.getId());
+		DbRestaurant res = DbHandler.find(DbRestaurant.class, r.getId());
 
 		validateRestHirarchy(res, //
 		    menuCats, //
@@ -318,17 +316,17 @@ public class DbHandlerTest extends AbstractGAETest
 		    0, //
 		    numBranchMenuCatCourses);
 
-		db.save(r);	
-		db.save(r2);
+		DbHandler.save(r);	
+		DbHandler.save(r2);
 
-		List<DbRestaurant> list = db.find(DbRestaurant.class, 10);
+		List<DbRestaurant> list = DbHandler.find(DbRestaurant.class, 10);
 		assertEquals(2, list.size());
 		assertNotNull(list);
 		
 		tearDownPMF();
 		setUpPMF();
 		
-		list = db.find(DbRestaurant.class, 10);
+		list = DbHandler.find(DbRestaurant.class, 10);
 		assertNotNull(list);
 		assertEquals(2, list.size());
 		
@@ -352,61 +350,21 @@ public class DbHandlerTest extends AbstractGAETest
 		    numBranchMenuCats, //
 		    numBranchMenuCatCourses);
 
-		db.save(r);
+		DbHandler.save(r);
 		
 
-		List<DbRestaurant> list = db.find(DbRestaurant.class, 10);
+		List<DbRestaurant> list = DbHandler.find(DbRestaurant.class, 10);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		
-		List<DbMenu> menus = db.find(DbMenu.class, 10);
+		List<DbMenu> menus = DbHandler.find(DbMenu.class, 10);
 		assertNotNull(menus);
 		assertEquals(3, menus.size());
 		
 		
 	}
 	
-	private DbRestaurant createRest(String name, //
-	    int numMenuCats, //
-	    int numMenuCourses, //
-	    int numBranches, //
-	    int numBranchMenuCats, //
-	    int numBranchMenuCourses)
-	{
-
-		DbRestaurant r = new DbRestaurant();
-
-		for (int i = 0; i < numMenuCats; ++i)
-		{
-			DbMenuCategory category = new DbMenuCategory("rest" + Math.random());
-			r.getMenu().getCategories().add(category);
-
-			for (int j = 0; j < numMenuCourses; ++j)
-			{
-				category.getCourses().add(new DbCourse("course" + Math.random(), 12.2 + 10 * Math.random()));
-			}
-		}
-
-		for (int i = 0; i < numBranches; ++i)
-		{
-			DbRestaurantBranch branch = new DbRestaurantBranch();
-			r.getBranches().add(branch);
-
-			branch.setAddress("addr" + Math.random());
-			for (int j = 0; j < numBranchMenuCats; ++j)
-			{
-				DbMenuCategory category = new DbMenuCategory("branch" + Math.random());
-				branch.getMenu().getCategories().add(category);
-				for (int k = 0; k < numBranchMenuCourses; ++k)
-				{
-					category.getCourses().add(new DbCourse("branch_course" + Math.random(), 12.2 + 10 * Math.random()));
-				}
-			}
-		}
-
-		return r;
-	}
-
+	
 	public void validateRestaurant(DbRestaurant ref, DbRestaurant o, boolean isValidateId, boolean isValidateName)
 	{
 		assertNotNull(o);

@@ -9,13 +9,13 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.panels.RestaurantPanel;
 import foodcenter.client.service.RequestUtils;
-import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.requset.ClientServiceRequest;
 
 public class ManageRestaurant implements EntryPoint
 {
 //    private static final String GWT_CONTINER = "gwtContainer";
-    private UserCommonServiceProxy userCommonService = RequestUtils.getRequestFactory().getUserCommonService();
+    private ClientServiceRequest userCommonService = RequestUtils.getRequestFactory().getClientService();
 
     /**************************************************************************
      * Data Objects
@@ -60,7 +60,7 @@ public class ManageRestaurant implements EntryPoint
             PopupPanel loading = new PopupPanel(false);
             loading.setWidget(new Label("Loading..."));
             loading.center();
-            userCommonService.saveRestaurant(rest).fire(new AddRestaurantReciever(loading));
+//            TODO uncommnt userCommonService.saveRestaurant(rest).fire(new AddRestaurantReciever(loading));
 
         }
 

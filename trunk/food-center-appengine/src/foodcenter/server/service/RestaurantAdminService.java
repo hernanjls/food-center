@@ -1,51 +1,72 @@
 package foodcenter.server.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.api.utils.SystemProperty;
-
 import foodcenter.server.db.DbHandler;
-import foodcenter.server.db.DbHandlerImp;
 import foodcenter.server.db.modules.DbRestaurant;
-import foodcenter.server.db.modules.DbUser;
+import foodcenter.server.db.modules.DbRestaurantBranch;
+import foodcenter.service.enums.ServiceType;
 
-public class RestaurantAdminService
+public class RestaurantAdminService extends RestaurantBranchAdminService
 {
 
-    private static UserService userService = UserServiceFactory.getUserService();
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
-    private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
-    private static DbHandler db = new DbHandlerImp();
-
-    public static DbUser getDbUser(String email)
+//    private static UserService userService = UserServiceFactory.getUserService();
+//    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+    
+    
+    public static void setIconBytes(DbRestaurant rest, List<Byte> iconBytes)
     {
-        logger.info("getDbUser is called");
-        return db.find(DbUser.class, "email = emailP", "String emailP", new Object[]{email});
+    	rest.setIconBytes(iconBytes);
     }
+    
+    public static void addRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
+	{
+		List<DbRestaurantBranch> branches= rest.getBranches();
+		if (null == branches)
+		{
+			branches = new ArrayList<DbRestaurantBranch>();
+			rest.setBranches(branches);
+		}
+		branches.add(branch);
+	}
+    
+    public static void removeRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
+	{
+		List<DbRestaurantBranch> branches= rest.getBranches();
+		if (null == branches)
+		{
+			return;
+		}
+		branches.remove(branch);
+	}
+    
+    public static void addRestaurantAdmin(DbRestaurant rest, String admin)
+	{
+		rest.getAdmins().add(admin);
+	}
+	
+	public static void removeRestaurantAdmin(DbRestaurant rest, String admin)
+	{
+		rest.getAdmins().remove(admin);
+	}
+    
+	public static void addRestaurantServiceType(DbRestaurant rest, ServiceType service)
+	{
+		rest.getServices().add(service);
+	}
+	
+	public static void removeRestaurantServiceType(DbRestaurant rest, ServiceType service)
+	{
+		rest.getServices().remove(service);
+	}
+	
+    public static DbRestaurant saveRestaurant(DbRestaurant rest)
+	{
+		DbRestaurant res = DbHandler.save(rest);
+		
+		return res;
+	}
 
-    public static List<DbRestaurant> getDefaultRestaurants()
-    {
-        logger.info("getDefaultRestaurants is called");
-        return db.find(DbRestaurant.class, 10);
-    }
-
-    public static DbRestaurant getRestaurant(String id)
-    {
-        return db.find(DbRestaurant.class, id);
-    }
-
-    public static Boolean saveRestaurant(DbRestaurant rest)
-    {
-        return (null != db.save(rest));
-    }
-
-    public static Boolean deleteRestaurant(String id)
-    {
-        return 0 == Long.compare(0l, db.delete(DbRestaurant.class, id));
-    }
+    
 }

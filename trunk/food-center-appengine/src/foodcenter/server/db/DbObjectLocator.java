@@ -9,67 +9,64 @@ import foodcenter.server.db.modules.AbstractDbObject;
 
 public class DbObjectLocator extends Locator<AbstractDbObject, String>
 {
-    private DbHandler db;
-    private Logger logger;
-    
-    public DbObjectLocator()
-    {
-        this.db = new DbHandlerImp();
-        logger = LoggerFactory.getLogger(getClass());
-        logger.trace("new DbObjectLocator()");
-    }
+	private Logger logger;
 
-    @Override
-    public AbstractDbObject create(Class<? extends AbstractDbObject> clazz)
-    {
-    	logger.trace("Loader.create: " + clazz);
-        try
-        {
-            return clazz.newInstance();
-        }
-        catch (Exception e)
-        {
-            logger.error("unexpected exeption", e);
-        }
-        return null;
-    }
+	public DbObjectLocator()
+	{
+		logger = LoggerFactory.getLogger(getClass());
+		logger.trace("new DbObjectLocator()");
+	}
 
-    @Override
-    public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
-    {
-    	logger.debug("Loader.find: " + clazz + " id: " + id);
-        return db.find(clazz, id);
-    }
+	@Override
+	public AbstractDbObject create(Class<? extends AbstractDbObject> clazz)
+	{
+		logger.trace("Loader.create: " + clazz);
+		try
+		{
+			return clazz.newInstance();
+		}
+		catch (Exception e)
+		{
+			logger.error("unexpected exeption", e);
+		}
+		return null;
+	}
 
-    @Override
-    public Class<AbstractDbObject> getDomainType()
-    {
-    	logger.debug("Loader.getDomainType()");
-        return null;
-    }
+	@Override
+	public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
+	{
+		logger.debug("Loader.find: " + clazz + " id: " + id);
+		return DbHandler.find(clazz, id);
+	}
 
-    @Override
-    public String getId(AbstractDbObject domainObject)
-    {
-    	logger.debug("Loader.getId(AbstractDbObject domainObject)");
-        return domainObject.getId();
-    }
+	@Override
+	public Class<AbstractDbObject> getDomainType()
+	{
+		logger.debug("Loader.getDomainType()");
+		return null;
+	}
 
-    @Override
-    public Class<String> getIdType()
-    {
-    	logger.debug("Loader.getIdType()");
-        return String.class;
-    }
+	@Override
+	public String getId(AbstractDbObject domainObject)
+	{
+		logger.debug("Loader.getId(AbstractDbObject domainObject)");
+		return domainObject.getId();
+	}
 
-    @Override
-    public Object getVersion(AbstractDbObject domainObject)
-    {
-    	
-        Integer version = domainObject.getVersion();
-        logger.debug("Loader.getVersion(AbstractDbObject domainObject)= " + version);
-    	return version;
-    }
-    
-    
+	@Override
+	public Class<String> getIdType()
+	{
+		logger.debug("Loader.getIdType()");
+		return String.class;
+	}
+
+	@Override
+	public Object getVersion(AbstractDbObject domainObject)
+	{
+
+		Integer version = domainObject.getVersion();
+		logger.debug("Loader.getVersion(AbstractDbObject domainObject)= " + version);
+		return version;
+	}
+
 }

@@ -18,9 +18,9 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.service.RequestUtils;
-import foodcenter.service.UserCommonServiceProxy;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.requset.ClientServiceRequest;
 
 public class RestaurantsListPanel extends VerticalPanel
 {
@@ -46,15 +46,15 @@ public class RestaurantsListPanel extends VerticalPanel
 
 	private void reloadRestaurants()
 	{
-		UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService();
+		ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
 		PopupPanel popup = new PopupPanel(false);
 		popup.setWidget(new Label("Loading..."));
 		popup.center();
 		// TODO deal "with" this!!!!
 
-		service.getDefaultRestaurants() //
-		    .with(RestaurantProxy.REST_WITH) //
-		    .fire(new GetDefaultRestaurantsReceiver(popup));
+		//TODO uncommnet service.getDefaultRestaurants() //
+//		    .with(RestaurantProxy.REST_WITH) //
+//		    .fire(new GetDefaultRestaurantsReceiver(popup));
 	}
 
 	private void redraw(List<RestaurantProxy> rests)
@@ -169,7 +169,7 @@ public class RestaurantsListPanel extends VerticalPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService();
+			ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
 
 			RestaurantProxy rest = RequestUtils.createRestaurantProxy(service);
 
@@ -200,7 +200,7 @@ public class RestaurantsListPanel extends VerticalPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			UserCommonServiceProxy service = RequestUtils.getRequestFactory().getUserCommonService();
+			ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
 
 			PopupPanel popup = new PopupPanel(false);
 
@@ -222,11 +222,11 @@ public class RestaurantsListPanel extends VerticalPanel
 
 	private class OnClickSaveRestaurant implements Runnable
 	{
-		private final UserCommonServiceProxy service;
+		private final ClientServiceRequest service;
 		private final PopupPanel popup;
 		private final RestaurantProxy toSave;
 
-		public OnClickSaveRestaurant(UserCommonServiceProxy service, PopupPanel popup, RestaurantProxy rest)
+		public OnClickSaveRestaurant(ClientServiceRequest service, PopupPanel popup, RestaurantProxy rest)
 		{
 			this.service = service;
 			this.popup = popup;
@@ -241,7 +241,7 @@ public class RestaurantsListPanel extends VerticalPanel
 			PopupPanel loading = new PopupPanel(false);
 			loading.setWidget(new Label("Loading..."));
 			loading.center();
-			service.saveRestaurant(toSave).fire(new SaveRestaurantReciever(loading));
+//			TODO uncommnt service.saveRestaurant(toSave).fire(new SaveRestaurantReciever(loading));
 
 		}
 
