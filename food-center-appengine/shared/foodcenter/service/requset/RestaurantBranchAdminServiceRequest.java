@@ -1,6 +1,7 @@
 package foodcenter.service.requset;
 
 import com.google.web.bindery.requestfactory.shared.Request;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 import foodcenter.service.enums.ServiceType;
@@ -8,7 +9,7 @@ import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.TableProxy;
 
 @ServiceName(value = "foodcenter.server.service.RestaurantBranchAdminService")
-public interface RestaurantBranchAdminServiceRequest extends MenuAdminServiceRequest
+public interface RestaurantBranchAdminServiceRequest extends RequestContext, MenuAdminServiceRequest
 {
 
 	public Request<Void> addBranchAdmin(RestaurantBranchProxy branch, String admin);

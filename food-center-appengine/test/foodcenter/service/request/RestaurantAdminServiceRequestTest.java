@@ -7,8 +7,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.web.bindery.requestfactory.shared.Receiver;
-
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -35,8 +33,10 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
 	
 	@Test
-	public void saveRestaurantServiceTest()
+	public void saveNewRestaurantServiceTest()
 	{
+		RestaurantProxy response = null;
+		
 		menuCats = 3;
 		menuCatCourses = 4;
 		numBranches = 2;
@@ -44,24 +44,32 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		numBranchMenuCatCourses = 8;
 
 		RestaurantAdminServiceRequest service = rf.getRestaurantAdminService();
-
+		
 		RestaurantProxy rest = createRest(service, "rest", menuCats, menuCatCourses, numBranches, numBranchMenuCats, numBranchMenuCatCourses);
-		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(new Receiver<RestaurantProxy>()
+		MockTestRespone<RestaurantProxy> testResponse = new MockTestRespone<RestaurantProxy>();
+		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse);
+		response = testResponse.response;
+		
+		assertNotNull(response.getMenu());
+		assertNotNull(response.getMenu().getCategories());
+		assertEquals(menuCats, response.getMenu().getCategories().size());
+		assertNotNull(response.getBranches());
+		assertEquals(numBranches, response.getBranches().size());
+		
+		for (int i=0; i<numBranches; ++i)
 		{
-
-			@Override
-			public void onSuccess(RestaurantProxy response)
+			RestaurantBranchProxy branch = response.getBranches().get(i);
+			assertNotNull(branch.getMenu());
+			assertNotNull(branch.getMenu().getCategories());
+			assertEquals(numBranchMenuCats, branch.getMenu().getCategories().size());
+			for (int j=0; j<numBranchMenuCats; ++j)
 			{
-				assertNotNull(response.getMenu());
-				
-				assertNotNull(response.getMenu().getCategories());
-				assertEquals(menuCats, response.getMenu().getCategories().size());
-				
-				assertNotNull(response.getBranches());
-				assertEquals(numBranches, response.getBranches().size());
-
+				MenuCategoryProxy cat = branch.getMenu().getCategories().get(j);
+				assertNotNull(cat.getCourses());
+				assertEquals(numBranchMenuCatCourses, cat.getCourses().size());
 			}
-		});
+		}
+
 	}
 
 	/**
@@ -85,10 +93,9 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 			numBranchMenuCats, //
 			numBranchMenuCatCourses);
 		
-		MockTestRespone<RestaurantProxy> notifier = new MockTestRespone<RestaurantProxy>();
-		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(notifier);
-		assertNotNull(notifier.response);
-		
+		MockTestRespone<RestaurantProxy> testResponse = new MockTestRespone<RestaurantProxy>();
+		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse);
+		assertNotNull(testResponse.response);
 		
 		// tear down the pmf, because this is going to be a new RF call
 		tearDownPMF();
@@ -96,7 +103,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		RestaurantAdminServiceRequest adminService = rf.getRestaurantAdminService();
 		
 		// make the restaurant editable
-		RestaurantProxy editable = adminService.edit(notifier.response);
+		RestaurantProxy editable = adminService.edit(testResponse.response);
 
 		// add course to the restaurant menu
 
@@ -109,7 +116,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		// setup a new pmf for the new call
 		setUpPMF();
 
-		notifier.response = null;
+		testResponse.response = null;
 		
 		adminService.addRestaurantBranch(editable, branch);
 		++numBranches;
@@ -117,15 +124,13 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		adminService.addRestaurantBranch(editable, branch2);
 		++numBranches;
 
-		adminService.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).to(notifier);
+		adminService.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).to(testResponse);
 		adminService.fire();
 		
-		assertNotNull(notifier.response);
-		assertEquals(numBranches, notifier.response.getBranches().size());
+		assertNotNull(testResponse.response);
+		assertEquals(numBranches, testResponse.response.getBranches().size());
 
 	}
-	
-	
 	
 	@Test
 	public void addMenuCategoryCourseToRestaurantTest()
@@ -168,7 +173,6 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		// validate it was added only to the 1st category
 		assertEquals(menuCatCourses, response.getMenu().getCategories().get(1).getCourses().size());
 		assertEquals(menuCatCourses + 1, response.getMenu().getCategories().get(0).getCourses().size());
-		
 		
 	}
 
