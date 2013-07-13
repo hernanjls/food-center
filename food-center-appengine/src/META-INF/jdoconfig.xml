@@ -6,9 +6,10 @@
    <persistence-manager-factory name="transactions-optional">
        <property name="javax.jdo.PersistenceManagerFactoryClass"
            value="org.datanucleus.api.jdo.JDOPersistenceManagerFactory"/>
-       
+           
        <property name="datanucleus.appengine.autoCreateDatastoreTxns" value="true"/>
        
+       <property name="datanucleus.appengine.datastoreEnableXGTransactions" value="false"/>
        
        <property name="javax.jdo.option.ConnectionURL" value="appengine"/>
        <property name="javax.jdo.option.NontransactionalRead" value="true"/>

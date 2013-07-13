@@ -21,6 +21,7 @@ import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.requset.ClientServiceRequest;
+import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
 public class RestaurantsListPanel extends VerticalPanel
 {
@@ -52,9 +53,10 @@ public class RestaurantsListPanel extends VerticalPanel
 		popup.center();
 		// TODO deal "with" this!!!!
 
-		//TODO uncommnet service.getDefaultRestaurants() //
-//		    .with(RestaurantProxy.REST_WITH) //
-//		    .fire(new GetDefaultRestaurantsReceiver(popup));
+		//TODO was commented out 
+		service.getDefaultRestaurants() //
+		    .with(RestaurantProxy.REST_WITH) //
+		    .fire(new GetDefaultRestaurantsReceiver(popup));
 	}
 
 	private void redraw(List<RestaurantProxy> rests)
@@ -89,13 +91,13 @@ public class RestaurantsListPanel extends VerticalPanel
 		String table = rest.getServices().contains(ServiceType.TABLE) ? "yes" : "no";
 		restsTable.setText(row, 4, table);
 
+        // TODO edit restaurant button for restaurant admin only
 		Button edit = new Button("edit");
-		edit.addClickHandler(new OnClickUpdateRestaurant(rest));
-		// TODO edit restaurnt button
+		edit.addClickHandler(new OnClickEditRestaurant(rest));
 		restsTable.setWidget(row, 5, edit);
 
+		// TODO delete restaurant button for restaurant admin only
 		Button delete = new Button("X");
-		// TODO edit restaurnt button
 		restsTable.setWidget(row, 6, delete);
 
 		++i;
@@ -111,8 +113,11 @@ public class RestaurantsListPanel extends VerticalPanel
 		restsTable.setText(0, 4, "Table");
 
 		Button newButton = new Button("New");
+		newButton.setEnabled(isAdmin);
 		newButton.addClickHandler(new OnClickNewRestaurant());
 		restsTable.setWidget(0, 5, newButton);
+	    
+		
 	}
 
 	private Panel createOptionsHorizonalPannel()
@@ -169,7 +174,7 @@ public class RestaurantsListPanel extends VerticalPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+			RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory().getRestaurantAdminService();
 
 			RestaurantProxy rest = RequestUtils.createRestaurantProxy(service);
 
@@ -187,12 +192,12 @@ public class RestaurantsListPanel extends VerticalPanel
 
 	}
 
-	private class OnClickUpdateRestaurant implements ClickHandler
+	private class OnClickEditRestaurant implements ClickHandler
 	{
 
 		private final RestaurantProxy rest;
 
-		public OnClickUpdateRestaurant(RestaurantProxy rest)
+		public OnClickEditRestaurant(RestaurantProxy rest)
 		{
 			this.rest = rest;
 		}
@@ -200,7 +205,7 @@ public class RestaurantsListPanel extends VerticalPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+			RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory().getRestaurantAdminService();
 
 			PopupPanel popup = new PopupPanel(false);
 
@@ -222,11 +227,11 @@ public class RestaurantsListPanel extends VerticalPanel
 
 	private class OnClickSaveRestaurant implements Runnable
 	{
-		private final ClientServiceRequest service;
+		private final RestaurantAdminServiceRequest service;
 		private final PopupPanel popup;
 		private final RestaurantProxy toSave;
 
-		public OnClickSaveRestaurant(ClientServiceRequest service, PopupPanel popup, RestaurantProxy rest)
+		public OnClickSaveRestaurant(RestaurantAdminServiceRequest service, PopupPanel popup, RestaurantProxy rest)
 		{
 			this.service = service;
 			this.popup = popup;
@@ -241,7 +246,7 @@ public class RestaurantsListPanel extends VerticalPanel
 			PopupPanel loading = new PopupPanel(false);
 			loading.setWidget(new Label("Loading..."));
 			loading.center();
-//			TODO uncommnt service.saveRestaurant(toSave).fire(new SaveRestaurantReciever(loading));
+			service.saveRestaurant(toSave).fire(new SaveRestaurantReciever(loading));
 
 		}
 
@@ -249,24 +254,25 @@ public class RestaurantsListPanel extends VerticalPanel
 
 	class SaveRestaurantReciever extends Receiver<RestaurantProxy>
 	{
-		private final PopupPanel loading;
+		private final PopupPanel popup;
 
-		public SaveRestaurantReciever(PopupPanel loading)
+		public SaveRestaurantReciever(PopupPanel popup)
 		{
-			this.loading = loading;
+			this.popup = popup;
 		}
 
 		@Override
 		public void onSuccess(RestaurantProxy response)
 		{
-			loading.removeFromParent();
+			popup.removeFromParent();
 			reloadRestaurants();
 		}
 
 		@Override
 		public void onFailure(ServerFailure error)
 		{
-			loading.hide();
+//			popup.hide();
+			popup.removeFromParent();
 			Window.alert("exception: " + error.getMessage());
 		}
 

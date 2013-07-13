@@ -50,12 +50,16 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse);
 		response = testResponse.response;
 		
+		// Validate the restaurant values
 		assertNotNull(response.getMenu());
 		assertNotNull(response.getMenu().getCategories());
 		assertEquals(menuCats, response.getMenu().getCategories().size());
+		
+		// Validate the branches values
 		assertNotNull(response.getBranches());
 		assertEquals(numBranches, response.getBranches().size());
 		
+		// Validate the branches inner values
 		for (int i=0; i<numBranches; ++i)
 		{
 			RestaurantBranchProxy branch = response.getBranches().get(i);
@@ -74,7 +78,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
 	/**
 	 * this test will test and demonstrate the flow: <br> 
-	 * restaurant admin adds a branch service to already exist branch
+	 * restaurant admin adds a branch to already exist restaurant
 	 * @throws InterruptedException 
 	 */
 	@Test
@@ -95,6 +99,10 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		
 		MockTestRespone<RestaurantProxy> testResponse = new MockTestRespone<RestaurantProxy>();
 		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse);
+		// the above line is equals to 
+		//		service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).to(testResponse);
+		//		service.fire();
+		
 		assertNotNull(testResponse.response);
 		
 		// tear down the pmf, because this is going to be a new RF call
@@ -112,10 +120,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
 		RestaurantBranchProxy branch2 = createRestBranch(adminService, 0, 0);
 		branch.setAddress("Dror2");
-
-		// setup a new pmf for the new call
-		setUpPMF();
-
+		
 		testResponse.response = null;
 		
 		adminService.addRestaurantBranch(editable, branch);
@@ -124,8 +129,13 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 		adminService.addRestaurantBranch(editable, branch2);
 		++numBranches;
 
+		// next 2 lines are equal to adminService.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).fire(testResponse);
 		adminService.saveRestaurant(editable).with(RestaurantProxy.REST_WITH).to(testResponse);
+		
+		// setup a new pmf for the new call
+        setUpPMF();
 		adminService.fire();
+
 		
 		assertNotNull(testResponse.response);
 		assertEquals(numBranches, testResponse.response.getBranches().size());
@@ -177,4 +187,23 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 	}
 
 
+	/**
+     * adds a new category with courses to already existing restaurant branch menu
+     */
+	@Test
+    public void addBranchMenuCategoryToBranchTest()
+	{
+	    
+	}
+	
+	/**
+	 * adds a new course to already existing restaurant branch menu category
+	 */
+	@Test
+	public void addBranchMenuCategoryCourseToBranchTest()
+	{
+	    
+	}
+	
+	
 }

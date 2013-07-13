@@ -11,8 +11,8 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
 import foodcenter.server.db.DbHandler;
-import foodcenter.server.db.modules.DbCart;
 import foodcenter.server.db.modules.DbCompany;
+import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUser;
 
@@ -93,11 +93,30 @@ public class ClientService
 		throw new NotImplementedException();
 	}
 
-	public static DbCart makeOrder(DbCart order)
+	public static DbOrder makeOrder(DbOrder order)
 	{
-		throw new NotImplementedException();
+	    logger.info("makeOrder is called");
+	    
+	    // Set the user of the current order
+	    DbUser user = getDbUser(userService.getCurrentUser().getEmail());
+
+	    order.setUser(user);
+	    user.getOrders().add(order);
+	    
+	    // Save the order
+	    if (null == DbHandler.save(user))
+	    {
+	        return null;
+	    }
+	    return order;
 	}
 
+	public static List<DbOrder> getOrders()
+	{
+	    DbUser user = getDbUser(userService.getCurrentUser().getEmail());
+	    return user.getOrders();
+	}
+	
 	public static List<DbCompany> getDefaultCompanies()
 	{
 		logger.info("getDefaultCompanies is called");

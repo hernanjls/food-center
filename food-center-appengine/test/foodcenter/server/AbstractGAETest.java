@@ -10,12 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
-import com.google.web.bindery.event.shared.SimpleEventBus;
-import com.google.web.bindery.requestfactory.server.ServiceLayer;
-import com.google.web.bindery.requestfactory.server.SimpleRequestProcessor;
-import com.google.web.bindery.requestfactory.server.testing.InProcessRequestTransport;
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 
 import foodcenter.server.db.PMF;
 

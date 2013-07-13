@@ -42,9 +42,6 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 	private List<DbTable> tables = new ArrayList<DbTable>();
 
 	@Persistent
-	private List<DbCart> orders = new ArrayList<DbCart>();
-
-	@Persistent
 	private DbMenu menu = new DbMenu();
 
 	@Persistent
@@ -107,16 +104,6 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 	public void setTables(List<DbTable> tables)
 	{
 		this.tables = tables;
-	}
-
-	public List<DbCart> getOrders()
-	{
-		return orders;
-	}
-
-	public void setOrders(List<DbCart> orders)
-	{
-		this.orders = orders;
 	}
 
 	public DbMenu getMenu()

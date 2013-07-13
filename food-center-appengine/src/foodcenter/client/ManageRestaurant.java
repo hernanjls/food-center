@@ -12,6 +12,7 @@ import foodcenter.client.service.RequestUtils;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.requset.ClientServiceRequest;
 
+@Deprecated
 public class ManageRestaurant implements EntryPoint
 {
 //    private static final String GWT_CONTINER = "gwtContainer";
@@ -60,7 +61,7 @@ public class ManageRestaurant implements EntryPoint
             PopupPanel loading = new PopupPanel(false);
             loading.setWidget(new Label("Loading..."));
             loading.center();
-//            TODO uncommnt userCommonService.saveRestaurant(rest).fire(new AddRestaurantReciever(loading));
+//TODO deprecated/uncommented            userCommonService.saveRestaurant(rest).fire(new AddRestaurantReciever(loading));
 
         }
 
