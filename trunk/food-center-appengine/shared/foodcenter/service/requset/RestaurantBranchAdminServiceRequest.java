@@ -9,7 +9,7 @@ import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.TableProxy;
 
 @ServiceName(value = "foodcenter.server.service.RestaurantBranchAdminService")
-public interface RestaurantBranchAdminServiceRequest extends RequestContext, MenuAdminServiceRequest
+public interface RestaurantBranchAdminServiceRequest extends MenuAdminServiceRequest, RequestContext
 {
 
 	public Request<Void> addBranchAdmin(RestaurantBranchProxy branch, String admin);

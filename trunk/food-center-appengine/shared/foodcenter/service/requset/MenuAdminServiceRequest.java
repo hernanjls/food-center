@@ -6,7 +6,7 @@ import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
 
-public interface MenuAdminServiceRequest 
+public interface MenuAdminServiceRequest
 {
 	public Request<Void> addCategoryCourse(MenuCategoryProxy cat, CourseProxy course);
 
