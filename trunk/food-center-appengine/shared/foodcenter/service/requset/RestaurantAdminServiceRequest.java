@@ -15,10 +15,8 @@ public interface RestaurantAdminServiceRequest extends RestaurantBranchAdminServ
 
     public Request<Void> setIconBytes(RestaurantProxy rest, List<Byte> iconBytes);
     
-    
     public Request<Void> addRestaurantBranch(RestaurantProxy rest, RestaurantBranchProxy branch);
 	
-    
     public Request<Void> removeRestaurantBranch(RestaurantProxy rest, RestaurantBranchProxy branch);
     
     public Request<Void> addRestaurantAdmin(RestaurantProxy rest, String admin);

@@ -5,7 +5,7 @@
 <%@page import="foodcenter.server.service.ClientService" %>
 <%@page import="foodcenter.server.db.modules.DbUser" %>
 <%@page import="foodcenter.server.db.modules.DbRestaurant" %>
-<%@page import="foodcenter.server.db.DbHandlerImp" %>
+<%@page import="foodcenter.server.db.DbHandler" %>
 
 <!doctype html>
 <!-- The DOCTYPE declaration above will set the     -->
@@ -42,26 +42,18 @@
   <!--                                           -->
   <body>
     <%
-    /*
+    
+        /*
+        // Make sure persistance filter is enabled.....
         Logger logger = LoggerFactory.getLogger(getClass());
-        DbUser info = UserCommonService.login(null);    
+        DbUser info = ClientService.login(null);    
         String nickName = info.getNickName();
         String userId = info.getUserId();
         String role = info.isAdmin() ? "Admin" : "User";        
         String email = info.getEmail();        
         String logoutUrl = info.getLogoutUrl();
         logger.debug("loggged in: " + email);
-        */
-        /*
-	        DbHandlerImp db = new DbHandlerImp();
-	        DbRestaurant res = db.find(DbRestaurant.class, "agtmb29kLWNlbnRlcnISCxIMRGJSZXN0YXVyYW50GAIM");
-	        //out.println("menu cats " + res.getMenu().getCategories().size());
-	        out.println("branches " + res.getBranches().size());
-	        out.println("branches[0]->addr " + res.getBranches().get(0).getAddress());
-	        out.println("branches[0]->menu " + res.getBranches().get(0).getMenu());
-	        out.println("branches[0]->menu->cats " + res.getBranches().get(0).getMenu().getCategories());
-	        out.println("branches[0]->menu->cat[0] " + res.getBranches().get(0).getMenu().getCategories().get(0).getCategoryTitle());
-        */
+        */    
     %>
     <div id ="header" class="header">
 	    <div id ="headerInformation" class="headerInformation">

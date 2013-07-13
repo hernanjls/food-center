@@ -33,9 +33,6 @@ public class DbCompanyBranch extends AbstractDbGeoObject
     private List<String> employees = new ArrayList<String>(); // emails
 
     @Persistent
-    private List<DbCart> orders = new ArrayList<DbCart>();
-
-    @Persistent
     private List<ServiceType> services = new ArrayList<ServiceType>();
 
     @Persistent
@@ -75,16 +72,6 @@ public class DbCompanyBranch extends AbstractDbGeoObject
     public void setEmployees(List<String> employees)
     {
         this.employees = employees;
-    }
-
-    public List<DbCart> getOrders()
-    {
-        return orders;
-    }
-
-    public void setOrders(List<DbCart> orders)
-    {
-        this.orders = orders;
     }
 
     public List<ServiceType> getServices()

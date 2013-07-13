@@ -1,5 +1,8 @@
 package foodcenter.server.db.modules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.persistence.Transient;
@@ -31,6 +34,9 @@ public class DbUser extends AbstractDbObject
 
 	@Persistent
 	private String gcmKey;
+	
+	@Persistent(mappedBy="user")
+	private List<DbOrder> orders = new ArrayList<DbOrder>();
 	
 	public DbUser()
 	{
@@ -96,4 +102,13 @@ public class DbUser extends AbstractDbObject
         this.gcmKey = gcmKey;
     }
 
+    public List<DbOrder> getOrders()
+    {
+        return orders;
+    }
+    
+    public void setOrders(List<DbOrder> orders)
+    {
+        this.orders = orders;
+    }
 }
