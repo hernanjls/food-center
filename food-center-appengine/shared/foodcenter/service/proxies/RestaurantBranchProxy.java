@@ -31,10 +31,6 @@ public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, Ent
 
     public void setTables(List<TableProxy> tables);
 
-    public List<CartProxy> getOrders();
-
-    public void setOrders(List<CartProxy> orders);
-
     public MenuProxy getMenu();
 
     public void setMenu(MenuProxy menu);

@@ -6,7 +6,7 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
-import foodcenter.service.proxies.CartProxy;
+import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.proxies.UserProxy;
@@ -27,7 +27,7 @@ public interface ClientServiceRequest extends RequestContext
     
     public Request<List<RestaurantProxy>> findRestaurant(String pattern);
     
-    public Request<CartProxy> makeOrder(CartProxy order);
+    public Request<OrderProxy> makeOrder(OrderProxy order);
     
     // services the user need for companies
     

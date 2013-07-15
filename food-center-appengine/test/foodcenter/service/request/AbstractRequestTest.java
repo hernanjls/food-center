@@ -15,6 +15,7 @@ import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.server.AbstractGAETest;
 import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -124,5 +125,29 @@ public abstract class AbstractRequestTest extends AbstractGAETest
 		}
 
 		return r;
+	}
+	
+	protected OrderProxy createOrder(RequestContext rContext, RestaurantBranchProxy branch, int maxCourses)
+	{
+		OrderProxy order = RequestUtils.createOrder(rContext);
+		int cnt = 0;
+		
+		int numCats = branch.getMenu().getCategories().size();
+		for (int i = 0; i< numCats; ++i)
+		{
+			MenuCategoryProxy cat = branch.getMenu().getCategories().get(i);
+			int numCourses = cat.getCourses().size();
+			for (int j=0; j<numCourses; ++j)
+			{
+				CourseProxy course = cat.getCourses().get(j);
+				order.getCourses().add(course.getId());
+				cnt++;
+				if (cnt >= maxCourses)
+				{
+					return order;
+				}
+			}
+		}
+		return order;
 	}
 }
