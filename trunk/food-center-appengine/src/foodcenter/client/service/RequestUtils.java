@@ -11,6 +11,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
+import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
@@ -80,6 +81,13 @@ public class RequestUtils
     	res.setMenu(createMenuProxy(rContext));
     	res.setServices(new ArrayList<ServiceType>());
     	
+    	return res;
+    }
+    
+    public static OrderProxy createOrder(RequestContext rContext)
+    {
+    	OrderProxy res = rContext.create(OrderProxy.class);
+    	res.setCourses(new ArrayList<String>());
     	return res;
     }
 }

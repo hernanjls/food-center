@@ -96,13 +96,21 @@ public class ClientService
 	public static DbOrder makeOrder(DbOrder order)
 	{
 	    logger.info("makeOrder is called");
-	    
+	    if (null == order)
+	    {
+	    	return null;
+	    }
+
 	    // Set the user of the current order
 	    DbUser user = getDbUser(userService.getCurrentUser().getEmail());
-
+	    if (null == user)
+	    {
+	    	return null;
+	    }
+	    
 	    order.setUser(user);
 	    user.getOrders().add(order);
-	    
+
 	    // Save the order
 	    if (null == DbHandler.save(user))
 	    {

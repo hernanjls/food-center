@@ -28,10 +28,6 @@ public interface CompanyBranchProxy extends AbstractGeoLocationInterface, Entity
     //
     // public void setOrders(List<String> orders);
 
-    public List<CartProxy> getOrders();
-
-    public void setOrders(List<CartProxy> orders);
-
     public List<ServiceType> getServices();
 
     public void setServices(List<ServiceType> services);

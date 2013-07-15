@@ -35,7 +35,7 @@ public class DbUser extends AbstractDbObject
 	@Persistent
 	private String gcmKey;
 	
-	@Persistent(mappedBy="user")
+	@Persistent
 	private List<DbOrder> orders = new ArrayList<DbOrder>();
 	
 	public DbUser()
