@@ -19,17 +19,15 @@ public class DbOrder extends AbstractDbObject
 	
 	@Persistent
 	@Unowned   
-	//TODO maybe fix unowned
 	private DbUser user;   //user which made this order
 	
 
 	@Persistent
 	@Unowned
-	//TODO maybe fix unowned
-	private List<String> courses = new ArrayList<String>();
+	private List<String> courses = new ArrayList<String>();	// Courses IDs
 	
-//	@Persistent
-//	private Date date;
+	@Persistent
+	private Date date;
 	
 	public DbOrder()
     {
@@ -38,14 +36,14 @@ public class DbOrder extends AbstractDbObject
 
 	
 	
-//    @Override
-//    public void jdoPreStore() 
-//    {
-//        super.jdoPreStore();
-//
-//        // Make sure the date is correct
-//        this.date = new Date();
-//    };
+    @Override
+    public void jdoPreStore() 
+    {
+        super.jdoPreStore();
+
+        // Make sure the date is correct
+        this.date = new Date();
+    };
     
     public DbUser getUser()
     {
@@ -67,10 +65,10 @@ public class DbOrder extends AbstractDbObject
         this.courses = courses;
     }
     
-//    public Date getDate()
-//    {
-//        return date;
-//    }
+    public Date getDate()
+    {
+        return date;
+    }
 
 	
 }
