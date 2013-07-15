@@ -3,6 +3,7 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.persistence.Transient;
@@ -29,7 +30,7 @@ public class DbUser extends AbstractDbObject
 	@Persistent
 	private String userId;
 	
-	@Transient
+	@NotPersistent
 	private Boolean isAdmin;
 
 	@Persistent
@@ -47,51 +48,52 @@ public class DbUser extends AbstractDbObject
 	{
 		return logoutUrl;
 	}
+	
+    public void setLogoutUrl(String logoutUrl)
+    {
+        this.logoutUrl = logoutUrl;
+    }
 
 	public String getNickName()
 	{
 		return nickName;
 	}
 
+	public void setNickName(String nickName)
+    {
+        this.nickName = nickName;
+    }
+	
 	public String getEmail()
 	{
 		return email;
 	}
 
+	public void setEmail(String email)
+    {
+        this.email = email;
+    }
+	
 	public String getUserId()
 	{
 		return userId;
 	}
 
+	public void setUserId(String userId)
+    {
+        this.userId = userId;
+    }
+	
 	public Boolean isAdmin()
 	{
 		return isAdmin;
 	}
-
-	public void setLogoutUrl(String logoutUrl)
-	{
-		this.logoutUrl = logoutUrl;
-	}
-
-	public void setNickName(String nickName)
-	{
-		this.nickName = nickName;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
-
-	public void setUserId(String userId)
-	{
-		this.userId = userId;
-	}
-
+	
 	public void setAdmin(Boolean isAdmin)
-	{
-		this.isAdmin = isAdmin;
-	}
+    {
+        this.isAdmin = isAdmin;
+    }
+
 	public String getGcmKey()
     {
         return gcmKey;

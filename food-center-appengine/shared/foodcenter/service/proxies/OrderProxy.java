@@ -17,7 +17,15 @@ public interface OrderProxy extends EntityProxy
 	public UserProxy getUser();
     
     public void setUser(UserProxy user);
-    
+
+    public String getCompBranchId();
+
+	public void setCompBranchId(String compBranchId);
+
+	public String getRestBranchId();
+
+	public void setRestBranchId(String restBranchId);
+
     public List<String> getCourses();
     
     public void setCourses(List<String> courses);

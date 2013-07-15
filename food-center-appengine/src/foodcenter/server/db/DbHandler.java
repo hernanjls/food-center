@@ -213,7 +213,7 @@ public class DbHandler
      * @param declaredParams - Declare the list of parameters query execution. <br>
      *                         The parameter declaration is a String containing <br>
      *                         one or more query parameter declarations separated with commas. <br>
-     *                         Ex: "String value, Int x".<br>
+     *                         Ex: "String value, Int x, Date dateP".<br>
      *                         if null or valus are null, no declared parameters nor values will be used.
      * @param values		 - the values for the declared parameters.<br>
      * 						   if null or declared params are null, no declared parameters nor values will be used.
