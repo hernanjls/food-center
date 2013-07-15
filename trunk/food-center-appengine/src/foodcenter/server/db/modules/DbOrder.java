@@ -9,66 +9,87 @@ import javax.jdo.annotations.Persistent;
 
 import com.google.appengine.datanucleus.annotations.Unowned;
 
-@PersistenceCapable(detachable="true")
+@PersistenceCapable(detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4888609583270819317L;
-	
-	@Persistent
-	@Unowned   
-	private DbUser user;   //user which made this order
-	
 
 	@Persistent
 	@Unowned
-	private List<String> courses = new ArrayList<String>();	// Courses IDs
-	
+	private DbUser user; // user which made this order
+
+	@Persistent
+	private String compBranchId;
+
+	@Persistent
+	private String restBranchId;
+
+	@Persistent
+	private List<String> courses = new ArrayList<String>(); // Courses IDs
+
 	@Persistent
 	private Date date;
-	
+
 	public DbOrder()
-    {
-        super();
-    }
+	{
+		super();
+	}
 
-	
-	
-    @Override
-    public void jdoPreStore() 
-    {
-        super.jdoPreStore();
+	@Override
+	public void jdoPreStore()
+	{
+		super.jdoPreStore();
 
-        // Make sure the date is correct
-        this.date = new Date();
-    };
-    
-    public DbUser getUser()
-    {
-        return user;
-    }
-    
-    public void setUser(DbUser user)
-    {
-        this.user = user;
-    }
-    
-    public List<String> getCourses()
-    {
-        return courses;
-    }
-    
-    public void setCourses(List<String> courses)
-    {
-        this.courses = courses;
-    }
-    
-    public Date getDate()
-    {
-        return date;
-    }
+		// Make sure the date is correct
+		this.date = new Date();
+	};
 
-	
+	public DbUser getUser()
+	{
+		return user;
+	}
+
+	public void setUser(DbUser user)
+	{
+		this.user = user;
+	}
+
+	public String getCompBranchId()
+	{
+		return compBranchId;
+	}
+
+	public void setCompBranchId(String compBranchId)
+	{
+		this.compBranchId = compBranchId;
+	}
+
+	public String getRestBranchId()
+	{
+		return restBranchId;
+	}
+
+	public void setRestBranchId(String restBranchId)
+	{
+		this.restBranchId = restBranchId;
+	}
+
+	public List<String> getCourses()
+	{
+		return courses;
+	}
+
+	public void setCourses(List<String> courses)
+	{
+		this.courses = courses;
+	}
+
+	public Date getDate()
+	{
+		return date;
+	}
+
 }

@@ -16,8 +16,6 @@ public interface ClientServiceRequest extends RequestContext
 {
 	public Request<Void> logout();
 
-    public Request<UserProxy> getDbUser(String email);
-
     public Request<UserProxy> login(String gcmKey);
 
 
