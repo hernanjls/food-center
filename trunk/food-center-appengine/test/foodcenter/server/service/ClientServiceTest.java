@@ -127,6 +127,9 @@ public class ClientServiceTest extends AbstractServiceTest
         DbRestaurant rest = createRest("rest", numMenuCats, numMenuCourses, numBranches, numBranchMenuCats, numBranchMenuCourses);
         RestaurantAdminService.saveRestaurant(rest);
         
+        tearDownPMF();
+        setUpPMF();
+        
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
         
         // Create an order and fill it with all the courses from branch menu to the order 
