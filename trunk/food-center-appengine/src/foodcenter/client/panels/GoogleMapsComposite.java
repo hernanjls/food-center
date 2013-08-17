@@ -18,7 +18,9 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 
 /**
  * 
- * @reference http://stackoverflow.com/questions/4320992/getting-location-details-from-google-map-in-gwt
+ * @reference 
+ *            http://stackoverflow.com/questions/4320992/getting-location-details-from-google-map-in-
+ *            gwt
  */
 public class GoogleMapsComposite extends Composite
 {
@@ -26,44 +28,57 @@ public class GoogleMapsComposite extends Composite
     private final TextBox addressBox;
     private final TextBox latBox;
     private final TextBox lngBox;
+    private final boolean isEditMode;
     
     private MapWidget map;
     private Geocoder geoCoder;
     private Marker marker;
-    
-    
+
     /**
      * @param address - is the textbox which holds the address, will be modified on marker movement
-     * @param latBox  - is the textbox to add the value to
-     * @param lngBox  - is the textbox to add the value to
-     * @param lat     - is the default lat to load with
-     * @param lng     - is the default lng to load with
+     * @param latBox - is the textbox to add the value to
+     * @param lngBox - is the textbox to add the value to
+     * @param lat - is the default lat to load with
+     * @param lng - is the default lng to load with
      */
-    public GoogleMapsComposite(AbstractGeoLocationInterface proxy, TextBox address, TextBox latBox, TextBox lngBox)
+    public GoogleMapsComposite(AbstractGeoLocationInterface proxy,
+                               TextBox address,
+                               TextBox latBox,
+                               TextBox lngBox,
+                               boolean isEditMode)
     {
         this.proxy = proxy;
         this.addressBox = address;
         this.latBox = latBox;
         this.lngBox = lngBox;
-        
-        LatLng center = LatLng.newInstance(proxy.getLat(), proxy.getLng()); 
-        
+        this.isEditMode = isEditMode;
+
+        LatLng center = LatLng.newInstance(proxy.getLat(), proxy.getLng());
+
         this.geoCoder = new Geocoder();
-        
+
         MarkerOptions options = MarkerOptions.newInstance();
         options.setDraggable(true);
         marker = new Marker(center, options);
         marker.setVisible(true);
-        marker.addMarkerDragEndHandler(new GoogleMapMarkerDragEndHandler());
-        
+        if (isEditMode)
+        {
+            marker.addMarkerDragEndHandler(new GoogleMapMarkerDragEndHandler());
+        }
+        else
+        {
+            marker.setDraggingEnabled(false);
+        }
+
         map = new MapWidget(center, 6);
         map.setSize("100%", "350px");
         map.addOverlay(marker);
         map.addControl(new LargeMapControl());
-        
+
         addressBox.setText(proxy.getAddress());
+
         updateMarkerByAddress();
-        
+
         initWidget(map);
     }
 
@@ -71,9 +86,10 @@ public class GoogleMapsComposite extends Composite
     {
         geoCoder.getLocations(addressBox.getText(), new GoogleMapLocationCallback());
     }
-    
+
     /**
      * update the text boxes with the lat, lng and address
+     * 
      * @param point is the LatLng point of the location
      * @param address is the address string of the location
      */
@@ -92,20 +108,22 @@ public class GoogleMapsComposite extends Composite
             addressBox.setText(address);
         }
     }
-    
+
     private void updateProxy(LatLng point, String address)
     {
-        proxy.setAddress(address);
-        proxy.setLat(point.getLatitude());
-        proxy.setLng(point.getLongitude());
+        if (isEditMode)
+        {
+            proxy.setAddress(address);
+            proxy.setLat(point.getLatitude());
+            proxy.setLng(point.getLongitude());
+        }
     }
-    
+
     private void performReverseLookup(final LatLng point)
     {
         geoCoder.getLocations(point, new GoogleMapLocationCallback());
     }
-    
-    
+
     private class GoogleMapMarkerDragEndHandler implements MarkerDragEndHandler
     {
         @Override
@@ -118,11 +136,10 @@ public class GoogleMapsComposite extends Composite
             }
         }
     }
-    
-    
+
     private class GoogleMapLocationCallback implements LocationCallback
     {
-        
+
         @Override
         public void onSuccess(JsArray<Placemark> locations)
         {
@@ -133,7 +150,7 @@ public class GoogleMapsComposite extends Composite
                 marker.setLatLng(point);
                 marker.setVisible(true);
                 String address = location.getAddress();
-                
+
                 updateTextBoxes(point, address);
                 updateProxy(point, address);
             }

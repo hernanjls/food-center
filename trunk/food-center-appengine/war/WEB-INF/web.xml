@@ -12,7 +12,7 @@
 
 	<filter-mapping>
 		<filter-name>PersistenceFilter</filter-name>
-		<url-pattern>/gwtRequest</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
 	<!-- GWT RequestFactory Servlet -->

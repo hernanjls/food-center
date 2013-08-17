@@ -83,6 +83,12 @@ public class ClientService
         return res;
     }
 
+    public static DbRestaurant getRestaurantById(String id)
+    {
+        logger.info("getRestaurantById is called, id: " +id);
+        return DbHandler.find(DbRestaurant.class, id);
+    }
+
     public static List<DbRestaurant> findRestaurant(String pattern)
     {
         throw new NotImplementedException();

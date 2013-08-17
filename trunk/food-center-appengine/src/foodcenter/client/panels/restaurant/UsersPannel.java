@@ -4,168 +4,185 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.RequestContext;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.service.RequestUtils;
-import foodcenter.service.proxies.UserProxy;
-import foodcenter.service.requset.ClientServiceRequest;
+import foodcenter.client.handlers.EmailHandler;
+import foodcenter.client.handlers.RedrawablePannel;
 
-public class UsersPannel extends FlexTable
+public class UsersPannel extends FlexTable implements RedrawablePannel
 {
 
-	private final Boolean isAdmin;
-	private final List<String> users;
+    private static final int COLUMN_EMAIL = 0;
+    private static final int COLUMN_NEW_BUTTON = 1;
+    private static final int COLUMN_ADD_BUTTON = 1;
+    private static final int COLUMN_CANCEL_BUTTON = 2;
 
-	private final Button newUserButton;
+    private final List<String> users;
+    private final List<String> addedUsers;
 
-	public UsersPannel(List<String> users, Boolean isAdmin)
-	{
-		super();
-		this.isAdmin = isAdmin;
-		this.users = users;
-		newUserButton = new Button("New");
-		newUserButton.addClickHandler(new OnClickNewUser());
+    private final EmailHandler emailAddHandler;
+    private final EmailHandler emailDeleteHandler;
 
-		redraw();
+    private final Button newUserButton;
 
-	}
+    public UsersPannel(List<String> users,
+                       List<String> addedUsers,
+                       EmailHandler emailAddHandler,
+                       EmailHandler emailDeleteHandler)
+    {
+        super();
+        this.users = users;
+        this.addedUsers = addedUsers;
+        this.emailAddHandler = emailAddHandler;
+        this.emailDeleteHandler = emailDeleteHandler;
 
-	public void redraw()
-	{
-		// Clear all the rows of this table
-		removeAllRows();
+        // Adds an empty row to fill
+        newUserButton = new Button("New");
+        OnClickNewButton onClickNewButton = new OnClickNewButton();
+        newUserButton.addClickHandler(onClickNewButton);
+        redraw();
+    }
 
-		// Print the header row of this table
-		printTableHeader();
+    @Override
+    public void redraw()
+    {
+        // Clear all the rows of this table
+        removeAllRows();
 
-		// Print all the categories if exits
-		int idx = 0;
-		if (null == users)
-		{
-			return;
-		}
-		
-		for (String up : users)
-		{
-			printUserRow(up, idx);
-			++idx;
-		}
+        // Print the header row of this table
+        printTableHeader();
 
-	}
+        if (null == users || null == addedUsers)
+        {
+            return;
+        }
 
-	private void printTableHeader()
-	{
+        // Print all the categories if exits
+        int row = 1;
+        for (String user : users)
+        {
+            printUserRow(user, row);
+            ++row;
+        }
+        
+        for (String user : addedUsers)
+        {
+            printUserRow(user, row);
+            ++row;
+        }
+        
+        newUserButton.setEnabled(null != emailAddHandler);
+    }
 
-		int row = getRowCount();
+    private void printTableHeader()
+    {
+        int row = getRowCount();
 
-		newUserButton.setEnabled(isAdmin);
+        // add the widgets to the table
+        setText(row, COLUMN_EMAIL, "user email");
 
-		// add the widgets to the table
-		setText(row, 0, "user email");
-		setWidget(row, 1, newUserButton);
-	}
+        if (null != emailAddHandler)
+        {
+            // This button starts a new row to type in
+            setWidget(row, COLUMN_NEW_BUTTON, newUserButton);
+        }
+    }
 
-	public void printAddNewUserRow()
-	{
+    public void printNewUserEmptyRow()
+    {
 
-		int row = getRowCount();
+        int row = getRowCount();
 
-		TextBox userEmail = new TextBox();
+        // Email text box
+        TextBox userEmail = new TextBox();
+        setWidget(row, COLUMN_EMAIL, userEmail);
 
-		Button addButton = new Button("Add");
-		addButton.addClickHandler(new OnClickAddUser(userEmail));
+        // Click on it tries to add the user...
+        Button addButton = new Button("Add");
+        addButton.addClickHandler(new OnClickAddButton(userEmail));
+        setWidget(row, COLUMN_ADD_BUTTON, addButton);
 
-		setWidget(row, 0, userEmail);
-		setWidget(row, 1, addButton);
+        // Click on it will cancel the raw and redraw!
+        Button cancelButton = new Button("Cancel");
+        cancelButton.addClickHandler(new OnClickCancelButton());
+        setWidget(row, COLUMN_CANCEL_BUTTON, cancelButton);
 
-	}
+    }
 
-	public void printUserRow(String email, int idx)
-	{
-		int row = getRowCount();
+    public void printUserRow(String email, int row)
+    {
+        setText(row, COLUMN_EMAIL, email);
 
-		Button delete = new Button("delete");
-		delete.addClickHandler(new DeleteUserClickHandler(idx));
-		delete.setEnabled(isAdmin);
+        if (null != emailDeleteHandler)
+        {
+            Button delete = new Button("Delete");
+            delete.addClickHandler(new OnClickDeleteButton(row));            
+            setWidget(row, COLUMN_ADD_BUTTON, delete);
+        }
+    }
 
-		setText(row, 0, email);
-		setWidget(row, 1, delete);
 
-	}
+    /* ********************************************************************* */
+    /* ********************** private classes ****************************** */
+    /* ********************************************************************* */
 
-	class OnClickNewUser implements ClickHandler
-	{
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			printAddNewUserRow();
-			newUserButton.setEnabled(false);
-		}
-	}
+    private class OnClickCancelButton implements ClickHandler
+    {
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            redraw();
+        }
+    }
 
-	class OnClickAddUser implements ClickHandler
-	{
-		private final TextBox emailTextBox;
+    private class OnClickNewButton implements ClickHandler
+    {
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            printNewUserEmptyRow();
+            newUserButton.setEnabled(false);
+        }
+    }
 
-		public OnClickAddUser(TextBox emailTextBox)
-		{
-			this.emailTextBox = emailTextBox;
-		}
+    private class OnClickAddButton implements ClickHandler
+    {
+        private final TextBox text;
 
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
-			//TODO uncommnet service.getDbUser(emailTextBox.getText()).fire(new AddUserReceiver());
-		}
-	}
+        public OnClickAddButton(TextBox text)
+        {
+            this.text = text;
+        }
 
-	class AddUserReceiver extends Receiver<UserProxy>
-	{
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            if (null != emailAddHandler && null != text)
+            {
+                String email = text.getText();
+                emailAddHandler.handle(email, UsersPannel.this);
+            }
 
-		@Override
-		public void onSuccess(UserProxy response)
-		{
-			if (null != response)
-			{
-				users.add(response.getEmail());
-				redraw();
-			}
-			else
-			{
-				Window.alert("email doesn't exists");
-			}
+        }
 
-		}
+    }
 
-		@Override
-		public void onFailure(ServerFailure error)
-		{
-			Window.alert(error.getMessage());
-		}
-	}
+    private class OnClickDeleteButton implements ClickHandler
+    {
+        private final int row;
 
-	class DeleteUserClickHandler implements ClickHandler
-	{
+        public OnClickDeleteButton(int row)
+        {
+            this.row = row;
+        }
 
-		private final int idx;
-
-		public DeleteUserClickHandler(int idx)
-		{
-			this.idx = idx;
-		}
-
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			users.remove(idx);
-			redraw();
-		}
-	}
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            String email = getText(row, COLUMN_EMAIL);
+            emailDeleteHandler.handle(email, UsersPannel.this);
+        }
+    }
 }

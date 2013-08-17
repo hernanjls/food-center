@@ -1,5 +1,6 @@
 package foodcenter.server;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
 import org.junit.After;
@@ -81,7 +82,13 @@ public abstract class AbstractGAETest
 		}
 		finally
 		{
-			Transaction tx = PMF.get().currentTransaction();
+		    PersistenceManager pmf = PMF.get();
+		    if (null == pmf)
+		    {
+		        return;
+		    }
+		    
+			Transaction tx = pmf.currentTransaction();
 			if (tx.isActive())
 			{
 				tx.rollback();

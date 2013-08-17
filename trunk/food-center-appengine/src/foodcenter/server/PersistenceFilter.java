@@ -2,9 +2,6 @@ package foodcenter.server;
 
 import java.io.IOException;
 
-import javax.jdo.FetchGroup;
-import javax.jdo.FetchPlan;
-import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

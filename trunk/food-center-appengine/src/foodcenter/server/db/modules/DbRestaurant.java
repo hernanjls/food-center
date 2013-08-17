@@ -5,8 +5,11 @@ import java.util.List;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.listener.LoadCallback;
 import javax.validation.constraints.NotNull;
 
+import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
@@ -17,7 +20,7 @@ import foodcenter.service.enums.ServiceType;
 //    @FetchGroup(name = "DbRestaurant_admins", members = { @Persistent(name = "admins") }), //
 //    @FetchGroup(name = "DbRestaurant_services", members = { @Persistent(name = "services") }), //
 //})
-public class DbRestaurant extends AbstractDbObject
+public class DbRestaurant extends AbstractDbObject implements LoadCallback
 {
 
 	/**
@@ -58,7 +61,15 @@ public class DbRestaurant extends AbstractDbObject
 		this.name = name;
 	}
 
-	public String getName()
+    @Override
+    public void jdoPostLoad()
+    {
+        UserPrivilege p = PrivilegeManager.getPrivilege(this);
+        boolean b = UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p;
+        setEditable(b);    
+    }
+
+    public String getName()
 	{
 		return name;
 	}
