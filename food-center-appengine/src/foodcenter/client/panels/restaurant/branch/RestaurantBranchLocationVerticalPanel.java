@@ -19,6 +19,7 @@ import foodcenter.service.proxies.RestaurantBranchProxy;
 public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
 {
     private final RestaurantBranchProxy branchPrxoy;
+    private final boolean isEditMode;
     
     private final HorizontalPanel hPanel; // holds all the text boxes and buttons
     
@@ -29,45 +30,41 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
     
     private GoogleMapsComposite map;
     
-    public RestaurantBranchLocationVerticalPanel(RestaurantBranchProxy branchPrxoy)
+    public RestaurantBranchLocationVerticalPanel(RestaurantBranchProxy branchPrxoy, boolean isEditMode)
     {
         super();
         
         this.branchPrxoy = branchPrxoy;
+        this.isEditMode = isEditMode;
+                       
+        hPanel = new HorizontalPanel();
         
-        if (null == branchPrxoy.getLat())
-        {
-            branchPrxoy.setLat(ClientUtils.GOOGLE_API_DEFAULT_LAT);
+        address = new TextBox();
+        address.setEnabled(false);
+        hPanel.add(new Label("Address:"));
+        hPanel.add(address);
+        
+        lat = new TextBox();
+        lat.setEnabled(false);
+        hPanel.add(new Label("lat:"));
+        hPanel.add(lat);
+        
+        lng = new TextBox();
+        lng.setEnabled(false);
+        hPanel.add(new Label("lng:"));
+        hPanel.add(lng);
+        
+        // add the set addr button
+        setAddrButton = new Button("set");
+        
+        if (isEditMode)
+        {   
+            address.addKeyUpHandler(new SetAddressKeyUpHandler());
+            address.setEnabled(true);
+            
+            setAddrButton.addClickHandler(new SetAddressClickHandler());
+            hPanel.add(setAddrButton);
         }
-        
-        if (null == branchPrxoy.getLng())
-        {
-            branchPrxoy.setLng(ClientUtils.GOOGLE_API_DEFAULT_LNG);
-        }
-        if (null == branchPrxoy.getAddress())
-        {
-            branchPrxoy.setAddress(ClientUtils.GOOGLE_API_DEFAULT_ADDR);
-        }
-        
-        this.lat = new TextBox();
-        this.lat.setEnabled(false);
-        
-        this.lng = new TextBox();
-        this.lng.setEnabled(false);
-        
-        this.address = new TextBox();
-        this.setAddrButton = new Button("set");
-        
-        this.hPanel = new HorizontalPanel();
-        this.hPanel.add(new Label("Address:"));
-        this.hPanel.add(address);
-        this.hPanel.add(new Label("lat:"));
-        this.hPanel.add(lat);
-        this.hPanel.add(new Label("lng:"));
-        this.hPanel.add(lng);
-        
-        // add the button 
-        this.hPanel.add(setAddrButton);
         
         // add the map and the pannels
         if (!Maps.isLoaded())
@@ -83,12 +80,8 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
     
     private void loadMap()
     {
-        map = new GoogleMapsComposite(branchPrxoy, address, lat, lng);
-        
-        // set the search button/ enter click
-        setAddrButton.addClickHandler(new SetAddressClickHandler());
-        address.addKeyUpHandler(new SetAddressKeyUpHandler());
-        
+        map = new GoogleMapsComposite(branchPrxoy, address, lat, lng, isEditMode);
+                
         add(hPanel);        
         add(map);
     }

@@ -9,6 +9,7 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.Image;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
+import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.OrderProxy;
@@ -69,6 +70,15 @@ public class RequestUtils
     {
     	RestaurantBranchProxy res = rContext.create(RestaurantBranchProxy.class);
     	res.setMenu(createMenuProxy(rContext));
+
+        res.setAdmins(new ArrayList<String>());
+        res.setWaiters(new ArrayList<String>());
+        res.setChefs(new ArrayList<String>());
+        
+    	res.setLat(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LAT);
+    	res.setLng(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LNG);
+    	res.setAddress(AbstractDbGeoObject.GOOGLE_API_DEFAULT_ADDR);
+    	
     	return res;
     }
     

@@ -1,6 +1,6 @@
 package foodcenter.client.panels.restaurant;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,18 +19,30 @@ import foodcenter.client.ClientUtils;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
 public class RestaurantProfilePannel extends HorizontalPanel
 {
 
     private RestaurantProxy rest;
-    private Boolean isAdmin;
+    private Boolean isEditMode;
+    private final RestaurantAdminServiceRequest requestService;
 
-    public RestaurantProfilePannel(RestaurantProxy rest, Boolean isAdmin)
+    // Add can't be done directly on the restaurant because of RF methodoligy
+    private final List<ServiceType> addedServices;
+
+    // remove can be done directly on the restaurant
+
+    public RestaurantProfilePannel(RestaurantAdminServiceRequest requestService,
+                                   RestaurantProxy rest,
+                                   Boolean isEditMode)
     {
         super();
-        this.isAdmin = isAdmin;
+        this.requestService = requestService;
+        this.isEditMode = isEditMode;
         this.rest = rest;
+
+        this.addedServices = new ArrayList<ServiceType>();
 
         redraw();
     }
@@ -71,7 +83,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox nameBox = new TextBox();
         ClientUtils.setNotNullText(nameBox, rest.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
-
+        nameBox.setEnabled(isEditMode);
         res.add(nameBox);
 
         return res;
@@ -86,6 +98,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox phoneBox = new TextBox();
         ClientUtils.setNotNullText(phoneBox, rest.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
+        phoneBox.setEnabled(isEditMode);
         res.add(phoneBox);
 
         return res;
@@ -94,35 +107,39 @@ public class RestaurantProfilePannel extends HorizontalPanel
     private Panel createServicesPanel()
     {
         HorizontalPanel res = new HorizontalPanel();
-        
-        CheckBox deliveryCheckBox = createServiceCheckBox(ServiceType.DELIVERY, "delivery", rest);
-        CheckBox takeAwayCheckBox = createServiceCheckBox(ServiceType.TAKE_AWAY, "take away", rest);
-        CheckBox tableCheckBox = createServiceCheckBox(ServiceType.TABLE, "table", rest);
 
+        CheckBox deliveryCheckBox = createServiceCheckBox(ServiceType.DELIVERY, "delivery");
         res.add(deliveryCheckBox);
+
+        CheckBox takeAwayCheckBox = createServiceCheckBox(ServiceType.TAKE_AWAY, "take away");
         res.add(takeAwayCheckBox);
+
+        CheckBox tableCheckBox = createServiceCheckBox(ServiceType.TABLE, "table");
         res.add(tableCheckBox);
 
         return res;
     }
-    
-    private CheckBox createServiceCheckBox(ServiceType service, String name, RestaurantProxy rest)
+
+    private CheckBox createServiceCheckBox(ServiceType service, String name)
     {
         CheckBox res = new CheckBox(name);
         List<ServiceType> services = rest.getServices();
-        
-        boolean value = (null == services) ? false : services.contains(service);
+
+        boolean value = addedServices.contains(service) || services.contains(service);
         res.setValue(value);
-        res.addClickHandler(new ServiceClickHandler(service, rest));
-        res.setEnabled(isAdmin);
-        
+
+        if (isEditMode)
+        {
+            res.addClickHandler(new ServiceClickHandler(service));
+        }
+        res.setEnabled(isEditMode);
+
         return res;
     }
 
     class NameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
-        
 
         public NameKeyUpHandler(TextBox titleBox)
         {
@@ -156,46 +173,43 @@ public class RestaurantProfilePannel extends HorizontalPanel
 
     private class ServiceClickHandler implements ClickHandler
     {
-        private ServiceType service;
-        private RestaurantProxy rest;
-        
-        public ServiceClickHandler(ServiceType service, RestaurantProxy rest)
+        private final ServiceType service;
+
+        public ServiceClickHandler(ServiceType service)
         {
             this.service = service;
-            this.rest= rest;
+
         }
 
         @Override
         public void onClick(ClickEvent event)
         {
             List<ServiceType> services = rest.getServices();
-            
-            if (null == services)
-            {
-                // TODO maybe move this validation from here
-                services = new LinkedList<ServiceType>();
-                rest.setServices(services);
-            }
-            
+
             boolean isChecked = ((CheckBox) event.getSource()).isEnabled();
-            
+
             if (isChecked)
             {
-                if (!services.contains(service))
+                if (!services.contains(service) && !addedServices.contains(service))
                 {
-                    services.add(service);
+                    addedServices.add(service);
+                    requestService.addRestaurantServiceType(rest, service);
                 }
             }
             else
             {
                 if (services.contains(service))
                 {
+                    requestService.removeRestaurantServiceType(rest, service);
                     services.remove(service);
                 }
+                else if (addedServices.contains(service))
+                {
+                    requestService.removeRestaurantServiceType(rest, service);
+                    addedServices.remove(service);
+                }
             }
-
         }
-
     }
 
 }

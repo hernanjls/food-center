@@ -20,6 +20,10 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 public abstract class AbstractDbGeoObject extends AbstractDbObject implements AbstractGeoLocationInterface
 {
 
+    public final static double GOOGLE_API_DEFAULT_LAT = 32.7775;
+    public final static double GOOGLE_API_DEFAULT_LNG = 35.021667;
+    public final static String GOOGLE_API_DEFAULT_ADDR = "Israeli Institute of Technology, Viazman 87, Kesalsaba, Israel";
+
 	/**
 	 * 
 	 */
@@ -27,18 +31,18 @@ public abstract class AbstractDbGeoObject extends AbstractDbObject implements Ab
 
 	@Persistent
 	@Latitude
-	private Double lat = 0.0;
+	private Double lat = GOOGLE_API_DEFAULT_LAT;
 
 	@Persistent
 	@Longitude
-	private Double lng = 0.0;
+	private Double lng = GOOGLE_API_DEFAULT_LNG;
 
 	@Persistent
 	@Geocells
 	private List<String> geoCells;
 
 	@Persistent
-	private String address;
+	private String address = GOOGLE_API_DEFAULT_ADDR;
 
 	public AbstractDbGeoObject()
 	{

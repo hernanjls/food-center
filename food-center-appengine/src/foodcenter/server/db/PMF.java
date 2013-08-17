@@ -7,8 +7,6 @@ import javax.jdo.PersistenceManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import foodcenter.server.PersistenceFilter;
-
 /**
  * 
  * PMF is the persistance manager as can be seen in google examples. <br>

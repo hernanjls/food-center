@@ -25,6 +25,8 @@ public interface ClientServiceRequest extends RequestContext
     
     public Request<List<RestaurantProxy>> findRestaurant(String pattern);
     
+    public Request<RestaurantProxy> getRestaurantById(String id);
+    
     public Request<OrderProxy> makeOrder(OrderProxy order);
     
     // services the user need for companies
