@@ -10,12 +10,13 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import foodcenter.server.db.modules.AbstractDbGeoObject;
+import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
-import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
+import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
@@ -35,10 +36,11 @@ public class RequestUtils
     }
     
     
+    
     public static Image getImage(byte[] imageByteArray)
 	{
 //	    String base64 = Base64Utils.toBase64(imageByteArray); 
-	    String base64 = "data:image/png;base64,"+imageByteArray.toString();
+	    String base64 = "data:image/png;base64," + imageByteArray.toString();
 	    return new Image(base64);
 	}
     
@@ -90,6 +92,7 @@ public class RequestUtils
 //    	TODO res.setIconBytes()
     	res.setMenu(createMenuProxy(rContext));
     	res.setServices(new ArrayList<ServiceType>());
+    	res.setImageUrl(DbRestaurant.DEFAULT_ICON_PATH);
     	
     	return res;
     }

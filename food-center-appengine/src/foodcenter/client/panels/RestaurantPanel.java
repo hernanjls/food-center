@@ -15,7 +15,6 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.handlers.RedrawablePannel;
-import foodcenter.client.handlers.EmailHandler;
 import foodcenter.client.handlers.RestaurantBranchHandler;
 import foodcenter.client.panels.restaurant.BranchesFlexTable;
 import foodcenter.client.panels.restaurant.MenuFlexTable;
@@ -33,20 +32,19 @@ public class RestaurantPanel extends VerticalPanel
 
     private final Boolean isEditMode;
 
-    private final Runnable afterSave;
+    private final Runnable afterOk;
     private final Runnable afterClose;
     private final Runnable onClickEdit;
 
     private final Panel hPanel;
     private final Panel sPanel;
     
-    private final List<String> addedAdmins;
     private final List<RestaurantBranchProxy> addedBranches;
 
     public RestaurantPanel(RestaurantAdminServiceRequest requestService,
                            RestaurantProxy rest,
                            Boolean isEditMode,
-                           Runnable afterSave,
+                           Runnable afterOk,
                            Runnable afterClose,
                            Runnable onClickEdit)
     {
@@ -55,11 +53,10 @@ public class RestaurantPanel extends VerticalPanel
         this.requestService = requestService;
         this.rest = rest;
         this.isEditMode = isEditMode;
-        this.afterSave = afterSave;
+        this.afterOk = afterOk;
         this.afterClose = afterClose;
         this.onClickEdit = onClickEdit;
 
-        this.addedAdmins = new LinkedList<String>();
         this.addedBranches = new LinkedList<RestaurantBranchProxy>();
         
         this.hPanel = createHorizonalPanel();
@@ -98,30 +95,22 @@ public class RestaurantPanel extends VerticalPanel
         StackPanel stackPanel = new StackPanel();
 
         // profile pannel
-        Panel profilePanel = new RestaurantProfilePannel(requestService, rest, isEditMode);
+        Panel profilePanel = new RestaurantProfilePannel(rest, isEditMode);
         Panel menuPanel = new MenuFlexTable(requestService, rest.getMenu(), isEditMode);
+                
+        Panel adminsPanel = new UsersPannel(rest.getAdmins(),
+                                            isEditMode);
         
-        EmailHandler addAdminEmailHandler = null;
-        EmailHandler delAdminEmailHandler = null;
-    
+        
         RestaurantBranchHandler addBranchHandler = null; 
         RestaurantBranchHandler delBranchHandler = null;
     
         if (isEditMode)
-        {
-            addAdminEmailHandler = new AddRestAdminEmailHandler();
-            delAdminEmailHandler = new DelRestAdminEmailHandler();
-            
+        {            
             addBranchHandler = new AddRestaurantBranchHandler();
             delBranchHandler = new DelRestaurantBranchHandler();
         }
-        
-        Panel adminsPanel = new UsersPannel(rest.getAdmins(),
-                                            addedAdmins,
-                                            addAdminEmailHandler,
-                                            delAdminEmailHandler);
-        
-        
+
         Panel branchesPanel = new BranchesFlexTable(requestService,
                                                     rest.getBranches(),
                                                     addedBranches,
@@ -184,52 +173,52 @@ public class RestaurantPanel extends VerticalPanel
         }   
     }
     
-    private class AddRestAdminEmailHandler implements EmailHandler
-    {
-        @Override
-        public void handle(String email, RedrawablePannel panel)
-        {
-            // Validate admin is not already defined
-            if (rest.getAdmins().contains(email) || addedAdmins.contains(email))
-            {
-                Window.alert(email + " is already Admin");
-                return;
-            }
-            
-            // Add the admin
-            requestService.addRestaurantAdmin(rest, email);
-
-            // This is needed because the email will not be retrieved until service fire
-            addedAdmins.add(email);
-            
-            // Redraw the panel to show the new email
-            panel.redraw();
-        }    
-    }
-
-    private class DelRestAdminEmailHandler implements EmailHandler
-    {
-        @Override
-        public void handle(String email, RedrawablePannel pannel)
-        {
-            
-            if (addedAdmins.contains(email))
-            {
-                addedAdmins.remove(email);
-                requestService.removeRestaurantAdmin(rest, email);           
-            }
-            else if (rest.getAdmins().contains(email))
-            {
-                rest.getAdmins().remove(email);
-                requestService.removeRestaurantAdmin(rest, email);
-            }
-            else
-            {
-                Window.alert(email + " isn't Admin");
-            }
-            pannel.redraw();
-        }    
-    }
+//    private class AddRestAdminEmailHandler implements EmailHandler
+//    {
+//        @Override
+//        public void handle(String email, RedrawablePannel panel)
+//        {
+//            // Validate admin is not already defined
+//            if (rest.getAdmins().contains(email) || addedAdmins.contains(email))
+//            {
+//                Window.alert(email + " is already Admin");
+//                return;
+//            }
+//            
+//            // Add the admin
+//            requestService.addRestaurantAdmin(rest, email);
+//
+//            // This is needed because the email will not be retrieved until service fire
+//            addedAdmins.add(email);
+//            
+//            // Redraw the panel to show the new email
+//            panel.redraw();
+//        }    
+//    }
+//
+//    private class DelRestAdminEmailHandler implements EmailHandler
+//    {
+//        @Override
+//        public void handle(String email, RedrawablePannel pannel)
+//        {
+//            
+//            if (addedAdmins.contains(email))
+//            {
+//                addedAdmins.remove(email);
+//                requestService.removeRestaurantAdmin(rest, email);           
+//            }
+//            else if (rest.getAdmins().contains(email))
+//            {
+//                rest.getAdmins().remove(email);
+//                requestService.removeRestaurantAdmin(rest, email);
+//            }
+//            else
+//            {
+//                Window.alert(email + " isn't Admin");
+//            }
+//            pannel.redraw();
+//        }    
+//    }
 
     class CloseRestClickHandler implements ClickHandler
     {
@@ -264,9 +253,9 @@ public class RestaurantPanel extends VerticalPanel
         public void onSuccess(RestaurantProxy response)
         {
             // Call after save callback
-            if (null != afterSave)
+            if (null != afterOk)
             {
-                afterSave.run();
+                afterOk.run();
             }
         }
         

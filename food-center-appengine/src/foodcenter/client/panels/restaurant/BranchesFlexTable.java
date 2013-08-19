@@ -135,11 +135,11 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
 
             // construct on close runnable
             AfterCloseEditBranch afterClose = new AfterCloseEditBranch(popup);
-            AfterSaveEditBranch afterSave = null;
+            AfterOkEditBranch afterOk = null;
             
             if (isEditMode)
             {
-                afterSave = new AfterSaveEditBranch(branch);
+                afterOk = new AfterOkEditBranch(branch);
             }
             
             // construct the panel and add it to the popup
@@ -147,7 +147,7 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
                                                                           branch,
                                                                           isEditMode,
                                                                           afterClose,
-                                                                          afterSave);
+                                                                          afterOk);
             popup.add(branchPanel);
             popup.setTitle("Edit Branch");
             popup.setPopupPosition(10, 80);
@@ -214,11 +214,11 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
         }
     }
 
-    private class AfterSaveEditBranch implements Runnable
+    private class AfterOkEditBranch implements Runnable
     {
         private final RestaurantBranchProxy branch;
 
-        public AfterSaveEditBranch(RestaurantBranchProxy branch)
+        public AfterOkEditBranch(RestaurantBranchProxy branch)
         {
             this.branch = branch;
         }

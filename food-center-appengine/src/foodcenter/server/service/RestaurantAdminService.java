@@ -14,12 +14,7 @@ public class RestaurantAdminService extends RestaurantBranchAdminService
 //    private static UserService userService = UserServiceFactory.getUserService();
 //    private static Logger logger = LoggerFactory.getLogger(UserService.class);
     
-    
-    public static void setIconBytes(DbRestaurant rest, List<Byte> iconBytes)
-    {
-    	rest.setIconBytes(iconBytes);
-    }
-    
+        
     public static void addRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
 	{
 		List<DbRestaurantBranch> branches= rest.getBranches();
@@ -45,15 +40,15 @@ public class RestaurantAdminService extends RestaurantBranchAdminService
 //		}
 	}
     
-    public static void addRestaurantAdmin(DbRestaurant rest, String admin)
-	{
-		rest.getAdmins().add(admin);
-	}
-	
-	public static void removeRestaurantAdmin(DbRestaurant rest, String admin)
-	{
-		rest.getAdmins().remove(admin);
-	}
+//    public static void addRestaurantAdmin(DbRestaurant rest, String admin)
+//	{
+//		rest.getAdmins().add(admin);
+//	}
+//	
+//	public static void removeRestaurantAdmin(DbRestaurant rest, String admin)
+//	{
+//		rest.getAdmins().remove(admin);
+//	}
     
 	public static void addRestaurantServiceType(DbRestaurant rest, ServiceType service)
 	{

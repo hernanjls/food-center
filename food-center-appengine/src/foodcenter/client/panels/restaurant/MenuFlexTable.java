@@ -76,7 +76,7 @@ public class MenuFlexTable extends FlexTable implements RedrawablePannel
     {
         setText(0, COLUMN_CATEGORIES, "Categories");
         setText(0, COLUMN_CATEGORY_COURSES, "Courses");
-        
+
         if (isEditMode)
         {
             Button addCatButton = new Button("Add Category");
@@ -97,16 +97,7 @@ public class MenuFlexTable extends FlexTable implements RedrawablePannel
         MenuCategoryProxy menuCatProxy = RequestUtils.createMenuCategoryProxy(requestContext);
 
         // add it to the menu proxy
-        // FIXME null when there were no categories in the 1st place....
         menuProxy.getCategories().add(menuCatProxy);
-        // if (null != rest)
-        // {
-        // rest.setMenu(menuProxy);
-        // }
-        // if (null != branch)
-        // {
-        // branch.setMenu(menuProxy);
-        // }
 
         // print its table row
         printCategoryTableRow(menuCatProxy);
@@ -138,23 +129,22 @@ public class MenuFlexTable extends FlexTable implements RedrawablePannel
         TextBox catTitle = new TextBox();
         catTitle.setText(menuCatProxy.getCategoryTitle());
         catTitle.setEnabled(isEditMode);
-        
+
         setWidget(row, COLUMN_CATEGORIES, catTitle);
 
         if (isEditMode)
         {
             catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(menuCatProxy));
-            
+
             Button deleteCatButton = new Button("Delete");
             deleteCatButton.addClickHandler(new DeleteCategoryClickHandler(row));
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, deleteCatButton);
         }
-        
 
         CoursesFlexTable coursesTable = new CoursesFlexTable(requestContext,
                                                              menuCatProxy,
                                                              isEditMode);
-        
+
         setWidget(row, COLUMN_CATEGORY_COURSES, coursesTable);
     }
 

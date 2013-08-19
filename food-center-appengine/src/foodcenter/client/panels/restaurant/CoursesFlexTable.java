@@ -16,7 +16,7 @@ import foodcenter.service.proxies.MenuCategoryProxy;
 
 public class CoursesFlexTable extends FlexTable
 {
-    
+
     private static final int COLUMN_NAME = 0;
     private static final int COLUMN_PRICE = 1;
     private static final int COLUMN_BUTTON_ADD_COURSE = 2;
@@ -26,31 +26,33 @@ public class CoursesFlexTable extends FlexTable
     private final RequestContext requestContext;
     private final Boolean isEditMode;
 
-    public CoursesFlexTable(RequestContext requestContext, MenuCategoryProxy menuCatProxy, Boolean isEditMode)
+    public CoursesFlexTable(RequestContext requestContext,
+                            MenuCategoryProxy menuCatProxy,
+                            Boolean isEditMode)
     {
         super();
-        
+
         this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
         this.isEditMode = isEditMode;
-        
+
         if (null == menuCatProxy)
         {
-        	return;
+            return;
         }
-        
+
         createHeader();
-        
+
         List<CourseProxy> courses = menuCatProxy.getCourses();
         if (null == courses)
         {
-        	return;
+            return;
         }
         for (CourseProxy cp : courses)
         {
             printCourseRow(cp);
         }
-        
+
     }
 
     private void createHeader()
@@ -87,7 +89,7 @@ public class CoursesFlexTable extends FlexTable
         name.setText(courseProxy.getName());
         name.addKeyUpHandler(new CourseNameKeyUpHandler(name, courseProxy));
         setWidget(row, COLUMN_NAME, name);
-        
+
         TextBox price = new TextBox();
         Double coursePrice = courseProxy.getPrice();
         if (null != coursePrice)
@@ -95,11 +97,11 @@ public class CoursesFlexTable extends FlexTable
             price.setText(coursePrice.toString());
         }
         setWidget(row, COLUMN_PRICE, price);
-        
+
         if (isEditMode)
         {
             price.addKeyUpHandler(new CoursePriceKeyUpHandler(price, courseProxy));
-            
+
             Button delete = new Button("delete");
             delete.addClickHandler(new DeleteCourseClickHandler(row));
             setWidget(row, COLUMN_BUTTON_DEL_COURSE, delete);
@@ -107,7 +109,7 @@ public class CoursesFlexTable extends FlexTable
         else
         {
             name.setEnabled(false);
-            price.setEnabled(false);            
+            price.setEnabled(false);
         }
     }
 

@@ -1,6 +1,5 @@
 package foodcenter.client.panels.restaurant;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -16,49 +15,50 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import foodcenter.client.ClientUtils;
-import foodcenter.client.service.RequestUtils;
+import foodcenter.client.handlers.ImageUploadedHandler;
+import foodcenter.client.handlers.RedrawablePannel;
+import foodcenter.client.panels.FileUploadPanel;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
-import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
-public class RestaurantProfilePannel extends HorizontalPanel
+public class RestaurantProfilePannel extends HorizontalPanel implements RedrawablePannel
 {
 
-    private RestaurantProxy rest;
-    private Boolean isEditMode;
-    private final RestaurantAdminServiceRequest requestService;
-
-    // Add can't be done directly on the restaurant because of RF methodoligy
-    private final List<ServiceType> addedServices;
+    private final RestaurantProxy rest;
+    private String imgUrl;
+    private final Boolean isEditMode;
 
     // remove can be done directly on the restaurant
 
-    public RestaurantProfilePannel(RestaurantAdminServiceRequest requestService,
-                                   RestaurantProxy rest,
-                                   Boolean isEditMode)
+    public RestaurantProfilePannel(RestaurantProxy rest, Boolean isEditMode)
     {
         super();
-        this.requestService = requestService;
-        this.isEditMode = isEditMode;
         this.rest = rest;
-
-        this.addedServices = new ArrayList<ServiceType>();
+        this.isEditMode = isEditMode;
+        
+        imgUrl = rest.getImageUrl();
 
         redraw();
     }
 
+    @Override
     public final void redraw()
     {
         // remove all the widgets in this panel
         clear();
 
         // Add the image
-        Image image = RequestUtils.getImage(rest.getIconBytes()); // TODO get image bytes;
+        Image image = new Image(imgUrl);
         if (null != image)
         {
             add(image);
         }
-
+        if (isEditMode)
+        {
+            image.addClickHandler(new OnClickImage());
+        }
+        
+        
         // Add the information panel
         add(createProfileInfoPanel());
     }
@@ -125,7 +125,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         CheckBox res = new CheckBox(name);
         List<ServiceType> services = rest.getServices();
 
-        boolean value = addedServices.contains(service) || services.contains(service);
+        boolean value = services.contains(service);
         res.setValue(value);
 
         if (isEditMode)
@@ -137,7 +137,26 @@ public class RestaurantProfilePannel extends HorizontalPanel
         return res;
     }
 
-    class NameKeyUpHandler implements KeyUpHandler
+    
+    
+    private class OnClickImage implements ClickHandler, ImageUploadedHandler
+    {
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            new FileUploadPanel(this, rest.getId(), null);
+        }
+        
+        @Override
+        public void updateImage(String url)
+        {
+            imgUrl = url;
+            redraw();
+        }
+
+        
+    }
+    private class NameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
 
@@ -154,7 +173,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
 
     }
 
-    class PhoneKeyUpHandler implements KeyUpHandler
+    private class PhoneKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
 
@@ -186,28 +205,15 @@ public class RestaurantProfilePannel extends HorizontalPanel
         {
             List<ServiceType> services = rest.getServices();
 
-            boolean isChecked = ((CheckBox) event.getSource()).isEnabled();
+            boolean isChecked = ((CheckBox) event.getSource()).getValue();
 
-            if (isChecked)
+            if (isChecked && !services.contains(service))
             {
-                if (!services.contains(service) && !addedServices.contains(service))
-                {
-                    addedServices.add(service);
-                    requestService.addRestaurantServiceType(rest, service);
-                }
+                services.add(service);
             }
-            else
+            else if (!isChecked && services.contains(service))
             {
-                if (services.contains(service))
-                {
-                    requestService.removeRestaurantServiceType(rest, service);
-                    services.remove(service);
-                }
-                else if (addedServices.contains(service))
-                {
-                    requestService.removeRestaurantServiceType(rest, service);
-                    addedServices.remove(service);
-                }
+                services.remove(service);
             }
         }
     }

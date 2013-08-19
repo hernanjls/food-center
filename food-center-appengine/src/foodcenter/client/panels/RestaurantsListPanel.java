@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -90,6 +91,12 @@ public class RestaurantsListPanel extends VerticalPanel
     private void printRestaurantRow(RestaurantProxy rest, int row)
     {
         // set image here
+        // Add the image
+        Image image = new Image(rest.getImageUrl());
+        if (null != image)
+        {
+            restsTable.setWidget(row, COLUMN_IMAGE, image);
+        }
 
         String name = rest.getName();
         restsTable.setText(row, COLUMN_NAME, name);
@@ -200,7 +207,7 @@ public class RestaurantsListPanel extends VerticalPanel
             Runnable afterClose = new AfterCloseRestaurant(holder);
 
             // Will be set according to the edit mode
-            Runnable afterSave = null;
+            Runnable afterOk = null;
             Runnable onClickEdit = null;
 
             RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory()
@@ -210,13 +217,13 @@ public class RestaurantsListPanel extends VerticalPanel
             {
                 rest = RequestUtils.createRestaurantProxy(service);
                 isEditMode = true;
-                afterSave = new AfterSaveRestaurant();
+                afterOk = new AfterOkRestaurant();
             }
 
             else if (isEditMode)
             {
                 rest = service.edit(rest);
-                afterSave = new AfterSaveRestaurant();
+                afterOk = new AfterOkRestaurant();
             }
             else if (rest.isEditable())
             {
@@ -226,7 +233,7 @@ public class RestaurantsListPanel extends VerticalPanel
             RestaurantPanel restPanel = new RestaurantPanel(service,
                                                             rest,
                                                             isEditMode,
-                                                            afterSave,
+                                                            afterOk,
                                                             afterClose,
                                                             onClickEdit);
 
@@ -369,7 +376,7 @@ public class RestaurantsListPanel extends VerticalPanel
      * Reloads the restaurant {@link RestaurantsListPanel#reloadRestaurants()} <br>
      * will be called after {@link AfterCloseRestaurant}
      */
-    private class AfterSaveRestaurant implements Runnable
+    private class AfterOkRestaurant implements Runnable
     {
         @Override
         public void run()
