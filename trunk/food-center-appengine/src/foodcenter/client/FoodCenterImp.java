@@ -17,7 +17,7 @@ public class FoodCenterImp extends Receiver<UserProxy> implements EntryPoint, Ru
 {
 
     // private static final String GWT_MENU_CONTAINER = "gwtMenuContainer";
-    private static final String GWT_CONTINER = "gwtContainer";
+    public static final String GWT_CONTINER = "gwtContainer";
 
     private boolean isAdmin;
 

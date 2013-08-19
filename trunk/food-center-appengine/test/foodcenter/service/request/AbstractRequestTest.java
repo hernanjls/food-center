@@ -118,7 +118,7 @@ public abstract class AbstractRequestTest extends AbstractGAETest
             r.getBranches().add(branch);
             // branch.setRestaurant(r);
         }
-
+        
         return r;
     }
 

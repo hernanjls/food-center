@@ -8,7 +8,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
  * 
  * @param <T> is the expected response
  */
-public class MockTestRespone<T> extends Receiver<T>
+public class MockTestResponse<T> extends Receiver<T>
 {
 	public T response = null;
 	

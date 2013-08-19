@@ -3,6 +3,7 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.listener.LoadCallback;
@@ -10,133 +11,152 @@ import javax.validation.constraints.NotNull;
 
 import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
+import foodcenter.server.service.blobstore.BlobUrlServlet;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
-//@FetchGroups(value = { //
-//	@FetchGroup(name = "DbRestaurant_menu", members = { @Persistent(name = "menu") }), //
-//    @FetchGroup(name = "DbRestaurant_iconBytes", members = { @Persistent(name = "iconBytes") }), //
-//    @FetchGroup(name = "DbRestaurant_branches", members = { @Persistent(name = "branches") }), //
-//    @FetchGroup(name = "DbRestaurant_admins", members = { @Persistent(name = "admins") }), //
-//    @FetchGroup(name = "DbRestaurant_services", members = { @Persistent(name = "services") }), //
-//})
 public class DbRestaurant extends AbstractDbObject implements LoadCallback
 {
 
-	/**
+    /**
 	 * 
 	 */
     private static final long serialVersionUID = -9053099508081246189L;
 
-	@Persistent
-	@NotNull
-	private String name = "";
+    public static final String DEFAULT_ICON_PATH = "images/default_restaurant_icon.png";
 
-	@Persistent
-	private DbMenu menu = new DbMenu();
+    @Persistent
+    @NotNull
+    private String name = "";
 
-	@Persistent
-	private List<Byte> iconBytes = new ArrayList<Byte>();
+    @Persistent
+    private DbMenu menu = new DbMenu();
 
-	@Persistent
-	private String phone = "";
+    @Persistent
+    private String imageKey = null;
 
-	@Persistent //(mappedBy = "restaurant")
-	private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
+    @NotPersistent
+    private String imageUrl = DEFAULT_ICON_PATH;
 
-	@Persistent
-	private List<String> admins = new ArrayList<String>(); // emails
+    @Persistent
+    private String phone = "";
 
-	@Persistent
-	private List<ServiceType> services = new ArrayList<ServiceType>();
+    @Persistent
+    // (mappedBy = "restaurant")
+    private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
 
-	public DbRestaurant()
-	{
-		super();
-	}
+    @Persistent
+    private List<String> admins = new ArrayList<String>(); // emails
 
-	public DbRestaurant(String name)
-	{
-		this();
-		this.name = name;
-	}
+    @Persistent
+    private List<ServiceType> services = new ArrayList<ServiceType>();
+
+    public DbRestaurant()
+    {
+        super();
+    }
+
+    public DbRestaurant(String name)
+    {
+        this();
+        this.name = name;
+    }
 
     @Override
     public void jdoPostLoad()
     {
+        // Set privilege...
         UserPrivilege p = PrivilegeManager.getPrivilege(this);
         boolean b = UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p;
-        setEditable(b);    
+        setEditable(b);
+
+        if (null != imageKey)
+        {
+            imageUrl = "/blobservlet?" //
+                       + BlobUrlServlet.BLOB_SERVE_KEY
+                       + "="
+                       + imageKey;
+        }
     }
 
     public String getName()
-	{
-		return name;
-	}
+    {
+        return name;
+    }
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	public DbMenu getMenu()
-	{
-		return menu;
-	}
+    public DbMenu getMenu()
+    {
+        return menu;
+    }
 
-	public void setMenu(DbMenu menu)
-	{
-		this.menu = menu;
-	}
+    public void setMenu(DbMenu menu)
+    {
+        this.menu = menu;
+    }
 
-	public List<Byte> getIconBytes()
-	{
-		return iconBytes;
-	}
+    public String getImageKey()
+    {
+        return imageKey;
+    }
 
-	public void setIconBytes(List<Byte> iconBytes)
-	{
-		this.iconBytes = iconBytes;
-	}
+    public void setImageKey(String imageKey)
+    {
+        this.imageKey = imageKey;
+    }
 
-	public String getPhone()
-	{
-		return phone;
-	}
+    public String getImageUrl()
+    {
+        return imageUrl;
+    }
 
-	public void setPhone(String phone)
-	{
-		this.phone = phone;
-	}
+    public void setImageUrl(String imageUrl)
+    {
+        this.imageUrl = imageUrl;
+    }
 
-	public List<DbRestaurantBranch> getBranches()
-	{
-		return branches;
-	}
+    public String getPhone()
+    {
+        return phone;
+    }
 
-	public void setBranches(List<DbRestaurantBranch> branches)
-	{
-		this.branches = branches;
-	}
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
+    }
 
-	public List<String> getAdmins()
-	{
-		return admins;
-	}
+    public List<DbRestaurantBranch> getBranches()
+    {
+        return branches;
+    }
 
-	public void setAdmins(List<String> admins)
-	{
-		this.admins = admins;
-	}
+    public void setBranches(List<DbRestaurantBranch> branches)
+    {
+        this.branches = branches;
+    }
 
-	public List<ServiceType> getServices()
-	{
-		return services;
-	}
+    public List<String> getAdmins()
+    {
+        return admins;
+    }
 
-	public void setServices(List<ServiceType> services)
-	{
-		this.services = services;
-	}
+    public void setAdmins(List<String> admins)
+    {
+        this.admins = admins;
+    }
+
+    public List<ServiceType> getServices()
+    {
+        return services;
+    }
+
+    public void setServices(List<ServiceType> services)
+    {
+        this.services = services;
+    }
 
 }

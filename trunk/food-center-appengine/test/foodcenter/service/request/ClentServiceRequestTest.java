@@ -13,7 +13,7 @@ import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.proxies.UserProxy;
-import foodcenter.service.request.mock.MockTestRespone;
+import foodcenter.service.request.mock.MockTestResponse;
 import foodcenter.service.requset.ClientServiceRequest;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
@@ -38,7 +38,7 @@ public class ClentServiceRequestTest extends AbstractRequestTest
     public void loginRequestTest()
     {
         ClientServiceRequest service = rf.getClientService();
-        MockTestRespone<UserProxy> userResponse = new MockTestRespone<UserProxy>();
+        MockTestResponse<UserProxy> userResponse = new MockTestResponse<UserProxy>();
         service.login("").fire(userResponse);
         assertNotNull(userResponse.response);
         assertEquals("", userResponse.response.getGcmKey());
@@ -70,14 +70,14 @@ public class ClentServiceRequestTest extends AbstractRequestTest
                                           numBranches,
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
-        MockTestRespone<RestaurantProxy> restResponse = new MockTestRespone<RestaurantProxy>();
+        MockTestResponse<RestaurantProxy> restResponse = new MockTestResponse<RestaurantProxy>();
         adminService.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
 
         // tear down the pmf, because this is going to be a new RF call
         tearDownPMF();
 
         ClientServiceRequest service = rf.getClientService();
-        MockTestRespone<UserProxy> userResponse = new MockTestRespone<UserProxy>();
+        MockTestResponse<UserProxy> userResponse = new MockTestResponse<UserProxy>();
 
         // setup a new pmf for the new call
         setUpPMF();
@@ -88,7 +88,7 @@ public class ClentServiceRequestTest extends AbstractRequestTest
         ClientServiceRequest clientService = rf.getClientService();
         RestaurantBranchProxy branch = restResponse.response.getBranches().get(0);
         OrderProxy order = createOrder(clientService, branch, numBranchMenuCatCourses);
-        MockTestRespone<OrderProxy> orderResponse = new MockTestRespone<OrderProxy>();
+        MockTestResponse<OrderProxy> orderResponse = new MockTestResponse<OrderProxy>();
 
         // setup a new pmf for the new call
         setUpPMF();
@@ -121,7 +121,7 @@ public class ClentServiceRequestTest extends AbstractRequestTest
                                           numBranches,
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
-        MockTestRespone<RestaurantProxy> restResponse = new MockTestRespone<RestaurantProxy>();
+        MockTestResponse<RestaurantProxy> restResponse = new MockTestResponse<RestaurantProxy>();
         adminService.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
 
         tearDownPMF();
@@ -135,14 +135,14 @@ public class ClentServiceRequestTest extends AbstractRequestTest
                                            numBranches,
                                            numBranchMenuCats,
                                            numBranchMenuCatCourses);
-        MockTestRespone<RestaurantProxy> restResponse2 = new MockTestRespone<RestaurantProxy>();
+        MockTestResponse<RestaurantProxy> restResponse2 = new MockTestResponse<RestaurantProxy>();
         adminService.saveRestaurant(rest2).with(RestaurantProxy.REST_WITH).fire(restResponse2);
 
         tearDownPMF();
         setUpPMF();
 
         ClientServiceRequest clientService = rf.getClientService();
-        MockTestRespone<List<RestaurantProxy>> getDefaultResponse = new MockTestRespone<List<RestaurantProxy>>();
+        MockTestResponse<List<RestaurantProxy>> getDefaultResponse = new MockTestResponse<List<RestaurantProxy>>();
         clientService.getDefaultRestaurants().with(RestaurantProxy.REST_WITH).fire(getDefaultResponse);
         
         tearDownPMF();
