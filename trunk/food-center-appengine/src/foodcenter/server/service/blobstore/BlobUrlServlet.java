@@ -2,9 +2,6 @@ package foodcenter.server.service.blobstore;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.Channels;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,20 +15,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.files.AppEngineFile;
-import com.google.appengine.api.files.FileService;
-import com.google.appengine.api.files.FileServiceFactory;
-import com.google.appengine.api.files.FileWriteChannel;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
+import foodcenter.server.FileManager;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -58,11 +51,12 @@ public class BlobUrlServlet extends HttpServlet
     private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     private Map<String, String> fields = new TreeMap<String, String>();
-    private FileItem fileItem = null;   //File to deal with
+    private FileItem fileItem = null; // File to deal with
 
     /**
      * for getting an image
      */
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException
     {
         BlobKey blobKey = new BlobKey(req.getParameter("blob-key"));
@@ -72,6 +66,7 @@ public class BlobUrlServlet extends HttpServlet
     /**
      * for uploading a new image
      */
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException,
                                                                        IOException
     {
@@ -119,14 +114,15 @@ public class BlobUrlServlet extends HttpServlet
             return;
         }
 
-        
         // Save the file
-        BlobKey blobKey = saveFile(fileItem);
-        
+        BlobKey blobKey = FileManager.saveFile(fileItem.getInputStream(), //
+                                               fileItem.getContentType());
+
         if (null != rest)
         {
+            rest.deleteImage();
             rest.setImageKey(blobKey.getKeyString());
-            rest.jdoPostLoad();
+            rest.jdoPostLoad(); // Set image URL according to the Blob-Key
             res.getWriter().write(rest.getImageUrl());
         }
         else if (null != comp)
@@ -186,32 +182,7 @@ public class BlobUrlServlet extends HttpServlet
                 fileItem = item;
             }
         }
-        
         return (fileItem != null);
-    }
-
-    private BlobKey saveFile(FileItem item) throws IOException
-    {
-        FileService fileService = FileServiceFactory.getFileService();
-        
-        // Create a new Blob file with mime-type same as served file
-        String contentType = item.getContentType();
-        AppEngineFile file = fileService.createNewBlobFile(contentType);
-
-        // Open a channel to write to it, lock because we intend to finalize
-        boolean lock = true;
-        FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
-
-        // Different standard Java ways of writing to the channel
-        // are possible. Here we use a OutputStream:
-        OutputStream os = Channels.newOutputStream(writeChannel);
-        InputStream is = item.getInputStream();
-        IOUtils.copy(is, os);
-        
-        // Now finalize
-        writeChannel.closeFinally();
-        
-        return fileService.getBlobKey(file);
     }
 
 }

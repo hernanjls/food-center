@@ -1,5 +1,6 @@
 package foodcenter.server.db.modules;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,9 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.listener.LoadCallback;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.LoggerFactory;
+
+import foodcenter.server.FileManager;
 import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.server.service.blobstore.BlobUrlServlet;
@@ -159,4 +163,19 @@ public class DbRestaurant extends AbstractDbObject implements LoadCallback
         this.services = services;
     }
 
+    public void deleteImage()
+    {
+        if (null != imageKey)
+        {
+            try
+            {
+                FileManager.deleteFile(imageKey);
+                imageKey = null;
+            }
+            catch (NullPointerException | IOException e)
+            {
+                LoggerFactory.getLogger(getClass()).error("Can't delete Image", e);
+            }
+        }
+    }
 }

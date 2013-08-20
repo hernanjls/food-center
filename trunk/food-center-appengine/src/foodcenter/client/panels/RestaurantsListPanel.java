@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -90,14 +89,9 @@ public class RestaurantsListPanel extends VerticalPanel
 
     private void printRestaurantRow(RestaurantProxy rest, int row)
     {
-        // set image here
-        // Add the image
-        Image image = new Image(rest.getImageUrl());
-        if (null != image)
-        {
-            restsTable.setWidget(row, COLUMN_IMAGE, image);
-        }
-
+        EditableImage img = new EditableImage(rest.getImageUrl());
+        restsTable.setWidget(row, COLUMN_IMAGE, img);
+        
         String name = rest.getName();
         restsTable.setText(row, COLUMN_NAME, name);
 
@@ -368,21 +362,21 @@ public class RestaurantsListPanel extends VerticalPanel
         public void run()
         {
             holder.removeFromParent();
+            reloadRestaurants();
         }
 
     }
 
     /**
      * Reloads the restaurant {@link RestaurantsListPanel#reloadRestaurants()} <br>
-     * will be called after {@link AfterCloseRestaurant}
+     * will be called before {@link AfterCloseRestaurant}
      */
-    private class AfterOkRestaurant implements Runnable
+    private class AfterOkRestaurant implements Runnable 
     {
         @Override
         public void run()
         {
             lastViewdRest = null;
-            reloadRestaurants();
         }
     }
 

@@ -47,7 +47,6 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> T save(T object)
     {
-//    	TODO check why it get lost here: new SimpleRequestProcessor(null).decodeInvocationArguments()
     	logger.info("save: " + object.getClass() + "state:" + JDOHelper.getObjectState(object));
     	PersistenceManager pm = PMF.get();
         try
