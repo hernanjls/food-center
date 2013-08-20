@@ -1,20 +1,20 @@
 package foodcenter.server.service.blobstore;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class BlobUrlServlet extends HttpServlet
     private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     private Map<String, String> fields = new TreeMap<String, String>();
-    private FileItem fileItem = null; // File to deal with
+    private String blobSaved = null; // File to deal with
 
     /**
      * for getting an image
@@ -70,13 +70,9 @@ public class BlobUrlServlet extends HttpServlet
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException,
                                                                        IOException
     {
-
         res.setHeader("Content-Type", "text/html");
 
-        if (false == processRequest(req, this.getServletContext()))
-        {
-            return;
-        }
+        processRequest(req);
 
         String restId = fields.get(BLOB_UPLOAD_REST_ID_PARAM);
         String compId = fields.get(BLOB_UPLOAD_COMP_ID_PARAM);
@@ -96,6 +92,7 @@ public class BlobUrlServlet extends HttpServlet
         if (null == rest && null == comp)
         {
             logger.error("rest and comp are null");
+            FileManager.deleteFile(blobSaved);
             return;
         }
 
@@ -104,6 +101,7 @@ public class BlobUrlServlet extends HttpServlet
             logger.info("user: " + userService.getCurrentUser().getEmail()
                         + " not allowed to add image to restaurant: "
                         + restId);
+            FileManager.deleteFile(blobSaved);
             return;
         }
         else if (null != comp && !comp.isEditable())
@@ -111,17 +109,16 @@ public class BlobUrlServlet extends HttpServlet
             logger.info("user: " + userService.getCurrentUser().getEmail()
                         + " not allowed to add image to company: "
                         + compId);
+            FileManager.deleteFile(blobSaved);
             return;
         }
 
         // Save the file
-        BlobKey blobKey = FileManager.saveFile(fileItem.getInputStream(), //
-                                               fileItem.getContentType());
 
         if (null != rest)
         {
             rest.deleteImage();
-            rest.setImageKey(blobKey.getKeyString());
+            rest.setImageKey(blobSaved);
             rest.jdoPostLoad(); // Set image URL according to the Blob-Key
             res.getWriter().write(rest.getImageUrl());
         }
@@ -132,57 +129,50 @@ public class BlobUrlServlet extends HttpServlet
             // comp.jdoPostLoad();
             // res.getWriter().write(comp.getImageUrl());
         }
+        else
+        {
+            FileManager.deleteFile(blobSaved);
+        }
+        
     }
 
-    private boolean processRequest(HttpServletRequest req, ServletContext servletContext)
+    private void processRequest(HttpServletRequest req) throws IOException
     {
-        List<FileItem> items = null;
-
-        // Parse the items using Apache commons-fileupload
-        // Create a factory for disk-based file items
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-
-        // Configure a repository (to ensure a secure temp location is used)
-        File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-        factory.setRepository(repository);
-
-        // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
         try
         {
-            items = upload.parseRequest(req); // Parse the request
-        }
-        catch (Exception e)
-        {
-            logger.error(e.getMessage(), e);
-            return false;
-        }
+            ServletFileUpload upload = new ServletFileUpload();
 
-        return parseItems(items);
-    }
-
-    private boolean parseItems(List<FileItem> items)
-    {
-        if (null == items)
-        {
-            logger.error("null items");
-            return false;
-        }
-
-        for (FileItem item : items)
-        {
-            if (item.isFormField())
+            FileItemIterator iterator = upload.getItemIterator(req);
+            while (iterator.hasNext())
             {
-                String fieldName = item.getFieldName();
-                String value = item.getString();
-                fields.put(fieldName, value);
-            }
-            else
-            {
-                fileItem = item;
+                FileItemStream item = iterator.next();
+                InputStream is = item.openStream();
+                
+                try
+                {
+                    if (item.isFormField())
+                    {
+                        String fieldName = item.getFieldName();
+                        String value = null;
+                            value = IOUtils.toString(is);
+    
+                        fields.put(fieldName, value);
+                    }
+                    else
+                    {
+                        blobSaved = FileManager.saveFile(is, item.getContentType()).getKeyString();
+                    }
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(is);
+                }
+
             }
         }
-        return (fileItem != null);
+        catch (FileUploadException e)
+        {
+            throw new IOException(e.getMessage(), e);
+        }
     }
-
 }

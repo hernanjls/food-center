@@ -37,15 +37,29 @@ public class FileManager
         return fileService.getBlobKey(file);
     }
 
-    public static void deleteFile(String blobKey) throws IOException, NullPointerException
+    public static void deleteFile(String blobKey) throws IOException
     {
+        if (null == blobKey)
+        {
+            return;
+        }
         deleteFile(new BlobKey(blobKey));
     }
     
-    public static void deleteFile(BlobKey blobKey) throws IOException, NullPointerException
+    public static void deleteFile(BlobKey blobKey) throws IOException
     {
+        if (null == blobKey)
+        {
+            return;
+        }
+        
         FileService fileService = FileServiceFactory.getFileService();
         AppEngineFile file = fileService.getBlobFile(blobKey);
+        
+        if (null == file)
+        {
+            return;
+        }
         fileService.delete(file);
     }
 
