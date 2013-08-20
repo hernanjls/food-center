@@ -2,7 +2,6 @@ package foodcenter.client.panels;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -59,7 +58,7 @@ public class FileUploadPanel
             TextBox restBoxId = new TextBox();
             restBoxId.setName(BlobUrlServlet.BLOB_UPLOAD_REST_ID_PARAM);
             restBoxId.setText(restId);
-//            restBoxId.setVisible(false);
+            restBoxId.setVisible(false);
             panel.add(restBoxId);
         }
         else if (null != compId && !"".equals(compId))
@@ -67,7 +66,7 @@ public class FileUploadPanel
             TextBox compBoxId = new TextBox();
             compBoxId.setName(BlobUrlServlet.BLOB_UPLOAD_COMP_ID_PARAM);
             compBoxId.setText(compId);
-//            compBoxId.setVisible(false);
+            compBoxId.setVisible(false);
             panel.add(compBoxId);
         }
         
@@ -83,16 +82,6 @@ public class FileUploadPanel
         
         panel.add(submit);
         
-//        form.addSubmitHandler(new SubmitHandler()
-//        {
-//            @Override
-//            public void onSubmit(SubmitEvent event)
-//            {
-//                Window.alert("Submitting...");
-//                form.s
-//            }
-//        });
-        
         form.addSubmitCompleteHandler(new SubmitCompleteHandler()
         {   
             @Override
@@ -100,7 +89,6 @@ public class FileUploadPanel
             {
                 String url = event.getResults();
                 callback.updateImage(url);
-                Window.alert(url);
                 popupHolder.removeFromParent();
             }
         });

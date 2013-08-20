@@ -233,14 +233,11 @@ public class RestaurantPanel extends VerticalPanel
         }
     }
 
-    class SaveRestClickHandler extends CloseRestClickHandler
+    class SaveRestClickHandler implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            // Do some closer
-            super.onClick(event);
-
             // Save the restaurant
             requestService.saveRestaurant(rest).with(RestaurantProxy.REST_WITH)
                 .fire(new SaveRestaurantReciever());
@@ -257,6 +254,13 @@ public class RestaurantPanel extends VerticalPanel
             {
                 afterOk.run();
             }
+            
+            // Call after close callback
+            if (null != afterClose)
+            {
+                afterClose.run();
+            }
+
         }
         
         @Override

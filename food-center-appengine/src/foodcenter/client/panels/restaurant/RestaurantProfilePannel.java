@@ -6,9 +6,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import foodcenter.client.ClientUtils;
 import foodcenter.client.handlers.ImageUploadedHandler;
 import foodcenter.client.handlers.RedrawablePannel;
+import foodcenter.client.panels.EditableImage;
 import foodcenter.client.panels.FileUploadPanel;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -25,7 +26,7 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
 {
 
     private final RestaurantProxy rest;
-    private String imgUrl;
+    private EditableImage img;
     private final Boolean isEditMode;
 
     // remove can be done directly on the restaurant
@@ -36,7 +37,8 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         this.rest = rest;
         this.isEditMode = isEditMode;
         
-        imgUrl = rest.getImageUrl();
+        ClickHandler onClickImage = (isEditMode) ? new OnClickImage() : null;
+        img = new EditableImage(rest.getImageUrl(), onClickImage);
 
         redraw();
     }
@@ -48,16 +50,8 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         clear();
 
         // Add the image
-        Image image = new Image(imgUrl);
-        if (null != image)
-        {
-            add(image);
-        }
-        if (isEditMode)
-        {
-            image.addClickHandler(new OnClickImage());
-        }
-        
+        img.updateImage(rest.getImageUrl());
+        add(img);        
         
         // Add the information panel
         add(createProfileInfoPanel());
@@ -144,14 +138,21 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         @Override
         public void onClick(ClickEvent event)
         {
-            new FileUploadPanel(this, rest.getId(), null);
+            if (null == rest.getId())
+            {
+                Window.alert("You must 1st save the restaurant");
+            }
+            else
+            {
+                new FileUploadPanel(this, rest.getId(), null);
+            }
         }
         
         @Override
         public void updateImage(String url)
         {
-            imgUrl = url;
-            redraw();
+            rest.setImageUrl(url);
+            img.updateImage(url);
         }
 
         
