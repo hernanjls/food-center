@@ -99,6 +99,10 @@ public class PrivilegeManager
     
     private static UserPrivilege getPrivilege(DbRestaurant restaurant, String email)
     {
+        if (null == restaurant)
+        {
+            return UserPrivilege.NotPremited;
+        }
         if (restaurant.getAdmins().contains(email))
         {
             return UserPrivilege.RestaurantAdmin;

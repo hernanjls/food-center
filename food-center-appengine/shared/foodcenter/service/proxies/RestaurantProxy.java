@@ -32,10 +32,6 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
 
     public void setMenu(MenuProxy menu);
 
-    public void setImageUrl(String imageUrl);
-    
-    public String getImageUrl();
-
     public String getPhone();
 
     public void setPhone(String phone);

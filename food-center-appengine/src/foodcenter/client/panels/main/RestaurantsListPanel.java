@@ -28,7 +28,6 @@ import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
 public class RestaurantsListPanel extends VerticalPanel
 {
-
     private final static int COLUMN_IMAGE = 0;
     private final static int COLUMN_NAME = 1;
     private final static int COLUMN_DELIVERY = 2;
@@ -70,7 +69,7 @@ public class RestaurantsListPanel extends VerticalPanel
 
         // Load the Restaurants without Menus, etc...
         // Fetch Groups issue not appearing on JUNIT tests!
-        service.getDefaultRestaurants().fire(new GetDefaultRestaurantsReceiver(popup));
+        service.getDefaultRestaurants().fire(new GetRestaurantssReceiver(popup));
     }
 
     private void redraw(List<RestaurantProxy> rests)
@@ -164,11 +163,11 @@ public class RestaurantsListPanel extends VerticalPanel
         return hPanel;
     }
 
-    private class GetDefaultRestaurantsReceiver extends Receiver<List<RestaurantProxy>>
+    private class GetRestaurantssReceiver extends Receiver<List<RestaurantProxy>>
     {
         private final PopupPanel popup;
 
-        public GetDefaultRestaurantsReceiver(PopupPanel popup)
+        public GetRestaurantssReceiver(PopupPanel popup)
         {
             this.popup = popup;
         }

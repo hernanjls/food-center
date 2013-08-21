@@ -6,6 +6,8 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
@@ -53,6 +55,19 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     {
         // empty ctor
         super();
+    }
+
+    @Override
+    public void jdoPostLoad()
+    {
+        super.jdoPostLoad();
+
+        // Set privilege...
+        UserPrivilege p = PrivilegeManager.getPrivilege(this);
+        boolean b = (UserPrivilege.Admin == p) //
+                    || (UserPrivilege.RestaurantAdmin == p)
+                    || UserPrivilege.RestaurantBranchAdmin == p;
+        setEditable(b);
     }
 
     public DbRestaurant getRestaurant()

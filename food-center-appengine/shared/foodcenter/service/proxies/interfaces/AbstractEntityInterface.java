@@ -8,4 +8,10 @@ public interface AbstractEntityInterface
 	public Integer getVersion();
 	
 	public Boolean isEditable();
+	
+	public void setEditable(Boolean editable);
+
+    public String getImageUrl();
+
+    public void setImageUrl(String imageUrl);
 }
