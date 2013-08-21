@@ -17,8 +17,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import foodcenter.client.ClientUtils;
 import foodcenter.client.handlers.ImageUploadedHandler;
 import foodcenter.client.handlers.RedrawablePannel;
-import foodcenter.client.panels.EditableImage;
-import foodcenter.client.panels.FileUploadPanel;
+import foodcenter.client.panels.common.EditableImage;
+import foodcenter.client.panels.common.FileUploadPanel;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
 

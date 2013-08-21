@@ -1,4 +1,4 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.main;
 
 import java.util.List;
 
@@ -17,6 +17,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.client.panels.common.EditableImage;
+import foodcenter.client.panels.restaurant.RestaurantPanel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -362,6 +364,7 @@ public class RestaurantsListPanel extends VerticalPanel
         public void run()
         {
             holder.removeFromParent();
+            lastViewdRest = null;
             reloadRestaurants();
         }
 
@@ -376,7 +379,6 @@ public class RestaurantsListPanel extends VerticalPanel
         @Override
         public void run()
         {
-            lastViewdRest = null;
         }
     }
 

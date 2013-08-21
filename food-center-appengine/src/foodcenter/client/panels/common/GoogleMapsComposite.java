@@ -1,4 +1,4 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.common;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.maps.client.MapWidget;

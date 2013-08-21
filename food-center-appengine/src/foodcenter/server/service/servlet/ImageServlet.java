@@ -1,4 +1,4 @@
-package foodcenter.server.service.blobstore;
+package foodcenter.server.service.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.Transform;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -32,7 +34,7 @@ import foodcenter.server.db.modules.DbRestaurant;
 /**
  * This is the google way (using request factory is extremely slow)
  */
-public class BlobUrlServlet extends HttpServlet
+public class ImageServlet extends HttpServlet
 {
     /**
      * 
@@ -46,9 +48,7 @@ public class BlobUrlServlet extends HttpServlet
     public static final String BLOB_SERVE_KEY = "blob-key";
 
     private static UserService userService = UserServiceFactory.getUserService();
-    private final static Logger logger = LoggerFactory.getLogger(BlobUrlServlet.class);
-
-    private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    private final static Logger logger = LoggerFactory.getLogger(ImageServlet.class);
 
     private Map<String, String> fields = new TreeMap<String, String>();
     private String blobSaved = null; // File to deal with
@@ -59,8 +59,16 @@ public class BlobUrlServlet extends HttpServlet
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException
     {
-        BlobKey blobKey = new BlobKey(req.getParameter("blob-key"));
-        blobstoreService.serve(blobKey, res);
+        BlobKey blobKey = new BlobKey(req.getParameter(BLOB_SERVE_KEY));
+        ImagesService imagesService = ImagesServiceFactory.getImagesService();
+        
+        Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
+        if (null != oldImage)
+        {
+            Transform resize = ImagesServiceFactory.makeResize(50, 50);
+            Image newImage = imagesService.applyTransform(resize, oldImage);
+            IOUtils.write(newImage.getImageData(), res.getOutputStream());
+        }
     }
 
     /**

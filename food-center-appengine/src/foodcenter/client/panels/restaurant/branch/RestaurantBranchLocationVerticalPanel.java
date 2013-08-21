@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import foodcenter.client.ClientUtils;
-import foodcenter.client.panels.GoogleMapsComposite;
+import foodcenter.client.panels.common.GoogleMapsComposite;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 
 public class RestaurantBranchLocationVerticalPanel extends VerticalPanel

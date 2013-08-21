@@ -1,4 +1,4 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.restaurant.branch;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -8,9 +8,8 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.panels.restaurant.MenuFlexTable;
-import foodcenter.client.panels.restaurant.UsersPannel;
-import foodcenter.client.panels.restaurant.branch.RestaurantBranchLocationVerticalPanel;
+import foodcenter.client.panels.common.UsersPannel;
+import foodcenter.client.panels.restaurant.internal.MenuPanel;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 
@@ -25,10 +24,6 @@ public class RestaurantBranchPanel extends VerticalPanel
 
     private Panel hPanel;
     private final Panel sPanel;
-    
-//    private final List<String> addedAdmins;
-//    private final List<String> addedWaiters;
-//    private final List<String> addedChefs;
 
     public RestaurantBranchPanel(RestaurantBranchAdminServiceRequest requestContext,
                                  RestaurantBranchProxy branch,
@@ -43,7 +38,7 @@ public class RestaurantBranchPanel extends VerticalPanel
         this.isEditMode = isEditMode;
         this.afterClose = afterClose;
         this.afterOk = afterOk;
-        
+
         this.hPanel = createHorizonalButtonsPanel();
         add(hPanel);
 
@@ -77,43 +72,33 @@ public class RestaurantBranchPanel extends VerticalPanel
         StackPanel res = new StackPanel();
 
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch, isEditMode);
-        Panel menuPanel = new MenuFlexTable(requestContext, branch.getMenu(), isEditMode);
-        
-
-        
-        Panel adminsPanel = new UsersPannel(branch.getAdmins(),
-                                            isEditMode);
-
-        Panel waitersPanel = new UsersPannel(branch.getWaiters(),
-                                             isEditMode);
-
-        Panel chefsPanel = new UsersPannel(branch.getChefs(),
-                                           isEditMode);
-
         res.add(locationPanel, "Location");
-        res.add(menuPanel, "Menu");
-        res.add(adminsPanel, "Admins");
-        res.add(waitersPanel, "Waiters");
-        res.add(chefsPanel, "Chefs");
 
+        Panel menuPanel = new MenuPanel(requestContext, branch.getMenu(), isEditMode);
+        res.add(menuPanel, "Menu");
+
+        if (isEditMode)
+        {
+            Panel adminsPanel = new UsersPannel(branch.getAdmins(), isEditMode);
+            res.add(adminsPanel, "Admins");
+            
+            Panel waitersPanel = new UsersPannel(branch.getWaiters(), isEditMode);
+            res.add(waitersPanel, "Waiters");
+            
+            Panel chefsPanel = new UsersPannel(branch.getChefs(), isEditMode);
+            res.add(chefsPanel, "Chefs");
+        }
+        
         // TODO tables res.add(tablesPanel, "Tables");
         // TODO orders res.add(ordersPanel, "Orders");
         return res;
 
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
     /* ********************************************************************* */
     /* ************************* Private Classes *************************** */
     /* ********************************************************************* */
-    
+
     private class CloseClickHandler implements ClickHandler
     {
         @Override

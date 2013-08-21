@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 
 import foodcenter.client.handlers.RedrawablePannel;
 import foodcenter.client.handlers.RestaurantBranchHandler;
-import foodcenter.client.panels.RestaurantBranchPanel;
+import foodcenter.client.panels.restaurant.branch.RestaurantBranchPanel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -19,7 +19,7 @@ import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 /**
  * Panel which represents a {@link MenuProxy}
  */
-public class BranchesFlexTable extends FlexTable implements RedrawablePannel
+public class RestaurantBranchesListPannel extends FlexTable implements RedrawablePannel
 {
 
     private final static int COLUMN_ADDRESS = 0;
@@ -34,12 +34,12 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
     private final RestaurantBranchHandler addBranchHandler;
     private final RestaurantBranchHandler delBranchHandler;
 
-    public BranchesFlexTable(RestaurantBranchAdminServiceRequest requestContext,
-                             List<RestaurantBranchProxy> branches,
-                             List<RestaurantBranchProxy> addedBranches,
-                             Boolean isEditMode,
-                             RestaurantBranchHandler addBranchHandler,
-                             RestaurantBranchHandler delBranchHandler)
+    public RestaurantBranchesListPannel(RestaurantBranchAdminServiceRequest requestContext,
+                              List<RestaurantBranchProxy> branches,
+                              List<RestaurantBranchProxy> addedBranches,
+                              Boolean isEditMode,
+                              RestaurantBranchHandler addBranchHandler,
+                              RestaurantBranchHandler delBranchHandler)
     {
         super();
         this.requestContext = requestContext;
@@ -136,12 +136,12 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
             // construct on close runnable
             AfterCloseEditBranch afterClose = new AfterCloseEditBranch(popup);
             AfterOkEditBranch afterOk = null;
-            
+
             if (isEditMode)
             {
                 afterOk = new AfterOkEditBranch(branch);
             }
-            
+
             // construct the panel and add it to the popup
             RestaurantBranchPanel branchPanel = new RestaurantBranchPanel(requestContext,
                                                                           branch,
@@ -157,6 +157,7 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
 
         }
     }
+
     /**
      * Handles add category button click
      */
@@ -209,7 +210,7 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
             // Removes the branch and calls redraw
             if (null != delBranchHandler)
             {
-                delBranchHandler.handle(branch, BranchesFlexTable.this);
+                delBranchHandler.handle(branch, RestaurantBranchesListPannel.this);
             }
         }
     }
@@ -229,7 +230,7 @@ public class BranchesFlexTable extends FlexTable implements RedrawablePannel
             // redraw (also deals with new branches)!
             if (null != addBranchHandler)
             {
-                addBranchHandler.handle(branch, BranchesFlexTable.this);
+                addBranchHandler.handle(branch, RestaurantBranchesListPannel.this);
             }
         }
     }
