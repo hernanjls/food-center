@@ -1,4 +1,4 @@
-package foodcenter.client.panels.restaurant;
+package foodcenter.client.panels.restaurant.internal;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 
-public class CoursesFlexTable extends FlexTable
+public class MenuCoursesPanel extends FlexTable
 {
 
     private static final int COLUMN_NAME = 0;
@@ -26,7 +26,7 @@ public class CoursesFlexTable extends FlexTable
     private final RequestContext requestContext;
     private final Boolean isEditMode;
 
-    public CoursesFlexTable(RequestContext requestContext,
+    public MenuCoursesPanel(RequestContext requestContext,
                             MenuCategoryProxy menuCatProxy,
                             Boolean isEditMode)
     {

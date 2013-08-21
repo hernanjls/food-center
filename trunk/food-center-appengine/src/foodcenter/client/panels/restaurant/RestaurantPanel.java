@@ -1,4 +1,4 @@
-package foodcenter.client.panels;
+package foodcenter.client.panels.restaurant;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,10 +16,8 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.handlers.RedrawablePannel;
 import foodcenter.client.handlers.RestaurantBranchHandler;
-import foodcenter.client.panels.restaurant.BranchesFlexTable;
-import foodcenter.client.panels.restaurant.MenuFlexTable;
-import foodcenter.client.panels.restaurant.RestaurantProfilePannel;
-import foodcenter.client.panels.restaurant.UsersPannel;
+import foodcenter.client.panels.common.UsersPannel;
+import foodcenter.client.panels.restaurant.internal.MenuPanel;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
@@ -96,22 +94,21 @@ public class RestaurantPanel extends VerticalPanel
 
         // profile pannel
         Panel profilePanel = new RestaurantProfilePannel(rest, isEditMode);
-        Panel menuPanel = new MenuFlexTable(requestService, rest.getMenu(), isEditMode);
+        Panel menuPanel = new MenuPanel(requestService, rest.getMenu(), isEditMode);
                 
-        Panel adminsPanel = new UsersPannel(rest.getAdmins(),
-                                            isEditMode);
-        
-        
+        Panel adminsPanel = null;
         RestaurantBranchHandler addBranchHandler = null; 
         RestaurantBranchHandler delBranchHandler = null;
     
         if (isEditMode)
         {            
+            adminsPanel = new UsersPannel(rest.getAdmins(), isEditMode);
+            
             addBranchHandler = new AddRestaurantBranchHandler();
             delBranchHandler = new DelRestaurantBranchHandler();
         }
 
-        Panel branchesPanel = new BranchesFlexTable(requestService,
+        Panel branchesPanel = new RestaurantBranchesListPannel(requestService,
                                                     rest.getBranches(),
                                                     addedBranches,
                                                     isEditMode,
@@ -120,7 +117,10 @@ public class RestaurantPanel extends VerticalPanel
 
         stackPanel.add(profilePanel, "Profile");
         stackPanel.add(menuPanel, "Menu");
-        stackPanel.add(adminsPanel, "Admins");
+        if (null != adminsPanel)
+        {
+            stackPanel.add(adminsPanel, "Admins");
+        }
         stackPanel.add(branchesPanel, "Braches");
 
         return stackPanel;
@@ -173,53 +173,6 @@ public class RestaurantPanel extends VerticalPanel
         }   
     }
     
-//    private class AddRestAdminEmailHandler implements EmailHandler
-//    {
-//        @Override
-//        public void handle(String email, RedrawablePannel panel)
-//        {
-//            // Validate admin is not already defined
-//            if (rest.getAdmins().contains(email) || addedAdmins.contains(email))
-//            {
-//                Window.alert(email + " is already Admin");
-//                return;
-//            }
-//            
-//            // Add the admin
-//            requestService.addRestaurantAdmin(rest, email);
-//
-//            // This is needed because the email will not be retrieved until service fire
-//            addedAdmins.add(email);
-//            
-//            // Redraw the panel to show the new email
-//            panel.redraw();
-//        }    
-//    }
-//
-//    private class DelRestAdminEmailHandler implements EmailHandler
-//    {
-//        @Override
-//        public void handle(String email, RedrawablePannel pannel)
-//        {
-//            
-//            if (addedAdmins.contains(email))
-//            {
-//                addedAdmins.remove(email);
-//                requestService.removeRestaurantAdmin(rest, email);           
-//            }
-//            else if (rest.getAdmins().contains(email))
-//            {
-//                rest.getAdmins().remove(email);
-//                requestService.removeRestaurantAdmin(rest, email);
-//            }
-//            else
-//            {
-//                Window.alert(email + " isn't Admin");
-//            }
-//            pannel.redraw();
-//        }    
-//    }
-
     class CloseRestClickHandler implements ClickHandler
     {
         @Override

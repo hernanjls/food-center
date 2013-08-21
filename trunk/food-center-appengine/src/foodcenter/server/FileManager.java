@@ -20,7 +20,7 @@ public class FileManager
         FileService fileService = FileServiceFactory.getFileService();
 
         // Create a new Blob file with mime-type
-       AppEngineFile file = fileService.createNewBlobFile(mimeType);
+        AppEngineFile file = fileService.createNewBlobFile(mimeType);
 
         // Open a channel to write to it, lock because we intend to finalize
         boolean lock = true;
@@ -37,6 +37,27 @@ public class FileManager
         return fileService.getBlobKey(file);
     }
 
+    
+    public static AppEngineFile getFile(String blobKey)
+    {
+        if (null == blobKey)
+        {
+            return null;
+        }
+        return getFile(new BlobKey(blobKey));
+    }
+    
+    public static AppEngineFile getFile(BlobKey blobKey)
+    {
+        if (null == blobKey)
+        {
+            return null;
+        }
+        
+        FileService fileService = FileServiceFactory.getFileService();
+        return fileService.getBlobFile(blobKey);
+    }
+    
     public static void deleteFile(String blobKey) throws IOException
     {
         if (null == blobKey)

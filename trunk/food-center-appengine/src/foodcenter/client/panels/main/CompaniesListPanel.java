@@ -1,3 +1,4 @@
+package foodcenter.client.panels.main;
 //package foodcenter.client.panels;
 //
 //import java.util.List;

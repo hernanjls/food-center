@@ -1,3 +1,4 @@
+package foodcenter.client.panels.company;
 //package foodcenter.client.panels;
 //
 //import java.util.LinkedList;

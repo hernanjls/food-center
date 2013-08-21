@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.panels.RestaurantsListPanel;
+import foodcenter.client.panels.main.RestaurantsListPanel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.proxies.UserProxy;
 import foodcenter.service.requset.ClientServiceRequest;

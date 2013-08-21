@@ -1,4 +1,4 @@
-package foodcenter.client.panels.restaurant;
+package foodcenter.client.panels.restaurant.internal;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import foodcenter.service.proxies.MenuProxy;
 /**
  * Panel which represents a {@link MenuProxy}
  */
-public class MenuFlexTable extends FlexTable implements RedrawablePannel
+public class MenuPanel extends FlexTable implements RedrawablePannel
 {
 
     private static final int COLUMN_CATEGORIES = 0;
@@ -31,7 +31,7 @@ public class MenuFlexTable extends FlexTable implements RedrawablePannel
     private final MenuProxy menuProxy;
     private final Boolean isEditMode;
 
-    public MenuFlexTable(RequestContext requestContext, MenuProxy menuProxy, Boolean isEditMode)
+    public MenuPanel(RequestContext requestContext, MenuProxy menuProxy, Boolean isEditMode)
     {
         super();
         this.requestContext = requestContext;
@@ -141,7 +141,7 @@ public class MenuFlexTable extends FlexTable implements RedrawablePannel
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, deleteCatButton);
         }
 
-        CoursesFlexTable coursesTable = new CoursesFlexTable(requestContext,
+        MenuCoursesPanel coursesTable = new MenuCoursesPanel(requestContext,
                                                              menuCatProxy,
                                                              isEditMode);
 

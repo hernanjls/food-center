@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import foodcenter.server.FileManager;
 import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
-import foodcenter.server.service.blobstore.BlobUrlServlet;
+import foodcenter.server.service.servlet.ImageServlet;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
@@ -77,7 +77,7 @@ public class DbRestaurant extends AbstractDbObject implements LoadCallback
         if (null != imageKey)
         {
             imageUrl = "/blobservlet?" //
-                       + BlobUrlServlet.BLOB_SERVE_KEY
+                       + ImageServlet.BLOB_SERVE_KEY
                        + "="
                        + imageKey;
         }

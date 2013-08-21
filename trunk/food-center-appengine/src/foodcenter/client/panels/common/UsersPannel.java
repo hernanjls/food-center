@@ -1,4 +1,4 @@
-package foodcenter.client.panels.restaurant;
+package foodcenter.client.panels.common;
 
 import java.util.List;
 

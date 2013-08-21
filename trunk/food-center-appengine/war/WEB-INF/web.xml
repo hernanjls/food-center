@@ -59,12 +59,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>BlobUrlServlet</servlet-name>
-		<servlet-class>foodcenter.server.service.blobstore.BlobUrlServlet</servlet-class>
+		<servlet-name>ImageServlet</servlet-name>
+		<servlet-class>foodcenter.server.service.servlet.ImageServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>BlobUrlServlet</servlet-name>
+		<servlet-name>ImageServlet</servlet-name>
 		<url-pattern>/blobservlet</url-pattern>
 	</servlet-mapping>
 
