@@ -15,12 +15,12 @@ import com.google.appengine.api.files.FileWriteChannel;
 
 public class FileManager
 {
-    public static BlobKey saveFile(InputStream is, String mimeType) throws IOException
+    public static BlobKey saveFile(InputStream is, String mimeType, String fileName) throws IOException
     {
         FileService fileService = FileServiceFactory.getFileService();
 
         // Create a new Blob file with mime-type
-        AppEngineFile file = fileService.createNewBlobFile(mimeType);
+        AppEngineFile file = fileService.createNewBlobFile(mimeType, fileName);
 
         // Open a channel to write to it, lock because we intend to finalize
         boolean lock = true;

@@ -2,11 +2,14 @@ package foodcenter.client.panels.restaurant.branch;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.panels.common.UsersPannel;
 import foodcenter.client.panels.restaurant.internal.MenuPanel;
@@ -16,28 +19,31 @@ import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 public class RestaurantBranchPanel extends VerticalPanel
 {
 
-    private final RestaurantBranchAdminServiceRequest requestContext;
+    private final RestaurantBranchAdminServiceRequest service;
     private final RestaurantBranchProxy branch;
-    private final Boolean isEditMode;
-    private final Runnable afterClose;
-    private final Runnable afterOk;
+    private final boolean  isEditMode;
+    private final Runnable closeCallback;
+    private final Runnable saveCallback;
+    private final Runnable editCallback;
 
     private Panel hPanel;
     private final Panel sPanel;
 
-    public RestaurantBranchPanel(RestaurantBranchAdminServiceRequest requestContext,
+    public RestaurantBranchPanel(RestaurantBranchAdminServiceRequest service,
                                  RestaurantBranchProxy branch,
-                                 Boolean isEditMode,
-                                 Runnable afterClose,
-                                 Runnable afterOk)
+                                 boolean isEditMode,
+                                 Runnable closeCallback,
+                                 Runnable saveCallback,
+                                 Runnable editCallback)
     {
         super();
 
-        this.requestContext = requestContext;
+        this.service = service;
         this.branch = branch;
         this.isEditMode = isEditMode;
-        this.afterClose = afterClose;
-        this.afterOk = afterOk;
+        this.closeCallback = closeCallback;
+        this.saveCallback = saveCallback;
+        this.editCallback = editCallback;
 
         this.hPanel = createHorizonalButtonsPanel();
         add(hPanel);
@@ -59,9 +65,15 @@ public class RestaurantBranchPanel extends VerticalPanel
         {
             close.setText("Cancel");
 
-            Button save = new Button("Ok");
+            Button save = new Button("Save");
             save.addClickHandler(new SaveClickHandler());
             res.add(save);
+        }
+        else if (branch.isEditable())
+        {
+            Button edit = new Button("Edit");
+            edit.addClickHandler(new EditClickHandler());
+            res.add(edit);
         }
 
         return res;
@@ -70,14 +82,14 @@ public class RestaurantBranchPanel extends VerticalPanel
     private Panel createMainStackPanel()
     {
         StackPanel res = new StackPanel();
-
+        
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch, isEditMode);
         res.add(locationPanel, "Location");
 
-        Panel menuPanel = new MenuPanel(requestContext, branch.getMenu(), isEditMode);
+        Panel menuPanel = new MenuPanel(service, branch.getMenu(), isEditMode);
         res.add(menuPanel, "Menu");
 
-        if (isEditMode)
+        if (branch.isEditable())
         {
             Panel adminsPanel = new UsersPannel(branch.getAdmins(), isEditMode);
             res.add(adminsPanel, "Admins");
@@ -104,27 +116,64 @@ public class RestaurantBranchPanel extends VerticalPanel
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null != afterClose)
+            if (null != closeCallback)
             {
-                afterClose.run();
+                closeCallback.run();
             }
         }
     }
 
-    private class SaveClickHandler implements ClickHandler
+    private class EditClickHandler extends CloseClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null != afterClose)
+            super.onClick(event);
+            
+            if (null != editCallback)
             {
-                afterClose.run();
+                editCallback.run();
+            }
+            
+        }
+    }
+    
+    private class SaveClickHandler extends Receiver<RestaurantBranchProxy> implements ClickHandler
+    {
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            if (null != saveCallback)
+            {
+                saveCallback.run();
+                closeMe();
+                
+                return;
+            }
+            service.saveRestaurantBranch(branch).fire(this);
+        }
+
+        @Override
+        public void onSuccess(RestaurantBranchProxy response)
+        {
+            closeMe();
+        }
+        
+        @Override
+        public void onFailure(ServerFailure error)
+        {
+            closeMe();
+            Window.alert("Can't save branch " + error.getMessage());
+        }
+        
+        private void closeMe()
+        {
+            Window.alert("Please refresh restaurant to see changes!");
+            if (null != closeCallback)
+            {
+                closeCallback.run();
             }
 
-            if (null != afterOk)
-            {
-                afterOk.run();
-            }
         }
 
     }

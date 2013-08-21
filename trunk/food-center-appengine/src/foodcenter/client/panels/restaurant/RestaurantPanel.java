@@ -28,7 +28,7 @@ public class RestaurantPanel extends VerticalPanel
     private final RestaurantAdminServiceRequest requestService;
     private final RestaurantProxy rest;
 
-    private final Boolean isEditMode;
+    private final boolean isEditMode;
 
     private final Runnable afterOk;
     private final Runnable afterClose;
@@ -41,7 +41,7 @@ public class RestaurantPanel extends VerticalPanel
 
     public RestaurantPanel(RestaurantAdminServiceRequest requestService,
                            RestaurantProxy rest,
-                           Boolean isEditMode,
+                           boolean isEditMode,
                            Runnable afterOk,
                            Runnable afterClose,
                            Runnable onClickEdit)
@@ -100,7 +100,7 @@ public class RestaurantPanel extends VerticalPanel
         RestaurantBranchHandler addBranchHandler = null; 
         RestaurantBranchHandler delBranchHandler = null;
     
-        if (isEditMode)
+        if (rest.isEditable())
         {            
             adminsPanel = new UsersPannel(rest.getAdmins(), isEditMode);
             

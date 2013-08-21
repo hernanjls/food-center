@@ -60,6 +60,8 @@ public class RequestUtils
     	res.setLng(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LNG);
     	res.setAddress(AbstractDbGeoObject.GOOGLE_API_DEFAULT_ADDR);
     	
+    	res.setEditable(true);
+    	
     	return res;
     }
     
@@ -71,7 +73,9 @@ public class RequestUtils
     	res.setMenu(createMenuProxy(rContext));
     	res.setServices(new ArrayList<ServiceType>());
     	res.setImageUrl(DbRestaurant.DEFAULT_ICON_PATH);
-    	
+
+        res.setEditable(true);
+
     	return res;
     }
     

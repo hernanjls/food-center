@@ -168,7 +168,7 @@ public class ImageServlet extends HttpServlet
                     }
                     else
                     {
-                        blobSaved = FileManager.saveFile(is, item.getContentType()).getKeyString();
+                        blobSaved = FileManager.saveFile(is, item.getContentType(), item.getName()).getKeyString();
                     }
                 }
                 finally

@@ -27,17 +27,20 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
 
     private final RestaurantProxy rest;
     private EditableImage img;
-    private final Boolean isEditMode;
+    private final boolean isEditMode;
 
     // remove can be done directly on the restaurant
 
-    public RestaurantProfilePannel(RestaurantProxy rest, Boolean isEditMode)
+    public RestaurantProfilePannel(RestaurantProxy rest, boolean isEditMode)
     {
         super();
         this.rest = rest;
         this.isEditMode = isEditMode;
-        
-        ClickHandler onClickImage = (isEditMode) ? new OnClickImage() : null;
+        ClickHandler onClickImage = null;
+        if (isEditMode)
+        {
+            onClickImage = new OnClickImage();
+        }
         img = new EditableImage(rest.getImageUrl(), onClickImage);
 
         redraw();
@@ -51,8 +54,8 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
 
         // Add the image
         img.updateImage(rest.getImageUrl());
-        add(img);        
-        
+        add(img);
+
         // Add the information panel
         add(createProfileInfoPanel());
     }
@@ -131,8 +134,6 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         return res;
     }
 
-    
-    
     private class OnClickImage implements ClickHandler, ImageUploadedHandler
     {
         @Override
@@ -147,7 +148,7 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
                 new FileUploadPanel(this, rest.getId(), null);
             }
         }
-        
+
         @Override
         public void updateImage(String url)
         {
@@ -155,8 +156,8 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
             img.updateImage(url);
         }
 
-        
     }
+
     private class NameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
