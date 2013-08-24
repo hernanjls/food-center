@@ -7,6 +7,14 @@ public interface PanelCallback<T extends EntityProxy, P extends RequestContext>
 {
 
     /**
+     * notifies on image update
+     * @param panel
+     * @param proxy
+     */
+    
+    //TODO public void updatedImg(RedrawablePanel panel, T proxy);
+    
+    /**
      * If panel is not null: calls panel.close()
      * 
      * @param panel - the caller panel to be closed 

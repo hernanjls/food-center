@@ -1,8 +1,8 @@
 package foodcenter.client.panels.common;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.maps.client.MapType;
 import com.google.gwt.maps.client.MapWidget;
-import com.google.gwt.maps.client.control.LargeMapControl;
 import com.google.gwt.maps.client.event.MarkerDragEndHandler;
 import com.google.gwt.maps.client.geocode.Geocoder;
 import com.google.gwt.maps.client.geocode.LocationCallback;
@@ -18,8 +18,9 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 
 /**
  * 
- * @reference 
- *            http://stackoverflow.com/questions/4320992/getting-location-details-from-google-map-in-
+ * @reference
+ *            http://stackoverflow.com/questions/4320992/getting-location-details-from-google-map-in
+ *            -
  *            gwt
  */
 public class GoogleMapsComposite extends Composite
@@ -29,7 +30,7 @@ public class GoogleMapsComposite extends Composite
     private final TextBox latBox;
     private final TextBox lngBox;
     private final boolean isEditMode;
-    
+
     private MapWidget map;
     private Geocoder geoCoder;
     private Marker marker;
@@ -52,7 +53,7 @@ public class GoogleMapsComposite extends Composite
         this.latBox = latBox;
         this.lngBox = lngBox;
         this.isEditMode = isEditMode;
-        
+
         LatLng center = LatLng.newInstance(proxy.getLat(), proxy.getLng());
 
         this.geoCoder = new Geocoder();
@@ -70,18 +71,28 @@ public class GoogleMapsComposite extends Composite
             marker.setDraggingEnabled(false);
         }
 
-        map = new MapWidget(center, 10);
-        map.setSize("100%", "150px");
+        map = new MapWidget(center, 15);
+        map.setSize("100%", "250px");
+
+        // add a marker
         map.addOverlay(marker);
-        map.addControl(new LargeMapControl());
+
+        map.setUIToDefault();
+        map.addMapType(MapType.getHybridMap());
+        map.setCurrentMapType(MapType.getHybridMap());
+
+        // Add some controls for the zoom level
+        // map.addControl(new LargeMapControl());
 
         addressBox.setText(proxy.getAddress());
 
-        updateMarkerByAddress();
-
         initWidget(map);
-
         setWidth("100%");
+        setHeight("330px");
+
+        map.checkResize();
+        updateMarkerByAddress();
+        
     }
 
     public void updateMarkerByAddress()
@@ -155,6 +166,9 @@ public class GoogleMapsComposite extends Composite
 
                 updateTextBoxes(point, address);
                 updateProxy(point, address);
+
+                map.setCenter(point);
+                map.onResize();
             }
             else
             {

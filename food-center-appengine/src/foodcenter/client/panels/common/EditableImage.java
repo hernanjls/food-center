@@ -33,7 +33,8 @@ public class EditableImage extends VerticalPanel implements ImageUploadedCallbac
         super();
         
         this.onClickEdit = onClickEdit;
-
+        getElement().setId("profile-button");
+        
         if (null != imgPath)
         {
             updateImage(imgPath);

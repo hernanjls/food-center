@@ -77,7 +77,6 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
         {
             loadMap();
         }
-        
     }
     
     private void loadMap()

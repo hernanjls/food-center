@@ -6,8 +6,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.StackPanel;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
@@ -42,14 +43,14 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         this.branch = branch;
         this.callback = callback;
         this.service = service;
-        
+
         this.isEditMode = (service != null);
-        
+
         setStyleName("popup-common");
 
         this.main = new VerticalPanel();
         main.setStyleName("popup-main-panel");
-        
+
         // Add the main Panel
         add(main);
 
@@ -65,13 +66,11 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
     {
         main.clear();
 
-        Panel buttonsPanel = createButtonsPanel();
-        main.add(buttonsPanel);
-
-        Panel sPanel = createDetailsPanel();
-        main.add(sPanel);
+        main.add(createButtonsPanel());
+        main.add(createDetailsPanel());
 
         center();
+        setPopupPosition(getAbsoluteLeft(), 60);
     }
 
     @Override
@@ -101,14 +100,16 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         return res;
     }
 
-    private Panel createDetailsPanel()
+    private Widget createDetailsPanel()
     {
-        StackPanel res = new StackPanel();
+        TabPanel res = new TabPanel();
         res.setWidth("100%");
-        
+//        res.setHeight("250px");
+
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch, isEditMode);
         res.add(locationPanel, "Location");
-
+        res.selectTab(res.getTabBar().getTabCount() - 1);
+        
         Panel menuPanel = new MenuPanel(branch.getMenu(), service);
         res.add(menuPanel, "Menu");
 
@@ -156,7 +157,10 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
-            callback.save(RestaurantBranchPanel.this, branch, callback, (RestaurantAdminServiceRequest) service);
+            callback.save(RestaurantBranchPanel.this,
+                          branch,
+                          callback,
+                          (RestaurantAdminServiceRequest) service);
         }
     }
 
