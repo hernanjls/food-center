@@ -40,8 +40,7 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
         this.profileImg = new EditableImage();
         profileImg.setClickHandler(new OnClickProfileImage());
         
-        
-        setSize("96%", "50px");
+        setStyleName("header-panel");
 
         add(new EditableImage("/images/logo.png"));
 
@@ -104,6 +103,7 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
                         BIG_PROFILE_IMAGE_WIDTH_PX + "px",
                         BIG_PROFILE_IMAGE_HEIGHT_PX + "px");
         dockpanel.add(img, DockPanel.WEST);
+        
 
         // Center - info
         VerticalPanel v = new VerticalPanel();

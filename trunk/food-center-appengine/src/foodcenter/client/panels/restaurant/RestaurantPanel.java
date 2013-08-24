@@ -11,8 +11,9 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.StackPanel;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
@@ -94,6 +95,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         main.add(createRestaurantDetailsPanel());
         
         center();
+        setPopupPosition(getAbsoluteLeft(), 60);
     }
 
     @Override
@@ -123,16 +125,17 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         return buttonsPannel;
     }
 
-    private Panel createRestaurantDetailsPanel()
+    private Widget createRestaurantDetailsPanel()
     {
-        StackPanel detailsPanel = new StackPanel();
+        TabPanel detailsPanel = new TabPanel();
         detailsPanel.setWidth("100%");
         Panel profilePanel = new RestaurantProfilePannel(rest, isEditMode);
         detailsPanel.add(profilePanel, "Profile");
 
         Panel menuPanel = new MenuPanel(rest.getMenu(), service);
         detailsPanel.add(menuPanel, "Menu");
-
+        detailsPanel.selectTab(detailsPanel.getTabBar().getTabCount() - 1);
+        
         if (rest.isEditable())
         {
             Panel adminsPanel = new UsersPanel(rest.getAdmins(), isEditMode);
