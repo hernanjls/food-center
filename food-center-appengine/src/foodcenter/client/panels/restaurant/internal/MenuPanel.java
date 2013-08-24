@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
-import foodcenter.client.handlers.RedrawablePannel;
 import foodcenter.client.service.RequestUtils;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
@@ -19,7 +18,7 @@ import foodcenter.service.proxies.MenuProxy;
 /**
  * Panel which represents a {@link MenuProxy}
  */
-public class MenuPanel extends FlexTable implements RedrawablePannel
+public class MenuPanel extends FlexTable
 {
 
     private static final int COLUMN_CATEGORIES = 0;
@@ -31,20 +30,24 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
     private final MenuProxy menuProxy;
     private final Boolean isEditMode;
 
-    public MenuPanel(RequestContext requestContext, MenuProxy menuProxy, Boolean isEditMode)
+    public MenuPanel(MenuProxy menuProxy)
+    {
+        this(menuProxy, null);
+    }
+
+    public MenuPanel(MenuProxy menuProxy, RequestContext requestContext)
     {
         super();
         this.requestContext = requestContext;
         this.menuProxy = menuProxy;
-        this.isEditMode = isEditMode;
+        this.isEditMode = (requestContext != null);
 
+        // Draw the Panel's data
         redraw();
     }
 
-    @Override
     public void redraw()
     {
-        // Clear all the rows of this table
         removeAllRows();
 
         // Print the header row of this table
@@ -62,11 +65,12 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
             return;
         }
 
+        int row = getRowCount();
         for (MenuCategoryProxy mcp : cats)
         {
-            printCategoryTableRow(mcp);
+            printCategoryTableRow(mcp, row);
+            ++row;
         }
-
     }
 
     /**
@@ -79,10 +83,8 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
 
         if (isEditMode)
         {
-            Button addCatButton = new Button("Add Category");
-            addCatButton.addClickHandler(new AddCategoryClickHandler());
-            addCatButton.setEnabled(isEditMode);
-            setWidget(0, COLUMN_CATEGORIES_ADD_BUTTON, addCatButton);
+            Button addButton = new Button("Add Category", new OnClickAddCategory());
+            setWidget(0, COLUMN_CATEGORIES_ADD_BUTTON, addButton);
         }
     }
 
@@ -91,7 +93,7 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
      * the category will be added to the menu proxy,
      * and to the flex table
      */
-    private void addCategory()
+    private void addCategory(int row)
     {
         // create a blank category
         MenuCategoryProxy menuCatProxy = RequestUtils.createMenuCategoryProxy(requestContext);
@@ -100,7 +102,7 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
         menuProxy.getCategories().add(menuCatProxy);
 
         // print its table row
-        printCategoryTableRow(menuCatProxy);
+        printCategoryTableRow(menuCatProxy, row);
     }
 
     /**
@@ -122,55 +124,48 @@ public class MenuPanel extends FlexTable implements RedrawablePannel
      * 
      * @param menuCatProxy is the category to print as row
      */
-    private void printCategoryTableRow(MenuCategoryProxy menuCatProxy)
+    private void printCategoryTableRow(MenuCategoryProxy menuCatProxy, int row)
     {
-        int row = this.getRowCount();
-
         TextBox catTitle = new TextBox();
         catTitle.setText(menuCatProxy.getCategoryTitle());
         catTitle.setEnabled(isEditMode);
-
         setWidget(row, COLUMN_CATEGORIES, catTitle);
 
         if (isEditMode)
         {
             catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(menuCatProxy));
 
-            Button deleteCatButton = new Button("Delete");
-            deleteCatButton.addClickHandler(new DeleteCategoryClickHandler(row));
-            setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, deleteCatButton);
+            Button delButton = new Button("Delete", new OnClickDeleteCategory(row));
+            setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, delButton);
         }
 
-        MenuCoursesPanel coursesTable = new MenuCoursesPanel(requestContext,
-                                                             menuCatProxy,
-                                                             isEditMode);
-
+        MenuCoursesPanel coursesTable = new MenuCoursesPanel(menuCatProxy, requestContext);
         setWidget(row, COLUMN_CATEGORY_COURSES, coursesTable);
     }
 
     /**
      * Handles add category button click
      */
-    private class AddCategoryClickHandler implements ClickHandler
+    private class OnClickAddCategory implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            addCategory();
+            addCategory(getRowCount());
         }
     }
 
     /**
      * Handles delete category button click
      */
-    private class DeleteCategoryClickHandler implements ClickHandler
+    private class OnClickDeleteCategory implements ClickHandler
     {
         private final int row;
 
         /**
          * @param row - is the table row to delete on button click
          */
-        public DeleteCategoryClickHandler(int row)
+        public OnClickDeleteCategory(int row)
         {
             this.row = row;
         }

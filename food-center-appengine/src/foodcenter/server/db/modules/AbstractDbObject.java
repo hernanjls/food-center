@@ -48,6 +48,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     @NotPersistent
     private String imageUrl = "";
 
+    
     public AbstractDbObject()
     {
         editable = false;
@@ -69,9 +70,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     {
         if (null != imageKey)
         {
-            imageUrl = ("/blobservlet?" //
-                        + ImageServlet.BLOB_SERVE_KEY
-                        + "=" + imageKey);
+            buildImageUrl();
         }
 
     }
@@ -98,11 +97,13 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     {
         return editable;
     }
-
+    
+    @Override
     public void setEditable(Boolean editable)
     {
         this.editable = editable;
     }
+    
     
     public String getImageKey()
     {
@@ -111,7 +112,17 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
 
     public void setImageKey(String imageKey)
     {
-        this.imageKey = imageKey;
+        // Delete old image if exists!
+        deleteImage();
+        
+        if (null != imageKey)
+        {
+            // Set the image key
+            this.imageKey = imageKey;
+            
+            // Set the image url 
+            buildImageUrl();
+        }
     }
 
     @Override
@@ -139,7 +150,14 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
             {
                 LoggerFactory.getLogger(getClass()).error("Can't delete Image", e);
             }
+            imageUrl = "";
         }
     }
-
+    
+    private void buildImageUrl()
+    {
+        imageUrl = ("/blobservlet?" //
+            + ImageServlet.BLOB_SERVE_KEY
+            + "=" + imageKey);
+    }
 }

@@ -17,7 +17,7 @@ public class RestaurantAdminService extends RestaurantBranchAdminService
         
     public static void addRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
 	{
-		List<DbRestaurantBranch> branches= rest.getBranches();
+		List<DbRestaurantBranch> branches = rest.getBranches();
 		if (null == branches)
 		{
 			branches = new ArrayList<DbRestaurantBranch>();
@@ -28,16 +28,16 @@ public class RestaurantAdminService extends RestaurantBranchAdminService
     
     public static void removeRestaurantBranch(DbRestaurant rest, DbRestaurantBranch branch)
 	{
-        return;
-//		List<DbRestaurantBranch> branches= rest.getBranches();
-//		if (null == branches)
-//		{
-//			return;
-//		}
-//		if (branches.contains(branch))
-//		{
-//		    branches.remove(branch);
-//		}
+        List<DbRestaurantBranch> branches= rest.getBranches();
+		if (null == branches)
+		{
+			return;
+		}
+		if (branches.contains(branch))
+		{
+		    branches.remove(branch);
+//		    branch.setRestaurant(null);
+		}
 	}
     
 //    public static void addRestaurantAdmin(DbRestaurant rest, String admin)

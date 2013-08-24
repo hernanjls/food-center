@@ -36,7 +36,9 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
         
         this.branchPrxoy = branchPrxoy;
         this.isEditMode = isEditMode;
-                       
+        
+        setWidth("100%");
+        
         hPanel = new HorizontalPanel();
         
         address = new TextBox();

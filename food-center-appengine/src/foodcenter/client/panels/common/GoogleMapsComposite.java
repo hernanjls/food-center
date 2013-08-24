@@ -52,7 +52,7 @@ public class GoogleMapsComposite extends Composite
         this.latBox = latBox;
         this.lngBox = lngBox;
         this.isEditMode = isEditMode;
-
+        
         LatLng center = LatLng.newInstance(proxy.getLat(), proxy.getLng());
 
         this.geoCoder = new Geocoder();
@@ -70,8 +70,8 @@ public class GoogleMapsComposite extends Composite
             marker.setDraggingEnabled(false);
         }
 
-        map = new MapWidget(center, 6);
-        map.setSize("100%", "350px");
+        map = new MapWidget(center, 10);
+        map.setSize("100%", "150px");
         map.addOverlay(marker);
         map.addControl(new LargeMapControl());
 
@@ -80,6 +80,8 @@ public class GoogleMapsComposite extends Composite
         updateMarkerByAddress();
 
         initWidget(map);
+
+        setWidth("100%");
     }
 
     public void updateMarkerByAddress()

@@ -11,14 +11,6 @@ import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable(detachable = "true")
-// @FetchGroups(value = { //
-// @FetchGroup(name = "DbRestaurantBranch_menu", members = { @Persistent(name = "menu") }), //
-// @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
-// @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "waiters") }), //
-// @FetchGroup(name = "DbRestaurantBranch_chefs", members = { @Persistent(name = "chefs") }), //
-// @FetchGroup(name = "DbDbRestaurantBranch_tables", members = { @Persistent(name = "tables") }), //
-// @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
-// })
 public class DbRestaurantBranch extends AbstractDbGeoObject
 {
 
@@ -27,8 +19,8 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 	 */
     private static final long serialVersionUID = -1838782438427806774L;
 
-    @Persistent
-    private DbRestaurant restaurant;
+    // @Persistent
+    // private DbRestaurant restaurant;
 
     @Persistent
     private List<String> admins = new ArrayList<String>(); // emails
@@ -64,21 +56,22 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
 
         // Set privilege...
         UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        boolean b = (UserPrivilege.Admin == p) //
-                    || (UserPrivilege.RestaurantAdmin == p)
-                    || UserPrivilege.RestaurantBranchAdmin == p;
-        setEditable(b);
+        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p
+            || UserPrivilege.RestaurantBranchAdmin == p)
+        {
+            setEditable(true);
+        }
     }
 
-    public DbRestaurant getRestaurant()
-    {
-        return restaurant;
-    }
-
-    public void setRestaurant(DbRestaurant restaurant)
-    {
-        this.restaurant = restaurant;
-    }
+    // public DbRestaurant getRestaurant()
+    // {
+    // return restaurant;
+    // }
+    //
+    // public void setRestaurant(DbRestaurant restaurant)
+    // {
+    // this.restaurant = restaurant;
+    // }
 
     public List<String> getAdmins()
     {

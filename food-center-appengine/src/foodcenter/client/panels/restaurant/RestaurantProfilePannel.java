@@ -15,14 +15,13 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import foodcenter.client.ClientUtils;
-import foodcenter.client.handlers.ImageUploadedHandler;
-import foodcenter.client.handlers.RedrawablePannel;
+import foodcenter.client.callbacks.ImageUploadedCallback;
 import foodcenter.client.panels.common.EditableImage;
 import foodcenter.client.panels.common.FileUploadPanel;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class RestaurantProfilePannel extends HorizontalPanel implements RedrawablePannel
+public class RestaurantProfilePannel extends HorizontalPanel
 {
 
     private final RestaurantProxy rest;
@@ -36,17 +35,16 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         super();
         this.rest = rest;
         this.isEditMode = isEditMode;
-        ClickHandler onClickImage = null;
+        
+        img = new EditableImage(rest.getImageUrl());
         if (isEditMode)
         {
-            onClickImage = new OnClickImage();
+            img.setClickHandler(new OnClickImage());
         }
-        img = new EditableImage(rest.getImageUrl(), onClickImage);
 
         redraw();
     }
 
-    @Override
     public final void redraw()
     {
         // remove all the widgets in this panel
@@ -134,7 +132,7 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         return res;
     }
 
-    private class OnClickImage implements ClickHandler, ImageUploadedHandler
+    private class OnClickImage implements ClickHandler, ImageUploadedCallback
     {
         @Override
         public void onClick(ClickEvent event)
@@ -154,6 +152,13 @@ public class RestaurantProfilePannel extends HorizontalPanel implements Redrawab
         {
             rest.setImageUrl(url);
             img.updateImage(url);
+        }
+        
+        @Override
+        public void updateImage(String url, String width, String height)
+        {
+            rest.setImageUrl(url);
+            img.updateImage(url, width, height);
         }
 
     }

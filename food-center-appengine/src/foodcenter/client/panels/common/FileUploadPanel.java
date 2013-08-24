@@ -14,19 +14,19 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.handlers.ImageUploadedHandler;
+import foodcenter.client.callbacks.ImageUploadedCallback;
 import foodcenter.server.service.servlet.ImageServlet;
 
 public class FileUploadPanel
 {
-    private final ImageUploadedHandler callback;
+    private final ImageUploadedCallback callback;
     private final String restId;
     private final String compId;
     private final PopupPanel popupHolder;
     private FormPanel form;
     private FileUpload upload;
 
-    public FileUploadPanel(ImageUploadedHandler callback, String restId, String compId)
+    public FileUploadPanel(ImageUploadedCallback callback, String restId, String compId)
     {
         this.callback = callback;
         this.restId = restId;
@@ -98,8 +98,7 @@ public class FileUploadPanel
 
         panel.add(cancel);
 
-        
-        
+           
         form.addSubmitHandler(new SubmitHandler()
         {
 
@@ -127,6 +126,7 @@ public class FileUploadPanel
         });
 
         popupHolder.setWidget(form);
+        popupHolder.center();
         popupHolder.show();
     }
 }

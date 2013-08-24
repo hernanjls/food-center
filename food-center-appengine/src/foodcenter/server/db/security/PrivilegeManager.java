@@ -113,22 +113,27 @@ public class PrivilegeManager
     
     private static UserPrivilege getPrivilege(DbRestaurantBranch branch, String email)
     {
-        if (UserPrivilege.RestaurantAdmin == getPrivilege(branch.getRestaurant(), email))
+        UserPrivilege p = getPrivilege();
+        if (UserPrivilege.User != p)
         {
-            return UserPrivilege.RestaurantAdmin;
+            return p;
         }
-        else if (branch.getAdmins().contains(email))
+        
+        if (branch.getAdmins().contains(email))
         {
             return UserPrivilege.RestaurantBranchAdmin;
         }
-        else if (branch.getWaiters().contains(email))
+        
+        if (branch.getWaiters().contains(email))
         {
             return UserPrivilege.RestaurantWaiter;
         }
-        else if (branch.getChefs().contains(email))
+        
+        if (branch.getChefs().contains(email))
         {
             return UserPrivilege.RestaurantChef;
         }
+        
         return UserPrivilege.User;
     }
     

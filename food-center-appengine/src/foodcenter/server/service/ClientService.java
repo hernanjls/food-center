@@ -6,6 +6,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
@@ -24,6 +25,17 @@ public class ClientService
     private static Logger logger = LoggerFactory.getLogger(UserService.class);
     private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
 
+    public static String getLogoutUrl()
+    {
+        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+        return userService.createLogoutURL("/") + logoutRedirectionUrl;
+    }
+    
+    public static User getCurrentUser()
+    {
+        return userService.getCurrentUser();
+    }
+    
     public static DbUser login(String gcmKey)
     {
 
@@ -58,9 +70,7 @@ public class ClientService
             user.setGcmKey(gcmKey);
         }
 
-        DbHandler.save(user);
-
-        return user;
+        return DbHandler.save(user);
     }
 
     public static void logout()

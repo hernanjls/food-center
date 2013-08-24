@@ -32,7 +32,7 @@ public class DbRestaurant extends AbstractDbObject
     @Persistent
     private String phone = "";
 
-    @Persistent(mappedBy = "restaurant")
+    @Persistent //(mappedBy = "restaurant")
     private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
 
     @Persistent
@@ -57,11 +57,14 @@ public class DbRestaurant extends AbstractDbObject
     {
         super.jdoPostLoad();
         
-        // Set privilege...
+        // Set permissions
         UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        boolean b = UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p;
-        setEditable(b);
+        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p)
+        {
+            setEditable(true);
+        }
         
+        // Make sure image can be shown!
         if (0 == getImageUrl().length())
         {
             setImageUrl(DEFAULT_ICON_PATH);
