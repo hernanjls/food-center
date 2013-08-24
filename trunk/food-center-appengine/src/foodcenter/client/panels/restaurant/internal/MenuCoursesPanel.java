@@ -26,21 +26,26 @@ public class MenuCoursesPanel extends FlexTable
     private final RequestContext requestContext;
     private final Boolean isEditMode;
 
-    public MenuCoursesPanel(RequestContext requestContext,
-                            MenuCategoryProxy menuCatProxy,
-                            Boolean isEditMode)
+    public MenuCoursesPanel(MenuCategoryProxy menuCatProxy)
+    {
+        this(menuCatProxy, null);
+    }
+
+    public MenuCoursesPanel(MenuCategoryProxy menuCatProxy, RequestContext requestContext)
     {
         super();
 
         this.requestContext = requestContext;
         this.menuCatProxy = menuCatProxy;
-        this.isEditMode = isEditMode;
+        this.isEditMode = (null != requestContext);
 
-        if (null == menuCatProxy)
-        {
-            return;
-        }
+        redraw();
+    }
 
+    private void redraw()
+    {
+        clear();
+        
         createHeader();
 
         List<CourseProxy> courses = menuCatProxy.getCourses();
@@ -48,11 +53,13 @@ public class MenuCoursesPanel extends FlexTable
         {
             return;
         }
+        
+        int row = getRowCount();
         for (CourseProxy cp : courses)
         {
-            printCourseRow(cp);
+            printCourseRow(cp, row);
+            ++row;
         }
-
     }
 
     private void createHeader()
@@ -62,32 +69,30 @@ public class MenuCoursesPanel extends FlexTable
         if (isEditMode)
         {
             Button addCourseButton = new Button("Add Course");
-            addCourseButton.addClickHandler(new AddCourseHandler());
+            addCourseButton.addClickHandler(new OnClickAddCourse());
             this.setWidget(0, COLUMN_BUTTON_ADD_COURSE, addCourseButton);
         }
     }
 
-    public void addCourse()
+    public void addCourse(int row)
     {
         CourseProxy courseProxy = requestContext.create(CourseProxy.class);
         menuCatProxy.getCourses().add(courseProxy);
-        printCourseRow(courseProxy);
+        printCourseRow(courseProxy, row);
     }
 
     public void deleteCourse(int row)
     {
         List<CourseProxy> courses = menuCatProxy.getCourses();
         courses.remove(row - 1);
-        removeRow(row);
+        redraw();
     }
 
-    public void printCourseRow(CourseProxy courseProxy)
+    public void printCourseRow(CourseProxy courseProxy, int row)
     {
-        int row = getRowCount();
-
         TextBox name = new TextBox();
         name.setText(courseProxy.getName());
-        name.addKeyUpHandler(new CourseNameKeyUpHandler(name, courseProxy));
+        name.addKeyUpHandler(new OnKeyUpCourseName(name, courseProxy));
         setWidget(row, COLUMN_NAME, name);
 
         TextBox price = new TextBox();
@@ -100,10 +105,9 @@ public class MenuCoursesPanel extends FlexTable
 
         if (isEditMode)
         {
-            price.addKeyUpHandler(new CoursePriceKeyUpHandler(price, courseProxy));
+            price.addKeyUpHandler(new OnKeyUpCoursePrice(price, courseProxy));
 
-            Button delete = new Button("delete");
-            delete.addClickHandler(new DeleteCourseClickHandler(row));
+            Button delete = new Button("delete", new OnClickDelCourse(row));
             setWidget(row, COLUMN_BUTTON_DEL_COURSE, delete);
         }
         else
@@ -113,21 +117,21 @@ public class MenuCoursesPanel extends FlexTable
         }
     }
 
-    class AddCourseHandler implements ClickHandler
+    class OnClickAddCourse implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            addCourse();
+            addCourse(getRowCount());
         }
     }
 
-    class DeleteCourseClickHandler implements ClickHandler
+    class OnClickDelCourse implements ClickHandler
     {
 
         private final int row;
 
-        public DeleteCourseClickHandler(int row)
+        public OnClickDelCourse(int row)
         {
             this.row = row;
         }
@@ -139,12 +143,12 @@ public class MenuCoursesPanel extends FlexTable
         }
     }
 
-    class CourseNameKeyUpHandler implements KeyUpHandler
+    class OnKeyUpCourseName implements KeyUpHandler
     {
         private final TextBox titleBox;
         private final CourseProxy course;
 
-        public CourseNameKeyUpHandler(TextBox titleBox, CourseProxy course)
+        public OnKeyUpCourseName(TextBox titleBox, CourseProxy course)
         {
             this.titleBox = titleBox;
             this.course = course;
@@ -158,12 +162,12 @@ public class MenuCoursesPanel extends FlexTable
 
     }
 
-    class CoursePriceKeyUpHandler implements KeyUpHandler
+    class OnKeyUpCoursePrice implements KeyUpHandler
     {
         private final TextBox titleBox;
         private final CourseProxy course;
 
-        public CoursePriceKeyUpHandler(TextBox titleBox, CourseProxy course)
+        public OnKeyUpCoursePrice(TextBox titleBox, CourseProxy course)
         {
             this.titleBox = titleBox;
             this.course = course;

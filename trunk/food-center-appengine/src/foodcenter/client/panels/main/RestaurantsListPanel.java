@@ -4,29 +4,22 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.client.callbacks.PanelCallback;
+import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.panels.common.EditableImage;
-import foodcenter.client.panels.restaurant.RestaurantPanel;
-import foodcenter.client.service.RequestUtils;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
-import foodcenter.service.requset.AdminServiceRequest;
-import foodcenter.service.requset.ClientServiceRequest;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
-public class RestaurantsListPanel extends VerticalPanel
+public class RestaurantsListPanel extends VerticalPanel implements RedrawablePanel
 {
     private final static int COLUMN_IMAGE = 0;
     private final static int COLUMN_NAME = 1;
@@ -38,61 +31,73 @@ public class RestaurantsListPanel extends VerticalPanel
     private final static int COLUMN_EDIT_BUTTON = 6;
     private final static int COLUMN_DELETE_BUTTON = 7;
 
+    private final List<RestaurantProxy> rests;
+    private final PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback;
     private final boolean isAdmin;
-    private final Panel hPanel;
+
+    private final RestCallback restCallback;
+    private final Panel optionsPanel;
     private final FlexTable restsTable;
 
-    private RestaurantProxy lastViewdRest;
+    public RestaurantsListPanel(List<RestaurantProxy> rests,
+                                PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
+    {
+        this(rests, callback, false);
+    }
 
-    public RestaurantsListPanel(boolean isAdmin)
+    public RestaurantsListPanel(List<RestaurantProxy> rests,
+                                PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
+                                boolean isAdmin)
     {
         super();
+
+        this.rests = rests;
+        this.callback = callback;
         this.isAdmin = isAdmin;
 
-        hPanel = createOptionsHorizonalPannel();
-        add(hPanel);
+        restCallback = new RestCallback();
+        optionsPanel = createOptionsPannel();
+        add(optionsPanel);
 
         restsTable = new FlexTable();
         add(restsTable);
 
-        lastViewdRest = null;
-
-        reloadRestaurants();
+        redraw();
     }
 
-    private void reloadRestaurants()
+    @Override
+    public void redraw()
     {
-        ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
-        PopupPanel popup = new PopupPanel(false);
-        popup.setWidget(new Label("Loading..."));
-        popup.center();
-
-        // Load the Restaurants without Menus, etc...
-        // Fetch Groups issue not appearing on JUNIT tests!
-        service.getDefaultRestaurants().fire(new GetRestaurantssReceiver(popup));
-    }
-
-    private void redraw(List<RestaurantProxy> rests)
-    {
+        // Clear all the rows of this table
         restsTable.removeAllRows();
+
+        // Print the header of this table
         printRestaurantsTableHeader();
 
+        // Print all the branches if exits
+        int row = restsTable.getRowCount();
         if (null != rests)
         {
-            int row = restsTable.getRowCount();
-            for (RestaurantProxy r : rests)
+            for (RestaurantProxy rp : rests)
             {
-                printRestaurantRow(r, row);
+                printRestaurantTableRow(rp, row);
                 row++;
             }
         }
     }
 
-    private void printRestaurantRow(RestaurantProxy rest, int row)
+    @Override
+    public void close()
+    {
+        // This is not supported by this internal panel
+        callback.error(this, null, "Not Supported!");
+    }
+
+    private void printRestaurantTableRow(RestaurantProxy rest, int row)
     {
         EditableImage img = new EditableImage(rest.getImageUrl());
         restsTable.setWidget(row, COLUMN_IMAGE, img);
-        
+
         String name = rest.getName();
         restsTable.setText(row, COLUMN_NAME, name);
 
@@ -115,9 +120,12 @@ public class RestaurantsListPanel extends VerticalPanel
             edit.addClickHandler(new OnClickEditRestaurant(rest));
             restsTable.setWidget(row, COLUMN_EDIT_BUTTON, edit);
 
-            Button delete = new Button("Delete");
-            delete.addClickHandler(new OnClickDeleteRestaurant(rest));
-            restsTable.setWidget(row, COLUMN_DELETE_BUTTON, delete);
+            if (isAdmin)
+            {
+                Button delete = new Button("Delete");
+                delete.addClickHandler(new OnClickDeleteRestaurant(rest));
+                restsTable.setWidget(row, COLUMN_DELETE_BUTTON, delete);
+            }
         }
     }
 
@@ -138,145 +146,127 @@ public class RestaurantsListPanel extends VerticalPanel
 
     }
 
-    private Panel createOptionsHorizonalPannel()
+    private Panel createOptionsPannel()
     {
+        HorizontalPanel result = new HorizontalPanel();
+
         TextBox searchBox = new TextBox();
+        result.add(searchBox);
 
         CheckBox delivery = new CheckBox("delivery");
         delivery.setValue(true);
+        result.add(delivery);
 
         CheckBox takeAway = new CheckBox("take away");
         takeAway.setValue(true);
+        result.add(takeAway);
 
         CheckBox table = new CheckBox("table");
         table.setValue(true);
+        result.add(table);
 
         Button searchButton = new Button("Search");
+        result.add(searchButton);
 
-        HorizontalPanel hPanel = new HorizontalPanel();
-        hPanel.add(searchBox);
-        hPanel.add(delivery);
-        hPanel.add(takeAway);
-        hPanel.add(table);
-        hPanel.add(searchButton);
-
-        return hPanel;
+        return result;
     }
 
-    private class GetRestaurantssReceiver extends Receiver<List<RestaurantProxy>>
+    /* **************************************************************** */
+    /* **************** private classes ********************* */
+
+    private class RestCallback implements
+                              PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest>
     {
-        private final PopupPanel popup;
 
-        public GetRestaurantssReceiver(PopupPanel popup)
+        @Override
+        public void close(RedrawablePanel panel, RestaurantProxy proxy)
         {
-            this.popup = popup;
+            // super gets this panel, and not the requested panel
+            if (null != panel)
+            {
+                panel.close();
+            }
+            RestaurantsListPanel.this.callback.close(RestaurantsListPanel.this, proxy);
         }
 
         @Override
-        public void onSuccess(List<RestaurantProxy> response)
+        public void save(RedrawablePanel panel,
+                         RestaurantProxy proxy,
+                         PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
+                         RestaurantAdminServiceRequest service)
         {
-            redraw(response);
-            popup.removeFromParent();
+            // callback === this
+
+            close(panel, proxy);
+            RestaurantsListPanel.this.callback.save(RestaurantsListPanel.this, proxy, callback, service);
         }
 
         @Override
-        public void onFailure(ServerFailure error)
+        public void view(RedrawablePanel panel,
+                         RestaurantProxy proxy,
+                         PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
         {
-            popup.removeFromParent();
-            Window.alert("[FAIL] service connection error: " + error.getMessage());
+            // callback === this
+
+            close(panel, proxy);
+            RestaurantsListPanel.this.callback.view(RestaurantsListPanel.this, proxy, callback);
         }
+
+        @Override
+        public void edit(RedrawablePanel panel,
+                         RestaurantProxy proxy,
+                         PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
+        {
+            // callback === this
+
+            close(panel, proxy);
+            RestaurantsListPanel.this.callback.edit(RestaurantsListPanel.this, proxy, callback);
+        }
+
+        @Override
+        public void
+            createNew(RedrawablePanel panel,
+                      PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
+        {
+            // callback === this
+
+            RestaurantsListPanel.this.callback.createNew(RestaurantsListPanel.this, callback);
+        }
+
+        @Override
+        public void del(RedrawablePanel panel, RestaurantProxy proxy)
+        {
+            close(panel, proxy); // Close the edit panel
+            RestaurantsListPanel.this.callback.del(RestaurantsListPanel.this, proxy);
+        }
+
+        @Override
+        public void error(RedrawablePanel panel, RestaurantProxy proxy, String reason)
+        {
+            callback.error(panel, proxy, reason);
+        }
+
     }
 
-    private abstract class OnClickCommonRestaurant extends Receiver<RestaurantProxy> implements ClickHandler
-    {
-        /**
-         * 
-         * @param rest - If null a new restaurant is created and panel starts in edit mode
-         * @param isEditMode - Creates editable restaurant and starts the panel in edit mode
-         */
-        protected void onClickRestaurant(RestaurantProxy rest, boolean isEditMode)
-        {
-            // Create a popup panel to show the new restaurant in
-            PopupPanel holder = new PopupPanel(false);
-
-            Runnable afterClose = new AfterCloseRestaurant(holder);
-
-            // Will be set according to the edit mode
-            Runnable afterOk = null;
-            Runnable onClickEdit = null;
-
-            RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory()
-                .getRestaurantAdminService();
-
-            if (null == rest)
-            {
-                rest = RequestUtils.createRestaurantProxy(service);
-                isEditMode = true;
-                afterOk = new AfterOkRestaurant();
-            }
-
-            else if (isEditMode)
-            {
-                rest = service.edit(rest);
-                afterOk = new AfterOkRestaurant();
-            }
-            else if (rest.isEditable())
-            {
-                onClickEdit = new OnClickEditRestaurant(rest);
-            }
-
-            RestaurantPanel restPanel = new RestaurantPanel(service,
-                                                            rest,
-                                                            isEditMode,
-                                                            afterOk,
-                                                            afterClose,
-                                                            onClickEdit);
-
-            // Add the restaurant panel to the popup and show it.
-            holder.setWidget(restPanel);
-            holder.show();
-        }
-
-        @Override
-        public void onSuccess(RestaurantProxy response)
-        {
-            lastViewdRest = response;            
-            onClick(null);
-        }
-        
-        @Override
-        public void onFailure(ServerFailure error)
-        {
-            Window.alert("Can't load rest " + error.getMessage());
-        }
-    }
-
-    private class OnClickViewRestaurant extends OnClickCommonRestaurant
+    private class OnClickViewRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
 
         public OnClickViewRestaurant(RestaurantProxy rest)
         {
             super();
+
             this.rest = rest;
         }
 
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null == lastViewdRest || !lastViewdRest.getId().equals(rest.getId()))
-            {
-                ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
-                service.getRestaurantById(rest.getId()).with(RestaurantProxy.REST_WITH).fire(this);
-            }
-            else
-            {
-                onClickRestaurant(lastViewdRest, false);
-            }
+            callback.view(RestaurantsListPanel.this, rest, restCallback);
         }
     }
 
-    private class OnClickEditRestaurant extends OnClickCommonRestaurant implements Runnable
+    private class OnClickEditRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
 
@@ -289,28 +279,14 @@ public class RestaurantsListPanel extends VerticalPanel
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null == lastViewdRest || !lastViewdRest.getId().equals(rest.getId()))
-            {
-                ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
-                service.getRestaurantById(rest.getId()).with(RestaurantProxy.REST_WITH).fire(this);
-            }
-            else
-            {
-                onClickRestaurant(lastViewdRest, true);
-            }
-        }
-
-        @Override
-        public void run()
-        {
-            onClick(null);
+            callback.edit(RestaurantsListPanel.this, rest, restCallback);
         }
     }
-    
-    private class OnClickDeleteRestaurant extends Receiver<Boolean> implements ClickHandler
+
+    private class OnClickDeleteRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
-        
+
         public OnClickDeleteRestaurant(RestaurantProxy rest)
         {
             this.rest = rest;
@@ -319,65 +295,16 @@ public class RestaurantsListPanel extends VerticalPanel
         @Override
         public void onClick(ClickEvent event)
         {
-            AdminServiceRequest service = RequestUtils.getRequestFactory().getAdminService();
-            service.deleteRestaurant(rest.getId()).fire(this);
+            callback.del(RestaurantsListPanel.this, rest);
         }
-
-        @Override
-        public void onSuccess(Boolean response)
-        {
-            reloadRestaurants();            
-        }
-        
-        @Override
-        public void onFailure(ServerFailure error)
-        {
-            Window.alert(error.getMessage());
-        }
-        
     }
 
-    private class OnClickNewRestaurant extends OnClickCommonRestaurant
+    private class OnClickNewRestaurant implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            // Will create a new restaurant
-            onClickRestaurant(null, true);
-        }
-    }
-
-    /**
-     * Removes the holder from the parent
-     */
-    private class AfterCloseRestaurant implements Runnable
-    {
-        private final PopupPanel holder;
-
-        public AfterCloseRestaurant(PopupPanel holder)
-        {
-            this.holder = holder;
-        }
-
-        @Override
-        public void run()
-        {
-            holder.removeFromParent();
-            lastViewdRest = null;
-            reloadRestaurants();
-        }
-
-    }
-
-    /**
-     * Reloads the restaurant {@link RestaurantsListPanel#reloadRestaurants()} <br>
-     * will be called before {@link AfterCloseRestaurant}
-     */
-    private class AfterOkRestaurant implements Runnable 
-    {
-        @Override
-        public void run()
-        {
+            callback.createNew(RestaurantsListPanel.this, restCallback);
         }
     }
 

@@ -22,6 +22,11 @@ public class RequestUtils
 {
     private static FoodCenterRequestFactory requestFactory = null;
     
+    private RequestUtils()
+    {
+        
+    }
+    
     public static FoodCenterRequestFactory getRequestFactory()
     {
         if (null == requestFactory)

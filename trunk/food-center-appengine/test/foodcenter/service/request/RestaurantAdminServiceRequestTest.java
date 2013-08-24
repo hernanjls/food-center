@@ -231,13 +231,12 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
         menuCats = 2;
         menuCatCourses = 2;
         RestaurantProxy response = null;
-        RestaurantAdminServiceRequest service = rf.getRestaurantAdminService(); // service can
-                                                                                // invoke a single
-                                                                                // fire!
 
-        /*
-         * create a restaurant for the rest of the test
-         */
+        // service can invoke a single fire!
+        RestaurantAdminServiceRequest service = rf.getRestaurantAdminService();
+
+        // create a restaurant for the rest of the test
+
         RestaurantProxy rest = createRest(service,
                                           "rest",
                                           menuCats,
@@ -290,6 +289,12 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
         assertEquals(2, response.getAdmins().size());
         assertEquals("test@example.com", response.getAdmins().get(0));
         assertEquals("test2@example.com", response.getAdmins().get(1));
+    }
+
+    @Test
+    public void delRestBranchAdminReqTests()
+    {
+
     }
 
     @Test
@@ -347,7 +352,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         assertEquals(0, response.getAdmins().size());
     }
-    
+
     @Test
     public void addBranchAdminRequestTest()
     {
@@ -366,18 +371,18 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
                                           numBranches,
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
-        
+
         service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(response);
         rest = response.response;
         response.response = null;
-        
+
         tearDownPMF();
         setUpPMF();
-        
+
         service = rf.getRestaurantAdminService();
         rest = service.edit(rest);
         RestaurantBranchProxy branch = rest.getBranches().get(0);
-        
+
         branch.getAdmins().add("admin@test.com");
         service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(response);
         rest = response.response;
@@ -390,7 +395,6 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
         assertNotNull(branch.getAdmins());
         assertEquals(1, branch.getAdmins().size());
     }
-
 
     @Test
     public void changeServiceRequestTest()
@@ -410,14 +414,14 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
                                           numBranches,
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
-        
+
         service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(response);
         rest = response.response;
         response.response = null;
-        
+
         tearDownPMF();
         setUpPMF();
-        
+
         service = rf.getRestaurantAdminService();
         rest = service.edit(rest);
         rest.getServices().add(ServiceType.DELIVERY);
@@ -431,7 +435,6 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         assertNotNull(rest.getServices());
         assertEquals(2, rest.getServices().size());
-        
 
         service = rf.getRestaurantAdminService();
         rest = service.edit(rest);

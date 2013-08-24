@@ -14,7 +14,6 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
     public final static String[] REST_WITH = { "menu",
                                               "menu.categories",
                                               "menu.categories.courses",
-                                              "iconBytes",
                                               "branches",
                                               "branches.restaurant",
                                               "branches.menu",
@@ -47,5 +46,4 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
     public List<String> getAdmins();
 
     public void setAdmins(List<String> admins);
-
 }

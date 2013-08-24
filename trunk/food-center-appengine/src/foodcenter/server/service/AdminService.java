@@ -64,7 +64,8 @@ public class AdminService
             return false;
         }
         r.deleteImage();
-        return 0 == Long.compare(0l, DbHandler.delete(DbRestaurant.class, id));
+        long deletedRows = DbHandler.delete(DbRestaurant.class, id);
+        return (deletedRows > 0);
     }
 
     public static Long createRestaurant(String name)

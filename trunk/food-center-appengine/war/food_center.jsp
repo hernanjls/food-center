@@ -41,32 +41,6 @@
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
   <body>
-    <%
-        // Make sure persistance filter is enabled.....
-        Logger logger = LoggerFactory.getLogger(getClass());
-        DbUser info = ClientService.login(null);    
-        String nickName = info.getNickName();
-        String userId = info.getUserId();
-        String role = info.isAdmin() ? "Admin" : "User";        
-        String email = info.getEmail();        
-        String logoutUrl = info.getLogoutUrl();
-        logger.debug("loggged in: " + email);
-            
-    %>
-    <div id ="header" class="header">
-	    <div id ="headerInformation" class="headerInformation">
-	       Hello: 
-	       <a href="user_profile.jsp"><% out.println(nickName); %></a>
-	       You are logged in as <a href="/_ah/admin"><% out.println(role); %></a>  
-	    </div>
-	    <div id="logout" class="logout">
-	        <a href="<% out.println(logoutUrl); %>">logout</a>
-	    </div>
-    </div>
-    
-    <div id="gwtMenuContainer"></div>
-    <h1>Food Center</h1>
-    
     <!--  container for gwt -->
     <div id="gwtContainer"></div>
     

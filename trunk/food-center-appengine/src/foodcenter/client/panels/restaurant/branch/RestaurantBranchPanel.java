@@ -2,109 +2,131 @@ package foodcenter.client.panels.restaurant.branch;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.StackPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.panels.common.UsersPannel;
+import foodcenter.client.callbacks.PanelCallback;
+import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.client.panels.common.UsersPanel;
 import foodcenter.client.panels.restaurant.internal.MenuPanel;
 import foodcenter.service.proxies.RestaurantBranchProxy;
+import foodcenter.service.requset.RestaurantAdminServiceRequest;
 import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 
-public class RestaurantBranchPanel extends VerticalPanel
+public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
 {
 
     private final RestaurantBranchAdminServiceRequest service;
     private final RestaurantBranchProxy branch;
-    private final boolean  isEditMode;
-    private final Runnable closeCallback;
-    private final Runnable saveCallback;
-    private final Runnable editCallback;
+    private final PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback;
 
-    private Panel hPanel;
-    private final Panel sPanel;
+    private final boolean isEditMode;
+    private final VerticalPanel main;
 
-    public RestaurantBranchPanel(RestaurantBranchAdminServiceRequest service,
-                                 RestaurantBranchProxy branch,
-                                 boolean isEditMode,
-                                 Runnable closeCallback,
-                                 Runnable saveCallback,
-                                 Runnable editCallback)
+    public RestaurantBranchPanel(RestaurantBranchProxy branch,
+                                 PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
+    {
+        this(branch, callback, null);
+    }
+
+    public RestaurantBranchPanel(RestaurantBranchProxy branch,
+                                 PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback,
+                                 RestaurantBranchAdminServiceRequest service)
     {
         super();
 
-        this.service = service;
         this.branch = branch;
-        this.isEditMode = isEditMode;
-        this.closeCallback = closeCallback;
-        this.saveCallback = saveCallback;
-        this.editCallback = editCallback;
+        this.callback = callback;
+        this.service = service;
+        
+        this.isEditMode = (service != null);
+        
+        setStyleName("popup-common");
 
-        this.hPanel = createHorizonalButtonsPanel();
-        add(hPanel);
+        this.main = new VerticalPanel();
+        main.setStyleName("popup-main-panel");
+        
+        // Add the main Panel
+        add(main);
 
-        this.sPanel = createMainStackPanel();
-        add(sPanel);
+        // Show this Panel
+        show();
 
+        // Draw the main Panel's data
+        redraw();
     }
 
-    private Panel createHorizonalButtonsPanel()
+    @Override
+    public void redraw()
+    {
+        main.clear();
+
+        Panel buttonsPanel = createButtonsPanel();
+        main.add(buttonsPanel);
+
+        Panel sPanel = createDetailsPanel();
+        main.add(sPanel);
+
+        center();
+    }
+
+    @Override
+    public void close()
+    {
+        removeFromParent();
+    }
+
+    private Panel createButtonsPanel()
     {
         HorizontalPanel res = new HorizontalPanel();
 
-        Button close = new Button("Close");
-        close.addClickHandler(new CloseClickHandler());
+        Button close = new Button("Close", new CloseClickHandler());
         res.add(close);
 
         if (isEditMode)
         {
-            close.setText("Cancel");
-
-            Button save = new Button("Save");
-            save.addClickHandler(new SaveClickHandler());
+            Button save = new Button("Save", new SaveClickHandler());
             res.add(save);
         }
         else if (branch.isEditable())
         {
-            Button edit = new Button("Edit");
-            edit.addClickHandler(new EditClickHandler());
+            Button edit = new Button("Edit", new EditClickHandler());
             res.add(edit);
         }
 
         return res;
     }
 
-    private Panel createMainStackPanel()
+    private Panel createDetailsPanel()
     {
         StackPanel res = new StackPanel();
+        res.setWidth("100%");
         
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch, isEditMode);
         res.add(locationPanel, "Location");
 
-        Panel menuPanel = new MenuPanel(service, branch.getMenu(), isEditMode);
+        Panel menuPanel = new MenuPanel(branch.getMenu(), service);
         res.add(menuPanel, "Menu");
 
         if (branch.isEditable())
         {
-            Panel adminsPanel = new UsersPannel(branch.getAdmins(), isEditMode);
+            Panel adminsPanel = new UsersPanel(branch.getAdmins(), isEditMode);
             res.add(adminsPanel, "Admins");
-            
-            Panel waitersPanel = new UsersPannel(branch.getWaiters(), isEditMode);
+
+            Panel waitersPanel = new UsersPanel(branch.getWaiters(), isEditMode);
             res.add(waitersPanel, "Waiters");
-            
-            Panel chefsPanel = new UsersPannel(branch.getChefs(), isEditMode);
+
+            Panel chefsPanel = new UsersPanel(branch.getChefs(), isEditMode);
             res.add(chefsPanel, "Chefs");
         }
-        
+
         // TODO tables res.add(tablesPanel, "Tables");
         // TODO orders res.add(ordersPanel, "Orders");
         return res;
-
     }
 
     /* ********************************************************************* */
@@ -116,66 +138,26 @@ public class RestaurantBranchPanel extends VerticalPanel
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null != closeCallback)
-            {
-                closeCallback.run();
-            }
+            callback.close(RestaurantBranchPanel.this, branch);
         }
     }
 
-    private class EditClickHandler extends CloseClickHandler
+    private class EditClickHandler implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            super.onClick(event);
-            
-            if (null != editCallback)
-            {
-                editCallback.run();
-            }
-            
+            callback.edit(RestaurantBranchPanel.this, branch, callback);
         }
     }
-    
-    private class SaveClickHandler extends Receiver<RestaurantBranchProxy> implements ClickHandler
+
+    private class SaveClickHandler implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
-            if (null != saveCallback)
-            {
-                saveCallback.run();
-                closeMe();
-                
-                return;
-            }
-            service.saveRestaurantBranch(branch).fire(this);
+            callback.save(RestaurantBranchPanel.this, branch, callback, (RestaurantAdminServiceRequest) service);
         }
-
-        @Override
-        public void onSuccess(RestaurantBranchProxy response)
-        {
-            closeMe();
-        }
-        
-        @Override
-        public void onFailure(ServerFailure error)
-        {
-            closeMe();
-            Window.alert("Can't save branch " + error.getMessage());
-        }
-        
-        private void closeMe()
-        {
-            Window.alert("Please refresh restaurant to see changes!");
-            if (null != closeCallback)
-            {
-                closeCallback.run();
-            }
-
-        }
-
     }
 
 }

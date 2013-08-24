@@ -9,9 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
 
-import foodcenter.client.handlers.RedrawablePannel;
-
-public class UsersPannel extends FlexTable implements RedrawablePannel
+public class UsersPanel extends FlexTable
 {
 
     private static final int COLUMN_EMAIL = 0;
@@ -20,26 +18,21 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
     private static final int COLUMN_CANCEL_BUTTON = 2;
 
     private final List<String> users;
-
     private final boolean isEditMode;
 
     private final Button newUserButton;
 
-    public UsersPannel(List<String> users,
-                       boolean isEditMode)
+    public UsersPanel(List<String> users, boolean isEditMode)
     {
         super();
         this.users = users;
         this.isEditMode = isEditMode;
 
-        // Adds an empty row to fill
-        newUserButton = new Button("New");
-        OnClickNewButton onClickNewButton = new OnClickNewButton();
-        newUserButton.addClickHandler(onClickNewButton);
+        newUserButton = new Button("New", new OnClickNewButton());
+
         redraw();
     }
 
-    @Override
     public void redraw()
     {
         // Clear all the rows of this table
@@ -54,7 +47,7 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
         }
 
         // Print all the categories if exits
-        int row = 1;
+        int row = getRowCount();
         for (String user : users)
         {
             printUserRow(user, row);
@@ -78,7 +71,6 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
 
     public void printNewUserEmptyRow()
     {
-
         int row = getRowCount();
 
         // Email text box
@@ -97,18 +89,17 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
 
     }
 
-    public void printUserRow(String email, int row)
+    private void printUserRow(String email, int row)
     {
         setText(row, COLUMN_EMAIL, email);
 
         if (isEditMode)
         {
             Button delete = new Button("Delete");
-            delete.addClickHandler(new OnClickDeleteButton(row));            
+            delete.addClickHandler(new OnClickDeleteButton(row));
             setWidget(row, COLUMN_ADD_BUTTON, delete);
         }
     }
-
 
     /* ********************************************************************* */
     /* ********************** private classes ****************************** */
@@ -119,6 +110,7 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
         @Override
         public void onClick(ClickEvent event)
         {
+            newUserButton.setEnabled(true);
             redraw();
         }
     }
@@ -148,6 +140,7 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
             String email = text.getText();
             users.add(email);
             redraw();
+            newUserButton.setEnabled(true);
         }
 
     }
@@ -169,11 +162,10 @@ public class UsersPannel extends FlexTable implements RedrawablePannel
             {
                 users.remove(email);
                 redraw();
+                return;
             }
-            else
-            {
-                Window.alert("User doesn't exists: " + email);
-            }
+            
+            Window.alert("User doesn't exists: " + email);            
         }
     }
 }

@@ -5,35 +5,69 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.handlers.ImageUploadedHandler;
+import foodcenter.client.callbacks.ImageUploadedCallback;
 
-public class EditableImage extends VerticalPanel implements ImageUploadedHandler
+public class EditableImage extends VerticalPanel implements ImageUploadedCallback
 {
 
-    private final ClickHandler onClickEdit;
+//    private final static String DEFAULT_WIDTH = "50px";
+//    private final static String DEFAULT_HEIGHT = "50px";
+    
+    private ClickHandler onClickEdit;
     private Image img;
     private Button button = null;
 
-    public EditableImage(String imgPath)
+    
+    public EditableImage()
     {
+        this(null, null);
+    }
+    
+    public EditableImage(String imgPath)
+    {    
         this(imgPath, null);
     }
 
     public EditableImage(String imgPath, ClickHandler onClickEdit)
     {
         super();
+        
         this.onClickEdit = onClickEdit;
 
-        updateImage(imgPath);
+        if (null != imgPath)
+        {
+            updateImage(imgPath);
+        }
     }
 
+    public void setClickHandler(ClickHandler onClick)
+    {
+        this.onClickEdit = onClick;
+    }
 
     @Override
-    public void updateImage(String url)
+    public final void updateImage(String url)
+    {
+        updateImage(url, null, null);
+    }
+    
+    @Override
+    public final void updateImage(String url, String width, String height)
     {
         clear();
-
+        
+        if (null == url)
+        {
+            return;
+        }
+        
         img = new Image(url);
+        if (null != width && null != height)
+        {
+            setSize(width, height);
+            img.setSize(width, height);
+        }
+        
         if (null != onClickEdit)
         {
             button = new Button();
@@ -45,6 +79,5 @@ public class EditableImage extends VerticalPanel implements ImageUploadedHandler
         {
             add(img);
         }
-
     }
 }

@@ -23,13 +23,14 @@ import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.Transform;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 import foodcenter.server.FileManager;
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.modules.AbstractDbObject;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbRestaurant;
+import foodcenter.server.db.modules.DbUser;
+import foodcenter.server.service.ClientService;
 
 /**
  * This is the google way (using request factory is extremely slow)
@@ -47,7 +48,6 @@ public class ImageServlet extends HttpServlet
 
     public static final String BLOB_SERVE_KEY = "blob-key";
 
-    private static UserService userService = UserServiceFactory.getUserService();
     private final static Logger logger = LoggerFactory.getLogger(ImageServlet.class);
 
     private Map<String, String> fields = new TreeMap<String, String>();
@@ -61,7 +61,7 @@ public class ImageServlet extends HttpServlet
     {
         BlobKey blobKey = new BlobKey(req.getParameter(BLOB_SERVE_KEY));
         ImagesService imagesService = ImagesServiceFactory.getImagesService();
-        
+
         Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
         if (null != oldImage)
         {
@@ -85,63 +85,36 @@ public class ImageServlet extends HttpServlet
         String restId = fields.get(BLOB_UPLOAD_REST_ID_PARAM);
         String compId = fields.get(BLOB_UPLOAD_COMP_ID_PARAM);
 
-        DbRestaurant rest = null;
-        DbCompany comp = null;
-
+        AbstractDbObject dbobj = null;
+        DbUser user = ClientService.login(null);
         if (null != restId)
         {
-            rest = DbHandler.find(DbRestaurant.class, restId);
+            dbobj = DbHandler.find(DbRestaurant.class, restId);
         }
-        else if (null != compId && null == rest)
+        else if (null != compId)
         {
-            comp = DbHandler.find(DbCompany.class, compId);
+            dbobj = DbHandler.find(DbCompany.class, compId);
         }
-
-        if (null == rest && null == comp)
+        else
         {
-            logger.error("rest and comp are null");
-            FileManager.deleteFile(blobSaved);
-            return;
+            dbobj = user;
         }
 
-        else if (null != rest && !rest.isEditable())
+        if (null == dbobj || !dbobj.isEditable())
         {
-            logger.info("user: " + userService.getCurrentUser().getEmail()
-                        + " not allowed to add image to restaurant: "
-                        + restId);
-            FileManager.deleteFile(blobSaved);
-            return;
-        }
-        else if (null != comp && !comp.isEditable())
-        {
-            logger.info("user: " + userService.getCurrentUser().getEmail()
-                        + " not allowed to add image to company: "
+            logger.warn("user: " + user.getEmail()
+                        + " not allowed to add image, restid: "
+                        + restId
+                        + ", compId:"
                         + compId);
             FileManager.deleteFile(blobSaved);
             return;
         }
 
         // Save the file
-
-        if (null != rest)
-        {
-            rest.deleteImage();
-            rest.setImageKey(blobSaved);
-            rest.jdoPostLoad(); // Set image URL according to the Blob-Key
-            res.getWriter().write(rest.getImageUrl());
-        }
-        else if (null != comp)
-        {
-            // TODO set comp image on blob upload
-            // comp.setImageKey;
-            // comp.jdoPostLoad();
-            // res.getWriter().write(comp.getImageUrl());
-        }
-        else
-        {
-            FileManager.deleteFile(blobSaved);
-        }
-        
+        dbobj.setImageKey(blobSaved);
+        dbobj = DbHandler.save(dbobj);
+        res.getWriter().write(dbobj.getImageUrl());
     }
 
     private void processRequest(HttpServletRequest req) throws IOException
@@ -155,20 +128,21 @@ public class ImageServlet extends HttpServlet
             {
                 FileItemStream item = iterator.next();
                 InputStream is = item.openStream();
-                
+
                 try
                 {
                     if (item.isFormField())
                     {
                         String fieldName = item.getFieldName();
                         String value = null;
-                            value = IOUtils.toString(is);
-    
+                        value = IOUtils.toString(is);
+
                         fields.put(fieldName, value);
                     }
                     else
                     {
-                        blobSaved = FileManager.saveFile(is, item.getContentType(), item.getName()).getKeyString();
+                        blobSaved = FileManager.saveFile(is, item.getContentType(), item.getName())
+                            .getKeyString();
                     }
                 }
                 finally

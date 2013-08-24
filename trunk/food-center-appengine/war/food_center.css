@@ -31,42 +31,35 @@ h1 {
 	margin: 15px 6px 6px;
 }
 
-html, body
-{
+html,body {
+	width: 99%;
+	overflow: auto;
+}
+
+.popup-common {
+	background-color: white;
+	border: 3px solid #009;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;	
+}
+.popup-main-panel {
+	overflow: auto;
 	width: 100%;
-}
-.header {
-    width: 100%;
-    float: left;
-    margin-top: 0px;
-    margin-left: 0px;
-    margin-bottom: 5px;
-    margin-right: 0px;
-    font-size: 16px;
-    background-color: black;
-    color: white;
-    padding-left: 0px;
-    padding-right: 0px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
-.headerInformation {
-	width: 70%;
-	float: left;
-	margin-left: 10px;
-	font-size: 13px;
-}
-
-.logout{
-    width: 20%;
-    float: right;
-    margin-right: 20px;
-    font-size: 13px;
-    text-align: right;
-}
-
-.fc_table {
-	width: 100%;
-	border-width: thin;
-	border-color: black;
-	border-style: solid;
+.blocking-popup-holder {
+	padding: 5px;
+	text-align: center;
+	width: 99%;
+	background-color: black;
+	min-height: 100%;
+	height: auto !important;
+	overflow: hidden;
+	height: 100%;
+	margin: 60px auto; /* -44px being the size of the footer */
+	opacity: 0.8;
+	filter: Alpha(opacity =     80); /* IE8 and earlier */
 }
