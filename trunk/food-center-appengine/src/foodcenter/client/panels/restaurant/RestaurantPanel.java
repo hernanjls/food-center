@@ -64,10 +64,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         setStyleName("popup-common");
         
         infoPopup = new PopupPanel(false);
-        infoPopupText = new Label();
-        
-        infoPopup.setWidget(infoPopupText);
-        infoPopup.center();
+        infoPopupText = new Label();        
 
         this.branchListCallback = new RestaurantBranchCallback();
         this.isEditMode = (null != service);
@@ -155,9 +152,17 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
     private void showPopup(String msg)
     {
         infoPopupText.setText(msg);
+        infoPopup.setWidget(infoPopupText);
         infoPopup.center();
         infoPopup.show();
     }
+    
+    private void hidePopup()
+    {
+        infoPopup.clear();
+        infoPopup.hide();
+    }
+
 
     /* ********************************************************************* */
     /* *************************** private classes ************************* */
@@ -364,7 +369,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onSuccess(RestaurantBranchProxy response)
         {
-            infoPopup.hide();
+            hidePopup();
             // When in edit mode branch can't fire save itself
             // This occurs only from view mode -> reload the restaurant in view mode
             RestaurantPanel.this.redraw();
@@ -374,7 +379,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onFailure(ServerFailure error)
         {
-            infoPopup.hide();
+            hidePopup();
             callback.error(RestaurantPanel.this, null, error.getMessage());
         }
 

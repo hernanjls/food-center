@@ -55,9 +55,6 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         infoPopup = new PopupPanel(false);
         infoPopupText = new Label();
 
-        infoPopup.setWidget(infoPopupText);
-        infoPopup.center();
-
     }
 
     @Override
@@ -123,8 +120,15 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
     private void showPopup(String msg)
     {
         infoPopupText.setText(msg);
+        infoPopup.setWidget(infoPopupText);
         infoPopup.center();
         infoPopup.show();
+    }
+    
+    private void hidePopup()
+    {
+        infoPopup.clear();
+        infoPopup.hide();
     }
 
     private void createHeaderProfilePanel()
@@ -246,7 +250,6 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             
             blockingPopup.show();
             showPopup("Deleting restaurant ...");
-            infoPopup.show();
             AdminServiceRequest service = RequestUtils.getRequestFactory().getAdminService();
             service.deleteRestaurant(rest.getId()).fire(new DelRestReceiver(rest));
 
@@ -277,7 +280,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         @Override
         public void onSuccess(RestaurantProxy response)
         {
-            infoPopup.hide();
+            hidePopup();
 
             if (null == response)
             {
@@ -310,7 +313,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         @Override
         public void onFailure(ServerFailure error)
         {
-            infoPopup.hide();
+            hidePopup();
             Window.alert("Failed to save rest: " + error.getMessage());
         }
 
@@ -333,14 +336,14 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
                 rests.remove(rest);
                 restsPanel.redraw();
             }
-            infoPopup.hide();
+            hidePopup();
 
         }
 
         @Override
         public void onFailure(ServerFailure error)
         {
-            infoPopup.hide();
+            hidePopup();
         }
 
     }
@@ -353,7 +356,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         {
             if (null == response)
             {
-                infoPopup.hide();
+                hidePopup();
                 Window.alert("Get default rest recieved null");
                 return;
             }
@@ -361,13 +364,13 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             rests.addAll(response);
 
             restsPanel.redraw();
-            infoPopup.hide();
+            hidePopup();
         }
 
         @Override
         public void onFailure(ServerFailure error)
         {
-            infoPopup.hide();
+            hidePopup();
             Window.alert("Can't get restaurants: " + error.getMessage());
         }
     }
