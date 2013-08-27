@@ -9,12 +9,13 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.web.bindery.requestfactory.shared.RequestContext;
 
+import foodcenter.client.callbacks.PanelCallback;
+import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.service.proxies.CourseProxy;
-import foodcenter.service.proxies.MenuCategoryProxy;
+import foodcenter.service.requset.MenuAdminServiceRequest;
 
-public class MenuCoursesPanel extends FlexTable
+public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 {
 
     private static final int COLUMN_NAME = 0;
@@ -22,46 +23,61 @@ public class MenuCoursesPanel extends FlexTable
     private static final int COLUMN_BUTTON_ADD_COURSE = 2;
     private static final int COLUMN_BUTTON_DEL_COURSE = 2;
 
-    private final MenuCategoryProxy menuCatProxy;
-    private final RequestContext requestContext;
-    private final Boolean isEditMode;
-
-    public MenuCoursesPanel(MenuCategoryProxy menuCatProxy)
+    private final List<CourseProxy> courses;
+    private final List<CourseProxy> addedCourses;
+    private final PanelCallback<CourseProxy, MenuAdminServiceRequest> callback;
+    private final boolean isEditMode;
+    
+    public MenuCoursesListPanel(List<CourseProxy> courses,
+                                List<CourseProxy> addedCourses,
+                                PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
     {
-        this(menuCatProxy, null);
+        this(courses, addedCourses, callback, false);
     }
 
-    public MenuCoursesPanel(MenuCategoryProxy menuCatProxy, RequestContext requestContext)
+    public MenuCoursesListPanel(List<CourseProxy> courses,
+                                List<CourseProxy> addedCourses,
+                                PanelCallback<CourseProxy, MenuAdminServiceRequest> callback,
+                                boolean isEditMode)
     {
         super();
 
-        this.requestContext = requestContext;
-        this.menuCatProxy = menuCatProxy;
-        this.isEditMode = (null != requestContext);
+        this.courses = courses;
+        this.addedCourses = addedCourses;
+        this.callback = callback;
+        this.isEditMode = isEditMode;
 
         redraw();
     }
 
-    private void redraw()
+    @Override
+    public void redraw()
     {
         clear();
-        
+
         createHeader();
 
-        List<CourseProxy> courses = menuCatProxy.getCourses();
-        if (null == courses)
-        {
-            return;
-        }
-        
         int row = getRowCount();
         for (CourseProxy cp : courses)
         {
             printCourseRow(cp, row);
             ++row;
         }
+        
+        for (CourseProxy cp : addedCourses)
+        {
+            printCourseRow(cp, row);
+            ++row;
+        }
+
     }
 
+    @Override
+    public void close()
+    {
+        callback.error(this, null, "Closing MenuCourseListPanel ??");
+        
+    }
     private void createHeader()
     {
         this.setText(0, COLUMN_NAME, "name");
@@ -74,19 +90,6 @@ public class MenuCoursesPanel extends FlexTable
         }
     }
 
-    public void addCourse(int row)
-    {
-        CourseProxy courseProxy = requestContext.create(CourseProxy.class);
-        menuCatProxy.getCourses().add(courseProxy);
-        printCourseRow(courseProxy, row);
-    }
-
-    public void deleteCourse(int row)
-    {
-        List<CourseProxy> courses = menuCatProxy.getCourses();
-        courses.remove(row - 1);
-        redraw();
-    }
 
     public void printCourseRow(CourseProxy courseProxy, int row)
     {
@@ -107,7 +110,7 @@ public class MenuCoursesPanel extends FlexTable
         {
             price.addKeyUpHandler(new OnKeyUpCoursePrice(price, courseProxy));
 
-            Button delete = new Button("delete", new OnClickDelCourse(row));
+            Button delete = new Button("delete", new OnClickDelCourse(courseProxy));
             setWidget(row, COLUMN_BUTTON_DEL_COURSE, delete);
         }
         else
@@ -122,24 +125,24 @@ public class MenuCoursesPanel extends FlexTable
         @Override
         public void onClick(ClickEvent event)
         {
-            addCourse(getRowCount());
+            callback.createNew(MenuCoursesListPanel.this, callback);
         }
     }
 
     class OnClickDelCourse implements ClickHandler
     {
 
-        private final int row;
+        private final CourseProxy course;
 
-        public OnClickDelCourse(int row)
+        public OnClickDelCourse(CourseProxy course)
         {
-            this.row = row;
+            this.course = course;
         }
 
         @Override
         public void onClick(ClickEvent event)
         {
-            deleteCourse(row);
+            callback.del(MenuCoursesListPanel.this, course);
         }
     }
 

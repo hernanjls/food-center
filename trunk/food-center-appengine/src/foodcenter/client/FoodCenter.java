@@ -261,6 +261,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
                           String reason)
         {
             Window.alert("Error: " + reason);
+            blockingPopup.hide();
         }
 
     }

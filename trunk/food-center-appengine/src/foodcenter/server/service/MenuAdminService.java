@@ -1,11 +1,18 @@
 package foodcenter.server.service;
 
+import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbMenuCategory;
+import foodcenter.service.proxies.MenuProxy;
 
 public class MenuAdminService
 {
+    
+    public static DbMenu saveMenu(DbMenu menu)
+    {
+        return DbHandler.save(menu);
+    }
 
 	/**
 	 * add the course to the category

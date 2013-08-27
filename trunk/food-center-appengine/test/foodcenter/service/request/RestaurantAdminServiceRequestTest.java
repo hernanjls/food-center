@@ -3,6 +3,8 @@ package foodcenter.service.request;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +12,11 @@ import org.junit.Test;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
+import foodcenter.service.proxies.MenuProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.request.mock.MockTestResponse;
+import foodcenter.service.requset.ClientServiceRequest;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
 
 public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
@@ -95,13 +99,12 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         RestaurantAdminServiceRequest service = rf.getRestaurantAdminService();
 
-        RestaurantProxy rest = createRest(//
-        service, //
-                                          "rest", //
-                                          menuCats, //
-                                          menuCatCourses, //
-                                          numBranches, //
-                                          numBranchMenuCats, //
+        RestaurantProxy rest = createRest(service,
+                                          "rest",
+                                          menuCats,
+                                          menuCatCourses,
+                                          numBranches,
+                                          numBranchMenuCats,
                                           numBranchMenuCatCourses);
 
         MockTestResponse<RestaurantProxy> testResponse = new MockTestResponse<RestaurantProxy>();
@@ -152,14 +155,67 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
     }
 
     @Test
+    public void delRestMenuCategoryTest()
+    {
+        menuCats = 2;
+        menuCatCourses = 2;
+        RestaurantProxy response = null;
+
+        RestaurantAdminServiceRequest service = rf.getRestaurantAdminService();
+        MockTestResponse<RestaurantProxy> restResponse = new MockTestResponse<RestaurantProxy>();
+        // service can invoke a single fire!
+
+        /*
+         * create a restaurant for the rest of the test
+         */
+        RestaurantProxy rest = createRest(service,
+                                          "rest",
+                                          menuCats,
+                                          menuCatCourses,
+                                          numBranches,
+                                          numBranchMenuCats,
+                                          numBranchMenuCatCourses);
+        service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
+        // service is dead after a fire
+        
+        response = restResponse.response;
+        restResponse.response = null;
+
+        tearDownPMF();
+        service = rf.getRestaurantAdminService();
+
+        rest = service.edit(response);
+        MenuProxy menu = rest.getMenu();
+
+        List<MenuCategoryProxy> cats = menu.getCategories();
+//         menu.getCategories().remove(0);
+        service.removeMenuCategory(menu, cats.get(0));
+
+        setUpPMF();
+
+        service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
+        // service is dead after a fire
+
+        tearDownPMF();
+        setUpPMF();
+
+        response = restResponse.response;
+        restResponse.response = null;
+        ClientServiceRequest client = rf.getClientService();
+        client.getRestaurantById(response.getId()).fire(restResponse);
+
+        assertEquals(menuCats - 1, response.getMenu().getCategories().size());
+    }
+
+    @Test
     public void addMenuCategoryCourseToRestaurantTest()
     {
         menuCats = 2;
         menuCatCourses = 2;
         RestaurantProxy response = null;
-        RestaurantAdminServiceRequest service = rf.getRestaurantAdminService(); // service can
-                                                                                // invoke a single
-                                                                                // fire!
+
+        RestaurantAdminServiceRequest service = rf.getRestaurantAdminService();
+        // service can invoke a single fire!
 
         /*
          * create a restaurant for the rest of the test
@@ -172,10 +228,9 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
         MockTestResponse<RestaurantProxy> testResponse = new MockTestResponse<RestaurantProxy>();
-        service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse); // service
-                                                                                         // is dead
-                                                                                         // after a
-                                                                                         // fire
+        service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(testResponse);
+        // service is dead after a fire
+
         response = testResponse.response;
         testResponse.response = null;
         assertNotNull(response);
@@ -202,8 +257,8 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         // validate it was added only to the 1st category
         assertEquals(menuCatCourses, response.getMenu().getCategories().get(1).getCourses().size());
-        assertEquals(menuCatCourses + 1, response.getMenu().getCategories().get(0).getCourses()
-            .size());
+        assertEquals(menuCatCourses + 1, //
+                     response.getMenu().getCategories().get(0).getCourses().size());
 
     }
 

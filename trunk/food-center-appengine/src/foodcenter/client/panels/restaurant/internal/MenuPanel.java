@@ -1,24 +1,31 @@
 package foodcenter.client.panels.restaurant.internal;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.web.bindery.requestfactory.shared.RequestContext;
 
+import foodcenter.client.callbacks.PanelCallback;
+import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.service.RequestUtils;
+import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
+import foodcenter.service.requset.MenuAdminServiceRequest;
 
 /**
  * Panel which represents a {@link MenuProxy}
  */
-public class MenuPanel extends FlexTable
+public class MenuPanel extends FlexTable implements RedrawablePanel
 {
 
     private static final int COLUMN_CATEGORIES = 0;
@@ -26,51 +33,81 @@ public class MenuPanel extends FlexTable
     private static final int COLUMN_CATEGORIES_DEL_BUTTON = 1;
     private static final int COLUMN_CATEGORY_COURSES = 2;
 
-    private final RequestContext requestContext;
-    private final MenuProxy menuProxy;
+    private final MenuProxy menu;
+    // private final PanelCallback<MenuProxy, MenuAdminServiceRequest> callback;
+    private final MenuAdminServiceRequest service;
+
     private final Boolean isEditMode;
 
-    public MenuPanel(MenuProxy menuProxy)
+    // new courses for existing category
+    private final Map<MenuCategoryProxy, List<CourseProxy>> addedCourses;
+
+    // new categories for menu
+    private final List<MenuCategoryProxy> addedCats;
+
+    // mapping from panel to category
+    private final Map<RedrawablePanel, MenuCategoryProxy> panelCategory;
+
+    private final CourseCallback coursesListCallback;
+
+    public MenuPanel(MenuProxy menu)
     {
-        this(menuProxy, null);
+        this(menu, null);
     }
 
-    public MenuPanel(MenuProxy menuProxy, RequestContext requestContext)
+    public MenuPanel(MenuProxy menu, MenuAdminServiceRequest service)
     {
         super();
-        this.requestContext = requestContext;
-        this.menuProxy = menuProxy;
-        this.isEditMode = (requestContext != null);
+
+        this.menu = menu;
+        this.service = service;
+
+        this.isEditMode = (null != service);
+
+        addedCats = new LinkedList<MenuCategoryProxy>();
+        addedCourses = new HashMap<MenuCategoryProxy, List<CourseProxy>>();
+
+        for (MenuCategoryProxy mcp : menu.getCategories())
+        {
+            addedCourses.put(mcp, new LinkedList<CourseProxy>());
+        }
+
+        panelCategory = new HashMap<RedrawablePanel, MenuCategoryProxy>();
+        coursesListCallback = new CourseCallback();
 
         // Draw the Panel's data
         redraw();
     }
 
+    @Override
     public void redraw()
     {
         removeAllRows();
+        panelCategory.clear();
 
         // Print the header row of this table
         printTableHeader();
 
-        // Print all the categories if exits
-        if (null == menuProxy)
-        {
-            return;
-        }
-
-        List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        if (null == cats)
-        {
-            return;
-        }
-
         int row = getRowCount();
-        for (MenuCategoryProxy mcp : cats)
+
+        for (MenuCategoryProxy mcp : menu.getCategories())
         {
             printCategoryTableRow(mcp, row);
             ++row;
         }
+
+        for (MenuCategoryProxy mcp : addedCats)
+        {
+            printCategoryTableRow(mcp, row);
+            ++row;
+        }
+    }
+
+    @Override
+    public void close()
+    {
+        // this is internal list, should do nothing!
+        coursesListCallback.error(this, null, "MenuPanel close was called!!");
     }
 
     /**
@@ -89,58 +126,130 @@ public class MenuPanel extends FlexTable
     }
 
     /**
-     * adds a new blank category
-     * the category will be added to the menu proxy,
-     * and to the flex table
-     */
-    private void addCategory(int row)
-    {
-        // create a blank category
-        MenuCategoryProxy menuCatProxy = RequestUtils.createMenuCategoryProxy(requestContext);
-
-        // add it to the menu proxy
-        menuProxy.getCategories().add(menuCatProxy);
-
-        // print its table row
-        printCategoryTableRow(menuCatProxy, row);
-    }
-
-    /**
-     * Deletes the category from the table and from the menu proxy
-     * 
-     * @param row is the table row of this category
-     */
-    private void deleteCategory(int row)
-    {
-        // delete it from the menu proxy
-        List<MenuCategoryProxy> cats = menuProxy.getCategories();
-        cats.remove(row - 1);
-        redraw();
-    }
-
-    /**
      * Adds a new row to the table
      * this row holds the category information
      * 
      * @param menuCatProxy is the category to print as row
      */
-    private void printCategoryTableRow(MenuCategoryProxy menuCatProxy, int row)
+    private void printCategoryTableRow(MenuCategoryProxy cat, int row)
     {
         TextBox catTitle = new TextBox();
-        catTitle.setText(menuCatProxy.getCategoryTitle());
+        catTitle.setText(cat.getCategoryTitle());
         catTitle.setEnabled(isEditMode);
         setWidget(row, COLUMN_CATEGORIES, catTitle);
 
         if (isEditMode)
         {
-            catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(menuCatProxy));
+            catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(cat));
 
-            Button delButton = new Button("Delete", new OnClickDeleteCategory(row));
+            Button delButton = new Button("Delete", new OnClickDeleteCategory(cat));
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, delButton);
         }
 
-        MenuCoursesPanel coursesTable = new MenuCoursesPanel(menuCatProxy, requestContext);
+        MenuCoursesListPanel coursesTable = new MenuCoursesListPanel(cat.getCourses(), //
+                                                                     addedCourses.get(cat),
+                                                                     coursesListCallback,
+                                                                     isEditMode);
+
+        // Save the mapping for the callbacks
+        panelCategory.put(coursesTable, cat);
+
         setWidget(row, COLUMN_CATEGORY_COURSES, coursesTable);
+    }
+
+    /* ******************************************************************************************* */
+    private class CourseCallback implements PanelCallback<CourseProxy, MenuAdminServiceRequest>
+    {
+
+        @Override
+        public void close(RedrawablePanel coursesPanel, CourseProxy proxy)
+        {
+            error(coursesPanel, proxy, "Close Courses is not supported");
+        }
+
+        @Override
+        public void save(RedrawablePanel coursesPanel,
+                         CourseProxy proxy,
+                         PanelCallback<CourseProxy, MenuAdminServiceRequest> callback,
+                         MenuAdminServiceRequest service)
+        {
+            error(coursesPanel, proxy, "Save Course is not supported");
+        }
+
+        @Override
+        public void view(RedrawablePanel coursesPanel,
+                         CourseProxy proxy,
+                         PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
+        {
+            error(coursesPanel, proxy, "View Course is not supported");
+
+        }
+
+        @Override
+        public void edit(RedrawablePanel coursesPanel,
+                         CourseProxy proxy,
+                         PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
+        {
+            error(coursesPanel, proxy, "Edit Course is not supported");
+        }
+
+        @Override
+        public void createNew(RedrawablePanel coursesPanel,
+                              PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
+        {
+            CourseProxy course = RequestUtils.createCourseProxy(service);
+            MenuCategoryProxy cat = panelCategory.get(coursesPanel);
+            
+            addedCourses.get(cat).add(course);
+            service.addCategoryCourse(cat, course);
+
+            coursesPanel.redraw();
+        }
+
+        private boolean removeCategoryCourse(MenuCategoryProxy cat, CourseProxy course)
+        {
+            if (cat.getCourses().contains(course))
+            {
+                cat.getCourses().remove(course);
+                service.removeCategoryCourse(cat, course);
+                return true;
+            }
+            else if (addedCourses.get(cat).contains(course))
+            {
+                addedCourses.get(cat).remove(course);
+                service.removeCategoryCourse(cat, course);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void del(RedrawablePanel coursesPanel, CourseProxy course)
+        {
+            for (MenuCategoryProxy mcp : menu.getCategories())
+            {
+                if (removeCategoryCourse(mcp, course))
+                {
+                    panelCategory.put(coursesPanel, null);
+                    return;
+                }
+            }
+
+            for (MenuCategoryProxy mcp : addedCats)
+            {
+                if (removeCategoryCourse(mcp, course))
+                {
+                    panelCategory.put(coursesPanel, null);
+                    return;
+                }
+            }
+        }
+
+        @Override
+        public void error(RedrawablePanel coursesPanel, CourseProxy proxy, String reason)
+        {
+            Window.alert("Error: " + reason);
+        }
     }
 
     /**
@@ -151,7 +260,12 @@ public class MenuPanel extends FlexTable
         @Override
         public void onClick(ClickEvent event)
         {
-            addCategory(getRowCount());
+            MenuCategoryProxy cat = RequestUtils.createMenuCategoryProxy(service); 
+            addedCats.add(cat);
+            addedCourses.put(cat, new LinkedList<CourseProxy>());
+            service.addMenuCategory(menu, cat);
+            
+            redraw();
         }
     }
 
@@ -160,21 +274,28 @@ public class MenuPanel extends FlexTable
      */
     private class OnClickDeleteCategory implements ClickHandler
     {
-        private final int row;
+        private final MenuCategoryProxy cat;
 
-        /**
-         * @param row - is the table row to delete on button click
-         */
-        public OnClickDeleteCategory(int row)
+        public OnClickDeleteCategory(MenuCategoryProxy cat)
         {
-            this.row = row;
+            this.cat = cat;
         }
 
         @Override
         public void onClick(ClickEvent event)
         {
-            deleteCategory(row);
-            redraw();
+            if (menu.getCategories().contains(cat))
+            {
+                menu.getCategories().remove(cat);
+//                service.removeMenuCategory(menu, cat);
+                redraw();
+            }
+            else if (addedCats.contains(cat))
+            {
+                addedCats.remove(cat);
+//                service.removeMenuCategory(menu, cat);
+                redraw();
+            }
         }
     }
 

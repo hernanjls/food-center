@@ -195,8 +195,6 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
                          PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
                          RestaurantAdminServiceRequest service)
         {
-            // callback === this
-
             close(panel, proxy);
             RestaurantsListPanel.this.callback.save(RestaurantsListPanel.this, proxy, callback, service);
         }
@@ -206,8 +204,6 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
                          RestaurantProxy proxy,
                          PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
         {
-            // callback === this
-
             close(panel, proxy);
             RestaurantsListPanel.this.callback.view(RestaurantsListPanel.this, proxy, callback);
         }
@@ -217,8 +213,6 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
                          RestaurantProxy proxy,
                          PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
         {
-            // callback === this
-
             close(panel, proxy);
             RestaurantsListPanel.this.callback.edit(RestaurantsListPanel.this, proxy, callback);
         }
@@ -228,8 +222,6 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
             createNew(RedrawablePanel panel,
                       PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
         {
-            // callback === this
-
             RestaurantsListPanel.this.callback.createNew(RestaurantsListPanel.this, callback);
         }
 
