@@ -5,6 +5,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -37,11 +38,16 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
         super();
 
         this.user = user;
-        this.profileImg = new EditableImage();
-        profileImg.setClickHandler(new OnClickProfileImage());
+        this.profileImg = new EditableImage(null, new OnClickProfileImage());
+
+        imgUrl = user.getImageUrl();
+        profileImg.updateImage(imgUrl,
+                               SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
+                               SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
         
         setStyleName("header-panel");
 
+        // add the logo image
         add(new EditableImage("/images/logo.png"));
 
         // It only applies to widgets added after this property is set.
@@ -49,23 +55,24 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
 
         add(new Label(user.getNickName()));
 
-        updateImage(user.getImageUrl());
-        profileImg.setClickHandler(new OnClickProfileImage());
         add(profileImg);
     }
 
     @Override
-    public void updateImage(String url)
+    public final void updateImage(String url)
     {
         imgUrl = url;
+
         profileImg.updateImage(imgUrl,
-                              SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
-                              SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
+                               SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
+                               SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
+
         boolean isShow = (null != profilePopup) && profilePopup.isShowing();
         
+        createProfilePopup();
+
         if (isShow)
         {
-            createProfilePopup();
             profilePopup.show();
         }
     }
@@ -103,7 +110,6 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
                         BIG_PROFILE_IMAGE_WIDTH_PX + "px",
                         BIG_PROFILE_IMAGE_HEIGHT_PX + "px");
         dockpanel.add(img, DockPanel.WEST);
-        
 
         // Center - info
         VerticalPanel v = new VerticalPanel();
@@ -117,8 +123,8 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
             Label email = new Label(user.getEmail());
             v.add(email);
         }
-        v.add(new Label(""));
-        
+        v.add(new HTML("<br>"));
+
         String role = user.isAdmin() ? "Admin" : "User";
         v.add(new Label("Role: " + role));
 

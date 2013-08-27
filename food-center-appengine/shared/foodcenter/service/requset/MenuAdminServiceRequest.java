@@ -1,12 +1,15 @@
 package foodcenter.service.requset;
 
 import com.google.web.bindery.requestfactory.shared.Request;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
+import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
 
-public interface MenuAdminServiceRequest
+@ServiceName(value = "foodcenter.server.service.MenuAdminService")
+public interface MenuAdminServiceRequest extends RequestContext
 {
     /**
      * adds the course to the category
@@ -47,4 +50,6 @@ public interface MenuAdminServiceRequest
 	 * @note save restaurant/ menu after the changes
 	 */
 	public Request<Void> removeMenuCategory(MenuProxy menu, MenuCategoryProxy category);
+	
+	public Request<MenuProxy> saveMenu(MenuProxy menu);
 }

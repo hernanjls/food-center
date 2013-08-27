@@ -45,6 +45,11 @@ public class RequestUtils
     	return res;
     }
     
+    public static CourseProxy createCourseProxy(RequestContext rContext)
+    {
+        return rContext.create(CourseProxy.class);
+    }
+    
     public static MenuCategoryProxy createMenuCategoryProxy(RequestContext rContext)
     {
     	MenuCategoryProxy res = rContext.create(MenuCategoryProxy.class);
