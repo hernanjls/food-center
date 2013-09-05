@@ -6,6 +6,8 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable //(detachable="true")
@@ -17,14 +19,11 @@ public class DbCompanyBranch extends AbstractDbGeoObject
 	 */
     private static final long serialVersionUID = 1303969414427455468L;
 
-	@Persistent()
-    private DbCompany company;
-
     @Persistent
     private List<String> admins = new ArrayList<String>(); // emails
 
     @Persistent
-    private List<String> employees = new ArrayList<String>(); // emails
+    private List<String> workers = new ArrayList<String>(); // emails
 
     @Persistent
     private List<ServiceType> services = new ArrayList<ServiceType>();
@@ -38,14 +37,18 @@ public class DbCompanyBranch extends AbstractDbGeoObject
         super();
     }
 
-    public DbCompany getCompany()
+    @Override
+    public void jdoPostLoad()
     {
-        return company;
-    }
+        super.jdoPostLoad();
 
-    public void setCompany(DbCompany company)
-    {
-        this.company = company;
+        // Set privilege...
+        UserPrivilege p = PrivilegeManager.getPrivilege(this);
+        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p
+            || UserPrivilege.RestaurantBranchAdmin == p)
+        {
+            setEditable(true);
+        }
     }
 
     public List<String> getAdmins()
@@ -58,15 +61,16 @@ public class DbCompanyBranch extends AbstractDbGeoObject
         this.admins = admins;
     }
 
-    public List<String> getEmployees()
+    public List<String> getWorkers()
     {
-        return employees;
+        return workers;
     }
 
-    public void setEmployees(List<String> employees)
+    public void setWorkers(List<String> workers)
     {
-        this.employees = employees;
+        this.workers = workers;
     }
+
 
     public List<ServiceType> getServices()
     {

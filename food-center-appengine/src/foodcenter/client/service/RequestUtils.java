@@ -8,9 +8,12 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import foodcenter.server.db.modules.AbstractDbGeoObject;
+import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
+import foodcenter.service.proxies.CompanyBranchProxy;
+import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
@@ -74,7 +77,23 @@ public class RequestUtils
     	
     	return res;
     }
-    
+
+    public static CompanyBranchProxy createCompanyBranchProxy(RequestContext rContext)
+    {
+        CompanyBranchProxy res = rContext.create(CompanyBranchProxy.class);
+        
+        res.setAdmins(new ArrayList<String>());
+        res.setWorkers(new ArrayList<String>());
+        
+        res.setLat(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LAT);
+        res.setLng(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LNG);
+        res.setAddress(AbstractDbGeoObject.GOOGLE_API_DEFAULT_ADDR);
+        
+        res.setEditable(true);
+        
+        return res;
+    }
+
     public static RestaurantProxy createRestaurantProxy(RequestContext rContext)
     {
     	RestaurantProxy res = rContext.create(RestaurantProxy.class);
@@ -88,7 +107,20 @@ public class RequestUtils
 
     	return res;
     }
-    
+
+    public static CompanyProxy createCompanyProxy(RequestContext rContext)
+    {
+        CompanyProxy res = rContext.create(CompanyProxy.class);
+        res.setAdmins(new ArrayList<String>());
+        res.setBranches(new ArrayList<CompanyBranchProxy>());
+        res.setServices(new ArrayList<ServiceType>());
+        res.setImageUrl(DbCompany.DEFAULT_ICON_PATH);
+
+        res.setEditable(true);
+
+        return res;
+    }
+
     public static OrderProxy createOrder(RequestContext rContext)
     {
     	OrderProxy res = rContext.create(OrderProxy.class);

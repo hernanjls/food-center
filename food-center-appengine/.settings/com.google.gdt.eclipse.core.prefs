@@ -1,5 +1,5 @@
 eclipse.preferences.version=1
-jarsExcludedFromWebInfLib=
+jarsExcludedFromWebInfLib=C\:/workspace/food-center/food-center-appengine/lib/appengine-api-stubs.jar|C\:/workspace/food-center/food-center-appengine/lib/appengine-testing.jar
 launchConfigExternalUrlPrefix=
 warSrcDir=war
 warSrcDirIsOutput=true

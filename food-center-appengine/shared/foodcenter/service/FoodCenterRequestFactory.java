@@ -4,8 +4,8 @@ import com.google.web.bindery.requestfactory.shared.RequestFactory;
 
 import foodcenter.service.requset.AdminServiceRequest;
 import foodcenter.service.requset.ClientServiceRequest;
-import foodcenter.service.requset.GCMServiceRequest;
-import foodcenter.service.requset.MsgServiceRequest;
+import foodcenter.service.requset.CompanyAdminServiceRequest;
+import foodcenter.service.requset.CompanyBranchAdminServiceRequest;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
 import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 import foodcenter.service.requset.RestaurantChefServiceRequest;
@@ -26,12 +26,8 @@ public interface FoodCenterRequestFactory extends RequestFactory
     public RestaurantAdminServiceRequest getRestaurantAdminService();
     public RestaurantWaiterServiceRequest getRestaurantWaiterService();
     public RestaurantChefServiceRequest getRestaurantChefService();
-	
     
-    // deprected services....
-    @Deprecated
-	public MsgServiceRequest msgService();
-    
-    @Deprecated
-	public GCMServiceRequest gcmService();
+    // services for companies / branches management
+    public CompanyBranchAdminServiceRequest getCompanyBranchAdminService();
+    public CompanyAdminServiceRequest getCompanyAdminService();
 }

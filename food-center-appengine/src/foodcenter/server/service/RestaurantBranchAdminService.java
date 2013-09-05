@@ -13,37 +13,6 @@ import foodcenter.server.db.security.UserPrivilege;
 
 public class RestaurantBranchAdminService extends MenuAdminService
 {
-
-    public static void addBranchAdmin(DbRestaurantBranch branch, String admin)
-    {
-        branch.getAdmins().add(admin);
-    }
-
-    public static void removeBranchAdmin(DbRestaurantBranch branch, String admin)
-    {
-        branch.getAdmins().remove(admin);
-    }
-
-    public static void addBranchWaiter(DbRestaurantBranch branch, String waiter)
-    {
-        branch.getWaiters().add(waiter);
-    }
-
-    public static void removeBranchWaiter(DbRestaurantBranch branch, String waiter)
-    {
-        branch.getWaiters().remove(waiter);
-    }
-
-    public static void addBranchChef(DbRestaurantBranch branch, String chef)
-    {
-        branch.getChefs().add(chef);
-    }
-
-    public static void removeBranchChef(DbRestaurantBranch branch, String chef)
-    {
-        branch.getChefs().remove(chef);
-    }
-
     public static void addBranchTable(DbRestaurantBranch branch, DbTable table)
     {
         branch.getTables().add(table);

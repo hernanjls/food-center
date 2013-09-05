@@ -20,7 +20,6 @@ import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.server.db.modules.AbstractDbObject;
 import foodcenter.server.db.modules.DbMsg;
 import foodcenter.server.db.modules.DbRestaurant;
-import foodcenter.server.db.modules.DbUserGcm;
 
 /**
  * Class for simplifying calls the the DB. <br>
@@ -343,57 +342,26 @@ public class DbHandler
         }
     }
 
-    @Deprecated
-    public static void gcmRegister(String email, String regId)
-    {
-        PersistenceManager pm = PMF.get();
-        DbUserGcm userGcm = new DbUserGcm(email, regId);
-        try
-        {
-            pm.makePersistent(userGcm);
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
 
-    @Deprecated
-    public static long gcmUnregister(String email, String regId)
-    {
-        PersistenceManager pm = PMF.get();
-        try
-        {
-            Query q = pm.newQuery(DbUserGcm.class);
-            q.setFilter("email == emailValue && gcmKey == gcmValue");
-            q.declareParameters("String emailValue, String gcmValue");
-            return q.deletePersistentAll(email, regId);
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
-
-    @Deprecated
-    public static List<String> getGcmRegistered()
-    {
-        PersistenceManager pm = PMF.get();
-        try
-        {
-            List<String> res = new LinkedList<String>();
-            Extent<DbUserGcm> extent = pm.getExtent(DbUserGcm.class, false);
-
-            for (DbUserGcm m : extent)
-            {
-                res.add(m.getGcmKey());
-            }
-
-            return res;
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
+//    @Deprecated
+//    public static List<String> getGcmRegistered()
+//    {
+//        PersistenceManager pm = PMF.get();
+//        try
+//        {
+//            List<String> res = new LinkedList<String>();
+//            Extent<DbUserGcm> extent = pm.getExtent(DbUserGcm.class, false);
+//
+//            for (DbUserGcm m : extent)
+//            {
+//                res.add(m.getGcmKey());
+//            }
+//
+//            return res;
+//        }
+//        finally
+//        {
+////            pm.close();
+//        }
+//    }
 }
