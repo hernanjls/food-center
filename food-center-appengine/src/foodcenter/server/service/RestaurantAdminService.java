@@ -6,7 +6,6 @@ import java.util.List;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
-import foodcenter.service.enums.ServiceType;
 
 public class RestaurantAdminService extends RestaurantBranchAdminService
 {
@@ -49,17 +48,7 @@ public class RestaurantAdminService extends RestaurantBranchAdminService
 //	{
 //		rest.getAdmins().remove(admin);
 //	}
-    
-	public static void addRestaurantServiceType(DbRestaurant rest, ServiceType service)
-	{
-		rest.getServices().add(service);
-	}
-	
-	public static void removeRestaurantServiceType(DbRestaurant rest, ServiceType service)
-	{
-		rest.getServices().remove(service);
-	}
-	
+    	
     public static DbRestaurant saveRestaurant(DbRestaurant rest)
 	{
 		DbRestaurant res = DbHandler.save(rest);

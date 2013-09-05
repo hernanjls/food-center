@@ -9,8 +9,7 @@ import javax.jdo.annotations.Persistent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@PersistenceCapable(detachable="true")
-//@FetchGroup(name = "DbMenuCategory", members = { @Persistent(name = "courses")})
+@PersistenceCapable //(detachable="true")
 public class DbMenuCategory extends AbstractDbObject
 {
 

@@ -10,7 +10,6 @@ import foodcenter.server.db.modules.DbTable;
 import foodcenter.server.db.modules.DbUser;
 import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
-import foodcenter.service.enums.ServiceType;
 
 public class RestaurantBranchAdminService extends MenuAdminService
 {
@@ -55,15 +54,6 @@ public class RestaurantBranchAdminService extends MenuAdminService
         branch.getTables().remove(table);
     }
 
-    public static void addRestaurantBranchServiceType(DbRestaurantBranch branch, ServiceType service)
-    {
-        branch.getServices().add(service);
-    }
-
-    public static void removeRestaurantBranchServiceType(DbRestaurantBranch branch, ServiceType service)
-    {
-        branch.getServices().remove(service);
-    }
 
     public static DbRestaurantBranch saveRestaurantBranch(DbRestaurantBranch branch)
     {
@@ -75,17 +65,18 @@ public class RestaurantBranchAdminService extends MenuAdminService
     {
         DbUser user = PrivilegeManager.getCurrentUser();
         UserPrivilege priv = PrivilegeManager.getPrivilege(user);
-        if (UserPrivilege.RestaurantAdmin != priv && UserPrivilege.Admin != priv && UserPrivilege.RestaurantBranchAdmin != priv)
+        if (UserPrivilege.RestaurantAdmin != priv && UserPrivilege.Admin != priv
+            && UserPrivilege.RestaurantBranchAdmin != priv)
         {
             return null;
         }
 
         String branchId = branch.getId();
         return DbHandler.find(DbOrder.class, // class
-            "restBranchId == branchIdP && date >= fromP && date <= toP", // base query
-            "String branchIdP, Date fromP, Date toP", // declared parameters
-            new Object[] { branchId, from, to }, // values
-            Integer.MAX_VALUE); // no limits...
+                              "restBranchId == branchIdP && date >= fromP && date <= toP", // base-query
+                              "String branchIdP, Date fromP, Date toP", // declared parameters
+                              new Object[] { branchId, from, to }, // values
+                              Integer.MAX_VALUE); // no limits...
 
     }
 

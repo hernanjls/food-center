@@ -153,6 +153,7 @@ public class DbHandlerTest extends AbstractDbTest
 		tearDownPMF();
 		setUpPMF();
 		
+		g0 = DbHandler.find(DbRestaurant.class, rests[0].getId());
 		validateRestaurant(rests[0], g0, true, false);
 		
 		tearDownPMF();

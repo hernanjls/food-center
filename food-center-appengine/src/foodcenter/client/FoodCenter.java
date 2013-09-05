@@ -14,6 +14,8 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.client.callbacks.SearchPanelCallback;
+import foodcenter.client.callbacks.search.RestaurantSearchOptions;
 import foodcenter.client.panels.common.BlockingPopupPanel;
 import foodcenter.client.panels.common.HeaderProfilePanel;
 import foodcenter.client.panels.main.RestaurantsListPanel;
@@ -38,6 +40,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
     // Callbacks
     private final PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> restCallback;
+    private final SearchPanelCallback<RestaurantSearchOptions> restSearchCallback;
 
     // Panels
     private RestaurantsListPanel restsPanel;
@@ -51,7 +54,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         // Initialize Restaurant List needed variables
         rests = new LinkedList<RestaurantProxy>();
         restCallback = new RestListCallbackImp();
-        
+        restSearchCallback = new RestSearchCallback();
         infoPopup = new PopupPanel(false);
         infoPopupText = new Label();
 
@@ -105,7 +108,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
         // Load the restaurants when map loading is done!
         RequestUtils.getRequestFactory().getClientService().getDefaultRestaurants()
-            .fire(new GetDefaultRestReceiver());
+            .fire(new GetRestListReceiver());
 
     }
 
@@ -124,7 +127,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         infoPopup.center();
         infoPopup.show();
     }
-    
+
     private void hidePopup()
     {
         infoPopup.clear();
@@ -142,7 +145,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
     private void createRestsListPanel()
     {
-        restsPanel = new RestaurantsListPanel(rests, restCallback, isAdmin);
+        restsPanel = new RestaurantsListPanel(rests, restCallback, restSearchCallback, isAdmin);
         RootPanel.get(FoodCenter.GWT_CONTINER).add(restsPanel);
     }
 
@@ -206,10 +209,10 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
                 error(panel, rest, "Permission Denied!");
                 return;
             }
-            
+
             blockingPopup.show();
             showPopup("Loading restaurant ...");
-            
+
             ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
             service.getRestaurantById(rest.getId()).with(RestaurantProxy.REST_WITH)
                 .fire(new RestaurantReceiver(callback, true));
@@ -225,7 +228,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
                 error(panel, null, "Permission Denied!");
                 return;
             }
-            
+
             blockingPopup.show();
             RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory()
                 .getRestaurantAdminService();
@@ -247,7 +250,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             {
                 error(restListPanel, rest, "Doesn't exists");
             }
-            
+
             blockingPopup.show();
             showPopup("Deleting restaurant ...");
             AdminServiceRequest service = RequestUtils.getRequestFactory().getAdminService();
@@ -349,7 +352,21 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
     }
 
-    private class GetDefaultRestReceiver extends Receiver<List<RestaurantProxy>>
+    private class RestSearchCallback implements SearchPanelCallback<RestaurantSearchOptions>
+    {
+
+        @Override
+        public void search(RestaurantSearchOptions options)
+        {
+            showPopup("Loading Restaurants ...");
+
+            RequestUtils.getRequestFactory().getClientService()
+                .findRestaurant(options.getPattern(), options.getServices())
+                .fire(new GetRestListReceiver());
+        }
+    }
+
+    private class GetRestListReceiver extends Receiver<List<RestaurantProxy>>
     {
 
         @Override

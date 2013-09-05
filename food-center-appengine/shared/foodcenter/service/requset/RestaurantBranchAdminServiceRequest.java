@@ -4,7 +4,6 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
-import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.TableProxy;
 
@@ -27,10 +26,6 @@ public interface RestaurantBranchAdminServiceRequest extends MenuAdminServiceReq
 	public Request<Void> addBranchTable(RestaurantBranchProxy branch, TableProxy table);
 	
 	public Request<Void> removeBranchTable(RestaurantBranchProxy branch, TableProxy table);
-	
-	public Request<Void> addRestaurantBranchServiceType(RestaurantBranchProxy branch, ServiceType service);
-	
-	public Request<Void> removeRestaurantBranchServiceType(RestaurantBranchProxy branch, ServiceType service);
 	
 	public Request<RestaurantBranchProxy> saveRestaurantBranch(RestaurantBranchProxy branch);
 }

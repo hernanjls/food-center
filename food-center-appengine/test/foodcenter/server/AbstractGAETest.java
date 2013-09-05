@@ -68,12 +68,17 @@ public abstract class AbstractGAETest
 
 	protected final void tearDownPMF()
 	{
+	    PersistenceManager pmf = PMF.get();
+        if (null == pmf)
+        {
+            return;
+        }
 		try
 		{
-			Transaction tx = PMF.get().currentTransaction();
+			Transaction tx = pmf.currentTransaction();
 			if (tx.isActive())
 			{
-				tx.commit();
+				tx.rollback();
 			}
 		}
 		catch (Exception e)
@@ -82,17 +87,7 @@ public abstract class AbstractGAETest
 		}
 		finally
 		{
-		    PersistenceManager pmf = PMF.get();
-		    if (null == pmf)
-		    {
-		        return;
-		    }
 		    
-			Transaction tx = pmf.currentTransaction();
-			if (tx.isActive())
-			{
-				tx.rollback();
-			}
 			PMF.closeThreadLocal();
 			
 		}

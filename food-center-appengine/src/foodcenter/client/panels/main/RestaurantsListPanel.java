@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -12,8 +15,11 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import foodcenter.client.callbacks.OnClickServiceCheckBox;
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.client.callbacks.SearchPanelCallback;
+import foodcenter.client.callbacks.search.RestaurantSearchOptions;
 import foodcenter.client.panels.common.EditableImage;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -33,28 +39,34 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
 
     private final List<RestaurantProxy> rests;
     private final PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback;
+    private final SearchPanelCallback<RestaurantSearchOptions> searchCallback;
     private final boolean isAdmin;
 
+    private final RestaurantSearchOptions searchOptions;
     private final RestCallback restCallback;
     private final Panel optionsPanel;
     private final FlexTable restsTable;
 
     public RestaurantsListPanel(List<RestaurantProxy> rests,
-                                PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
+                                PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
+                                SearchPanelCallback<RestaurantSearchOptions> searchCallback)
     {
-        this(rests, callback, false);
+        this(rests, callback, searchCallback, false);
     }
 
     public RestaurantsListPanel(List<RestaurantProxy> rests,
                                 PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
+                                SearchPanelCallback<RestaurantSearchOptions> searchCallback,
                                 boolean isAdmin)
     {
         super();
 
         this.rests = rests;
         this.callback = callback;
+        this.searchCallback = searchCallback;
         this.isAdmin = isAdmin;
 
+        searchOptions = new RestaurantSearchOptions();
         restCallback = new RestCallback();
         optionsPanel = createOptionsPannel();
         add(optionsPanel);
@@ -151,24 +163,32 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
         HorizontalPanel result = new HorizontalPanel();
 
         TextBox searchBox = new TextBox();
+        searchBox.addKeyUpHandler(new SearchKeyUpHandler());
         result.add(searchBox);
 
-        CheckBox delivery = new CheckBox("delivery");
-        delivery.setValue(true);
+        CheckBox delivery = createServiceCheckBox(ServiceType.DELIVERY);
         result.add(delivery);
 
-        CheckBox takeAway = new CheckBox("take away");
-        takeAway.setValue(true);
+        CheckBox takeAway = createServiceCheckBox(ServiceType.TAKE_AWAY);
         result.add(takeAway);
 
-        CheckBox table = new CheckBox("table");
-        table.setValue(true);
+        CheckBox table = createServiceCheckBox(ServiceType.TABLE);
         result.add(table);
 
         Button searchButton = new Button("Search");
+        searchButton.addClickHandler(new OnClickSearchRests());
         result.add(searchButton);
 
         return result;
+    }
+
+    private CheckBox createServiceCheckBox(ServiceType service)
+    {
+        CheckBox res = new CheckBox(service.getName());
+        res.setValue(true);
+        res.addClickHandler(new OnClickServiceCheckBox(searchOptions.getServices()));
+        
+        return res;
     }
 
     /* **************************************************************** */
@@ -196,7 +216,10 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
                          RestaurantAdminServiceRequest service)
         {
             close(panel, proxy);
-            RestaurantsListPanel.this.callback.save(RestaurantsListPanel.this, proxy, callback, service);
+            RestaurantsListPanel.this.callback.save(RestaurantsListPanel.this,
+                                                    proxy,
+                                                    callback,
+                                                    service);
         }
 
         @Override
@@ -240,6 +263,8 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
 
     }
 
+    /* ************************************************************************** */
+
     private class OnClickViewRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
@@ -258,6 +283,8 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
         }
     }
 
+    /* ************************************************************************** */
+
     private class OnClickEditRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
@@ -275,6 +302,8 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
         }
     }
 
+    /* ************************************************************************** */
+
     private class OnClickDeleteRestaurant implements ClickHandler
     {
         private final RestaurantProxy rest;
@@ -291,6 +320,8 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
         }
     }
 
+    /* ************************************************************************** */
+
     private class OnClickNewRestaurant implements ClickHandler
     {
         @Override
@@ -298,6 +329,35 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
         {
             callback.createNew(RestaurantsListPanel.this, restCallback);
         }
+    }
+
+    /* ************************************************************************** */
+
+    private class OnClickSearchRests implements ClickHandler
+    {
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            searchCallback.search(searchOptions);
+        }
+    }
+
+    /* ************************************************************************** */
+
+    private class SearchKeyUpHandler implements KeyUpHandler
+    {
+        @Override
+        public void onKeyUp(KeyUpEvent event)
+        {
+            if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+            {
+                searchCallback.search(searchOptions);
+            }
+            TextBox tb = (TextBox)event.getSource();
+            searchOptions.setPattern(tb.getText());
+            
+        }
+
     }
 
 }

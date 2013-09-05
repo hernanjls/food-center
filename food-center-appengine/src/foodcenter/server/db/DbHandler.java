@@ -141,7 +141,8 @@ public class DbHandler
      * @param clazz          - is the class to fetch from the DB.
      * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
      *                         Ex: "lastName == lastNameParam".<br>
-     *                         if null - no base query will be added
+     *                         if null - no base query will be added <br>
+     *                         or "||" may be used on a single field.
      * @param declaredParams - Declare the list of parameters query execution. <br>
      *                         The parameter declaration is a String containing <br>
      *                         one or more query parameter declarations separated with commas. <br>

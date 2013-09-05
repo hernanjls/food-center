@@ -10,7 +10,7 @@ import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable(detachable = "true")
+@PersistenceCapable //(detachable = "true")
 public class DbRestaurantBranch extends AbstractDbGeoObject
 {
 

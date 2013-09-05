@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import foodcenter.client.ClientUtils;
 import foodcenter.client.callbacks.ImageUploadedCallback;
+import foodcenter.client.callbacks.OnClickServiceCheckBox;
 import foodcenter.client.panels.common.EditableImage;
 import foodcenter.client.panels.common.FileUploadPanel;
 import foodcenter.service.enums.ServiceType;
@@ -103,29 +104,30 @@ public class RestaurantProfilePannel extends HorizontalPanel
     {
         HorizontalPanel res = new HorizontalPanel();
 
-        CheckBox deliveryCheckBox = createServiceCheckBox(ServiceType.DELIVERY, "delivery");
+        CheckBox deliveryCheckBox = createServiceCheckBox(ServiceType.DELIVERY.getName());
         res.add(deliveryCheckBox);
 
-        CheckBox takeAwayCheckBox = createServiceCheckBox(ServiceType.TAKE_AWAY, "take away");
+        CheckBox takeAwayCheckBox = createServiceCheckBox(ServiceType.TAKE_AWAY.getName());
         res.add(takeAwayCheckBox);
 
-        CheckBox tableCheckBox = createServiceCheckBox(ServiceType.TABLE, "table");
+        CheckBox tableCheckBox = createServiceCheckBox(ServiceType.TABLE.getName());
         res.add(tableCheckBox);
 
         return res;
     }
 
-    private CheckBox createServiceCheckBox(ServiceType service, String name)
+    private CheckBox createServiceCheckBox(String name)
     {
         CheckBox res = new CheckBox(name);
         List<ServiceType> services = rest.getServices();
 
+        ServiceType service = ServiceType.forName(name);
         boolean value = services.contains(service);
         res.setValue(value);
 
         if (isEditMode)
         {
-            res.addClickHandler(new ServiceClickHandler(service));
+            res.addClickHandler(new OnClickServiceCheckBox(rest.getServices()));
         }
         res.setEnabled(isEditMode);
 
@@ -177,7 +179,6 @@ public class RestaurantProfilePannel extends HorizontalPanel
         {
             rest.setName(titleBox.getText());
         }
-
     }
 
     private class PhoneKeyUpHandler implements KeyUpHandler
@@ -195,34 +196,6 @@ public class RestaurantProfilePannel extends HorizontalPanel
             rest.setPhone(titleBox.getText());
         }
 
-    }
-
-    private class ServiceClickHandler implements ClickHandler
-    {
-        private final ServiceType service;
-
-        public ServiceClickHandler(ServiceType service)
-        {
-            this.service = service;
-
-        }
-
-        @Override
-        public void onClick(ClickEvent event)
-        {
-            List<ServiceType> services = rest.getServices();
-
-            boolean isChecked = ((CheckBox) event.getSource()).getValue();
-
-            if (isChecked && !services.contains(service))
-            {
-                services.add(service);
-            }
-            else if (!isChecked && services.contains(service))
-            {
-                services.remove(service);
-            }
-        }
     }
 
 }

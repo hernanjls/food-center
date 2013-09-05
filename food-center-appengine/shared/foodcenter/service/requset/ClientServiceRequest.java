@@ -6,6 +6,7 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
+import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -23,7 +24,7 @@ public interface ClientServiceRequest extends RequestContext
     
     public Request<List<RestaurantProxy>> getDefaultRestaurants();
     
-    public Request<List<RestaurantProxy>> findRestaurant(String pattern);
+    public Request<List<RestaurantProxy>> findRestaurant(String pattern, List<ServiceType> services);
     
     public Request<RestaurantProxy> getRestaurantById(String id);
     

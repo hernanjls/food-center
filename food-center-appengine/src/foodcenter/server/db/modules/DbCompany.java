@@ -9,15 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable(detachable = "true")
-
-//@FetchGroups(value = { //
-//  @FetchGroup(name = "DbCompany_iconBytes", members = { @Persistent(name = "iconBytes") }), //
-//  @FetchGroup(name = "DbCompany_branches", members = { @Persistent(name = "branches") }), //
-//  @FetchGroup(name = "DbCompany_admins", members = { @Persistent(name = "admins") }), //
-//  @FetchGroup(name = "DbCompany_services", members = { @Persistent(name = "services") }), //
-//})
-
+@PersistenceCapable //(detachable="true")
 public class DbCompany extends AbstractDbObject
 {
     /**
