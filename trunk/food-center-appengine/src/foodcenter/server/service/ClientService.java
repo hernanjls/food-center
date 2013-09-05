@@ -1,5 +1,6 @@
 package foodcenter.server.service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -17,6 +18,7 @@ import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUser;
 import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.service.enums.ServiceType;
 
 public class ClientService
 {
@@ -30,12 +32,12 @@ public class ClientService
         String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
         return userService.createLogoutURL("/") + logoutRedirectionUrl;
     }
-    
+
     public static User getCurrentUser()
     {
         return userService.getCurrentUser();
     }
-    
+
     public static DbUser login(String gcmKey)
     {
 
@@ -95,13 +97,53 @@ public class ClientService
 
     public static DbRestaurant getRestaurantById(String id)
     {
-        logger.info("getRestaurantById is called, id: " +id);
+        logger.info("getRestaurantById is called, id: " + id);
         return DbHandler.find(DbRestaurant.class, id);
     }
 
-    public static List<DbRestaurant> findRestaurant(String pattern)
+    public static List<DbRestaurant> findRestaurant(String pattern, List<ServiceType> services)
     {
-        throw new NotImplementedException();
+        StringBuilder query = new StringBuilder();
+        StringBuilder pat = new StringBuilder();
+        List<Object> objsList = new LinkedList<Object>();
+        if (null != pattern && pattern.length() > 0)
+        {
+            query.append("name.startsWith(patternP)");            
+            pat.append("String patternP");
+            objsList.add(pattern);
+        }
+        
+        
+        
+
+        if (null != services && !services.isEmpty())
+        {
+            if (null != pattern && pattern.length() > 0)
+            {
+                query.append(" && ");
+            }
+            query.append("(");
+
+            int n = services.size();
+            for (int i = 0; i < n; ++i)
+            {
+                query.append("services == serviceP" + i);
+                if (i < n - 1)
+                {
+                    query.append(" || ");
+                }
+                
+                pat.append(", String serviceP" + i);
+                objsList.add(services.get(i));
+            }
+            query.append(" )");
+        }
+
+        return DbHandler.find(DbRestaurant.class, //
+                              query.toString(),
+                              pat.toString(),
+                              objsList.toArray(),
+                              20); // limit num of results...
     }
 
     public static DbOrder makeOrder(DbOrder order)

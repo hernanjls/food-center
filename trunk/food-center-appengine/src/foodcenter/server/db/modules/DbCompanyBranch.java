@@ -8,13 +8,7 @@ import javax.jdo.annotations.Persistent;
 
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable(detachable="true")
-
-//@FetchGroups(value = { //
-//  @FetchGroup(name = "DbRestaurantBranch_admins", members = { @Persistent(name = "admins") }), //
-//  @FetchGroup(name = "DbRestaurantBranch_waiters", members = { @Persistent(name = "employees") }), //
-//  @FetchGroup(name = "DbDbRestaurantBranch_orders", members = { @Persistent(name = "orders") }), //
-//})
+@PersistenceCapable //(detachable="true")
 public class DbCompanyBranch extends AbstractDbGeoObject
 {
 
@@ -92,10 +86,5 @@ public class DbCompanyBranch extends AbstractDbGeoObject
     public void setPhone(String phone)
     {
         this.phone = phone;
-    }
-
-    public static long getSerialversionuid()
-    {
-        return serialVersionUID;
     }
 }

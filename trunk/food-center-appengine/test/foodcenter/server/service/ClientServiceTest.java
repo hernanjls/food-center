@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -15,6 +16,7 @@ import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUser;
+import foodcenter.service.enums.ServiceType;
 
 public class ClientServiceTest extends AbstractServiceTest
 {
@@ -240,5 +242,97 @@ public class ClientServiceTest extends AbstractServiceTest
             assertNotNull(rests.get(i).getMenu());
             assertNotNull(rests.get(i).getMenu().getCategories());
         }
+    }
+    
+    @Test
+    public void findRestsTest()
+    {
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+
+        DbRestaurant rest = createRest("rest",
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        RestaurantAdminService.saveRestaurant(rest);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbRestaurant rest2 = createRest("dror",
+                                        numMenuCats,
+                                        numMenuCourses,
+                                        numBranches,
+                                        numBranchMenuCats,
+                                        numBranchMenuCourses);
+        
+        rest2.getServices().add(ServiceType.DELIVERY);
+        rest2.getServices().add(ServiceType.TAKE_AWAY);
+        RestaurantAdminService.saveRestaurant(rest2);
+
+        tearDownPMF();
+        setUpPMF();
+
+        List<ServiceType> services = new ArrayList<ServiceType>();
+        services.add(ServiceType.DELIVERY);
+        List<DbRestaurant> rests = ClientService.findRestaurant(rest2.getName(), services);
+        assertNotNull(rests);
+        assertEquals(1, rests.size());
+    }
+    
+    @Test
+    public void findRestsPatternTest()
+    {
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+        String name = "rest";
+
+        DbRestaurant rest = createRest(name + 1,
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        rest.getServices().add(ServiceType.DELIVERY);
+        rest.getServices().add(ServiceType.TAKE_AWAY);
+        RestaurantAdminService.saveRestaurant(rest);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbRestaurant rest2 = createRest(name + 2,
+                                        numMenuCats,
+                                        numMenuCourses,
+                                        numBranches,
+                                        numBranchMenuCats,
+                                        numBranchMenuCourses);
+        
+        rest2.getServices().add(ServiceType.DELIVERY);
+        rest2.getServices().add(ServiceType.TAKE_AWAY);
+        RestaurantAdminService.saveRestaurant(rest2);
+
+        tearDownPMF();
+        setUpPMF();
+
+        
+        List<ServiceType> services = new ArrayList<ServiceType>();
+        services.add(ServiceType.DELIVERY);
+        List<DbRestaurant> rests = ClientService.findRestaurant("rest", services);
+        assertNotNull(rests);
+        assertEquals(2, rests.size());
+        
+        rests = ClientService.findRestaurant("FDASDASDA", services);
+        assertNotNull(rests);
+        assertEquals(0, rests.size());
+        
+        
     }
 }
