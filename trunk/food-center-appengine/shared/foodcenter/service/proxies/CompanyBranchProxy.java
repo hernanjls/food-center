@@ -11,22 +11,15 @@ import foodcenter.service.proxies.interfaces.AbstractGeoLocationInterface;
 @ProxyForName(value = "foodcenter.server.db.modules.DbCompanyBranch", locator = "foodcenter.server.db.DbObjectLocator")
 public interface CompanyBranchProxy extends AbstractGeoLocationInterface, EntityProxy
 {
-
-    public CompanyProxy getCompany();
-
-    public void setCompany(CompanyProxy company);
+    public final static String[] BRANCH_WITH = {};
 
     public List<String> getAdmins();
 
     public void setAdmins(List<String> admins);
 
-    public List<String> getEmployees();
+    public List<String> getWorkers();
 
-    public void setEmployees(List<String> employees);
-
-    // public List<String> getOrders();
-    //
-    // public void setOrders(List<String> orders);
+    public void setWorkers(List<String> workers);
 
     public List<ServiceType> getServices();
 
@@ -35,5 +28,4 @@ public interface CompanyBranchProxy extends AbstractGeoLocationInterface, Entity
     public String getPhone();
 
     public void setPhone(String phone);
-
 }

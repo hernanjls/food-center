@@ -1,6 +1,8 @@
 package foodcenter.server.db;
 
 import foodcenter.server.AbstractGAETest;
+import foodcenter.server.db.modules.DbCompany;
+import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenuCategory;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -19,7 +21,7 @@ public abstract class AbstractDbTest extends AbstractGAETest
 
         DbRestaurant r = new DbRestaurant();
         r.setName(name);
-        
+
         for (int i = 0; i < numMenuCats; ++i)
         {
             DbMenuCategory category = new DbMenuCategory("rest" + Math.random());
@@ -51,6 +53,23 @@ public abstract class AbstractDbTest extends AbstractGAETest
         }
 
         return r;
+    }
+
+    protected DbCompany createComp(String name, int numBranches)
+    {
+
+        DbCompany c = new DbCompany();
+        c.setName(name);
+
+        for (int i = 0; i < numBranches; ++i)
+        {
+            DbCompanyBranch branch = new DbCompanyBranch();
+            c.getBranches().add(branch);
+
+            branch.setAddress("addr" + Math.random());
+        }
+
+        return c;
     }
 
 }

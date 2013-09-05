@@ -3,7 +3,6 @@ package foodcenter.server.service;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,64 +87,6 @@ public class ClientService
         DbHandler.save(user);
     }
 
-    public static List<DbRestaurant> getDefaultRestaurants()
-    {
-        logger.info("getDefaultRestaurants is called");
-        List<DbRestaurant> res = DbHandler.find(DbRestaurant.class, 10);
-        return res;
-    }
-
-    public static DbRestaurant getRestaurantById(String id)
-    {
-        logger.info("getRestaurantById is called, id: " + id);
-        return DbHandler.find(DbRestaurant.class, id);
-    }
-
-    public static List<DbRestaurant> findRestaurant(String pattern, List<ServiceType> services)
-    {
-        StringBuilder query = new StringBuilder();
-        StringBuilder pat = new StringBuilder();
-        List<Object> objsList = new LinkedList<Object>();
-        if (null != pattern && pattern.length() > 0)
-        {
-            query.append("name.startsWith(patternP)");            
-            pat.append("String patternP");
-            objsList.add(pattern);
-        }
-        
-        
-        
-
-        if (null != services && !services.isEmpty())
-        {
-            if (null != pattern && pattern.length() > 0)
-            {
-                query.append(" && ");
-            }
-            query.append("(");
-
-            int n = services.size();
-            for (int i = 0; i < n; ++i)
-            {
-                query.append("services == serviceP" + i);
-                if (i < n - 1)
-                {
-                    query.append(" || ");
-                }
-                
-                pat.append(", String serviceP" + i);
-                objsList.add(services.get(i));
-            }
-            query.append(" )");
-        }
-
-        return DbHandler.find(DbRestaurant.class, //
-                              query.toString(),
-                              pat.toString(),
-                              objsList.toArray(),
-                              20); // limit num of results...
-    }
-
     public static DbOrder makeOrder(DbOrder order)
     {
         logger.info("makeOrder is called");
@@ -178,15 +119,120 @@ public class ClientService
         return user.getOrders();
     }
 
+    
+    /* ************************* Restaurant APIs *************************** */
+    
+    public static List<DbRestaurant> getDefaultRestaurants()
+    {
+        logger.info("getDefaultRestaurants is called");
+        List<DbRestaurant> res = DbHandler.find(DbRestaurant.class, 10);
+        return res;
+    }
+
+    public static DbRestaurant getRestaurantById(String id)
+    {
+        logger.info("getRestaurantById is called, id: " + id);
+        return DbHandler.find(DbRestaurant.class, id);
+    }
+
+    public static List<DbRestaurant> findRestaurant(String pattern, List<ServiceType> services)
+    {
+        StringBuilder query = new StringBuilder();
+        StringBuilder pat = new StringBuilder();
+        List<Object> objsList = new LinkedList<Object>();
+        if (null != pattern && pattern.length() > 0)
+        {
+            query.append("name.startsWith(patternP)");            
+            pat.append("String patternP");
+            objsList.add(pattern);
+        }
+        
+        if (null != services && !services.isEmpty())
+        {
+            if (null != pattern && pattern.length() > 0)
+            {
+                query.append(" && ");
+            }
+            query.append("(");
+
+            int n = services.size();
+            for (int i = 0; i < n; ++i)
+            {
+                query.append("services == serviceP" + i);
+                if (i < n - 1)
+                {
+                    query.append(" || ");
+                }
+                
+                pat.append(", String serviceP" + i);
+                objsList.add(services.get(i));
+            }
+            query.append(" )");
+        }
+
+        return DbHandler.find(DbRestaurant.class, //
+                              query.toString(),
+                              pat.toString(),
+                              objsList.toArray(),
+                              20); // limit num of results...
+    }
+
+
+
+    /* ************************* Companies APIs *************************** */
+    
     public static List<DbCompany> getDefaultCompanies()
     {
-        logger.info("getDefaultCompanies is called");
+        logger.info("getDefaultRestaurants is called");
         return DbHandler.find(DbCompany.class, 10);
     }
 
-    public static List<DbCompany> findCompany(String pattern)
+    public static DbCompany getCompanyById(String id)
     {
-        throw new NotImplementedException();
+        logger.info("getCompanyById is called, id: " + id);
+        return DbHandler.find(DbCompany.class, id);
+    }
+
+    public static List<DbCompany> findCompany(String pattern, List<ServiceType> services)
+    {
+        StringBuilder query = new StringBuilder();
+        StringBuilder pat = new StringBuilder();
+        List<Object> objsList = new LinkedList<Object>();
+        if (null != pattern && pattern.length() > 0)
+        {
+            query.append("name.startsWith(patternP)");            
+            pat.append("String patternP");
+            objsList.add(pattern);
+        }
+        
+        if (null != services && !services.isEmpty())
+        {
+            if (null != pattern && pattern.length() > 0)
+            {
+                query.append(" && ");
+            }
+            query.append("(");
+
+            int n = services.size();
+            for (int i = 0; i < n; ++i)
+            {
+                query.append("services == serviceP" + i);
+                if (i < n - 1)
+                {
+                    query.append(" || ");
+                }
+                
+                pat.append(", String serviceP" + i);
+                objsList.add(services.get(i));
+            }
+            query.append(" )");
+        }
+
+        return DbHandler.find(DbCompany.class, //
+                              query.toString(),
+                              pat.toString(),
+                              objsList.toArray(),
+                              20); // limit num of results...
     }
 
 }

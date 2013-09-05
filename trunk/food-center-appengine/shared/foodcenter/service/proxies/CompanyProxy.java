@@ -5,27 +5,33 @@ import java.util.List;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyForName;
 
+import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
 @ProxyForName(value = "foodcenter.server.db.modules.DbCompany", locator = "foodcenter.server.db.DbObjectLocator")
 public interface CompanyProxy extends EntityProxy, AbstractEntityInterface
 {
+    public final static String[] COMP_WITH = { "branches", };
 
-    public String getName();
+     public String getId();
 
-    public void setName(String name);
+     public String getName();
 
-    public List<Byte> getIconBytes();
+     public void setName(String name);
 
-    public String getPhone();
+     public String getPhone();
 
-    public void setPhone(String phone);
+     public void setPhone(String phone);
 
-    public List<CompanyBranchProxy> getBranches();
+     public List<ServiceType> getServices();
 
-    public void setBranches(List<CompanyBranchProxy> branches);
+     public void setServices(List<ServiceType> services);
 
-    public List<String> getAdmins();
+     public List<CompanyBranchProxy> getBranches();
 
-    public void setAdmins(List<String> admins);
+     public void setBranches(List<CompanyBranchProxy> branches);
+
+     public List<String> getAdmins();
+
+     public void setAdmins(List<String> admins);
 }

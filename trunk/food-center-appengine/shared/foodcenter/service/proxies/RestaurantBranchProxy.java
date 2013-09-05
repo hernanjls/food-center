@@ -13,12 +13,7 @@ public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, Ent
 {
     public final static String[] BRANCH_WITH = { "menu",
                                                "menu.categories",
-                                               "menu.categories.courses",
-                                               "admins" };
-
-//    public RestaurantProxy getRestaurant();
-
-//    public void setRestaurant(RestaurantProxy restaurant);
+                                               "menu.categories.courses"};
 
     public List<String> getAdmins();
 
@@ -47,5 +42,4 @@ public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, Ent
     public String getPhone();
 
     public void setPhone(String phone);
-
 }

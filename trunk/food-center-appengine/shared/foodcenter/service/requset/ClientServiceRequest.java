@@ -16,23 +16,18 @@ import foodcenter.service.proxies.UserProxy;
 public interface ClientServiceRequest extends RequestContext
 {
 	public Request<Void> logout();
-
     public Request<UserProxy> login(String gcmKey);
+    public Request<OrderProxy> makeOrder(OrderProxy order);
 
-
-    //services the user need for restaurant
-    
+    //services the user needs for restaurant
     public Request<List<RestaurantProxy>> getDefaultRestaurants();
-    
     public Request<List<RestaurantProxy>> findRestaurant(String pattern, List<ServiceType> services);
-    
     public Request<RestaurantProxy> getRestaurantById(String id);
     
-    public Request<OrderProxy> makeOrder(OrderProxy order);
     
-    // services the user need for companies
-    
+    // services the user needs for companies    
     public Request<List<CompanyProxy>> getDefaultCompanies();
+    public Request<List<CompanyProxy>> findCompany(String pattern, List<ServiceType> services);
+    public Request<CompanyProxy> getCompanyById(String id);
     
-    public Request<List<CompanyProxy>> findCompany(String pattern);
 }

@@ -1,7 +1,5 @@
 package foodcenter.server.service;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,32 +18,23 @@ public class AdminService
 
     /******************** company apis ********************/
 
-    public static DbCompany searchCompanyByName(String name)
+    public static Boolean deleteCompany(String id)
     {
-        // TODO searchCompanyByName
-        throw new RuntimeException("Not Implemented");
-    }
-
-    public static List<DbCompany> getDefaultCompanies()
-    {
-        // TODO getDefaultCompanies
-        throw new RuntimeException("Not Implemented");
-    }
-
-    public static Boolean deleteCompany(Long id)
-    {
-        // TODO deleteCompany
-        throw new RuntimeException("Not Implemented");
-    }
-
-    public static DbCompany saveCompany(DbCompany comp)
-    {
-        if (!comp.isEditable())
+        if (!userService.isUserAdmin())
         {
-            return null;
+            return false;
+        }
+
+        DbCompany d = DbHandler.find(DbCompany.class, id);
+        if (null == d)
+        {
+            logger.error("Can't find company, id=" + id);
+            return false;
         }
         
-        return DbHandler.save(comp);
+        d.deleteImage();
+        long deletedRows = DbHandler.delete(DbCompany.class, id);
+        return (deletedRows > 0);
     }
 
     /******************** restaurant apis ********************/
@@ -67,18 +56,5 @@ public class AdminService
         long deletedRows = DbHandler.delete(DbRestaurant.class, id);
         return (deletedRows > 0);
     }
-
-    public static Long createRestaurant(String name)
-    {
-        if (!userService.isUserAdmin())
-        {
-            return null;
-        }
-
-        return null;
-        // return db.createRestaurant(name);
-    }
-
- 
  
 }

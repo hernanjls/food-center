@@ -7,6 +7,8 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
+import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable //(detachable="true")
@@ -17,17 +19,16 @@ public class DbCompany extends AbstractDbObject
 	 */
     private static final long serialVersionUID = -3140453310619997005L;
 
-	@Persistent
+    public static final String DEFAULT_ICON_PATH = "images/default_company_icon.jpg";
+
+    @Persistent
     @NotNull
     private String name = "";
 
     @Persistent
-    private List<Byte> iconBytes = new ArrayList<Byte>();
-
-    @Persistent
     private String phone = "";
 
-    @Persistent(mappedBy = "company")
+    @Persistent //(mappedBy = "company")
     private List<DbCompanyBranch> branches = new ArrayList<DbCompanyBranch>();
 
     @Persistent
@@ -47,6 +48,25 @@ public class DbCompany extends AbstractDbObject
         this.name = name;
     }
 
+    @Override
+    public void jdoPostLoad()
+    {
+        super.jdoPostLoad();
+        
+        // Set permissions
+        UserPrivilege p = PrivilegeManager.getPrivilege(this);
+        if (UserPrivilege.Admin == p || UserPrivilege.CompanyAdmin == p)
+        {
+            setEditable(true);
+        }
+        
+        // Make sure image can be shown!
+        if (0 == getImageUrl().length())
+        {
+            setImageUrl(DEFAULT_ICON_PATH);
+        }
+    }
+
     public String getName()
     {
         return name;
@@ -55,16 +75,6 @@ public class DbCompany extends AbstractDbObject
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public List<Byte> getIconBytes()
-    {
-        return iconBytes;
-    }
-
-    public void setIconBytes(List<Byte> iconBytes)
-    {
-        this.iconBytes = iconBytes;
     }
 
     public String getPhone()
@@ -96,6 +106,7 @@ public class DbCompany extends AbstractDbObject
     {
         this.admins = admins;
     }
+
     public List<ServiceType> getServices()
     {
         return services;

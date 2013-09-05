@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbOrder;
@@ -235,15 +236,48 @@ public class ClientServiceTest extends AbstractServiceTest
 
         assertEquals(rest.getName(), rests.get(0).getName());
         assertEquals(rest2.getName(), rests.get(1).getName());
-        
-        for (int i=0; i<2; ++i)
+
+        for (int i = 0; i < 2; ++i)
         {
             assertEquals(rests.get(i).isEditable(), true);
             assertNotNull(rests.get(i).getMenu());
             assertNotNull(rests.get(i).getMenu().getCategories());
         }
     }
-    
+
+    /**
+     * tests that after saving 2 restaurants we can retrieve them both
+     */
+    @Test
+    public void getDefaultCompsTest()
+    {
+        int numBranches = 1;
+
+        DbCompany c1 = createComp("c1", numBranches);
+        CompanyAdminService.saveCompany(c1);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbCompany c2 = createComp("c2", numBranches);
+        CompanyAdminService.saveCompany(c2);
+
+        tearDownPMF();
+        setUpPMF();
+
+        List<DbCompany> comps = ClientService.getDefaultCompanies();
+        assertNotNull(comps);
+        assertEquals(2, comps.size());
+
+        assertEquals(c1.getName(), comps.get(0).getName());
+        assertEquals(c2.getName(), comps.get(1).getName());
+
+        for (int i = 0; i < 2; ++i)
+        {
+            assertEquals(comps.get(i).isEditable(), true);
+        }
+    }
+
     @Test
     public void findRestsTest()
     {
@@ -270,7 +304,7 @@ public class ClientServiceTest extends AbstractServiceTest
                                         numBranches,
                                         numBranchMenuCats,
                                         numBranchMenuCourses);
-        
+
         rest2.getServices().add(ServiceType.DELIVERY);
         rest2.getServices().add(ServiceType.TAKE_AWAY);
         RestaurantAdminService.saveRestaurant(rest2);
@@ -284,7 +318,34 @@ public class ClientServiceTest extends AbstractServiceTest
         assertNotNull(rests);
         assertEquals(1, rests.size());
     }
-    
+
+    @Test
+    public void findCompsTest()
+    {
+        int numBranches = 1;
+
+        DbCompany rest = createComp("c1", numBranches);
+        CompanyAdminService.saveCompany(rest);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbCompany comp2 = createComp("dror", numBranches);
+
+        comp2.getServices().add(ServiceType.DELIVERY);
+        comp2.getServices().add(ServiceType.TAKE_AWAY);
+        CompanyAdminService.saveCompany(comp2);
+
+        tearDownPMF();
+        setUpPMF();
+
+        List<ServiceType> services = new ArrayList<ServiceType>();
+        services.add(ServiceType.DELIVERY);
+        List<DbCompany> comps = ClientService.findCompany(comp2.getName(), services);
+        assertNotNull(comps);
+        assertEquals(1, comps.size());
+    }
+
     @Test
     public void findRestsPatternTest()
     {
@@ -314,7 +375,7 @@ public class ClientServiceTest extends AbstractServiceTest
                                         numBranches,
                                         numBranchMenuCats,
                                         numBranchMenuCourses);
-        
+
         rest2.getServices().add(ServiceType.DELIVERY);
         rest2.getServices().add(ServiceType.TAKE_AWAY);
         RestaurantAdminService.saveRestaurant(rest2);
@@ -322,17 +383,50 @@ public class ClientServiceTest extends AbstractServiceTest
         tearDownPMF();
         setUpPMF();
 
-        
         List<ServiceType> services = new ArrayList<ServiceType>();
         services.add(ServiceType.DELIVERY);
         List<DbRestaurant> rests = ClientService.findRestaurant("rest", services);
         assertNotNull(rests);
         assertEquals(2, rests.size());
-        
+
         rests = ClientService.findRestaurant("FDASDASDA", services);
         assertNotNull(rests);
         assertEquals(0, rests.size());
-        
-        
     }
+
+    @Test
+    public void findCompsPatternTest()
+    {
+        int numBranches = 1;
+
+        String name = "comp";
+
+        DbCompany comp = createComp(name + 1, numBranches);
+        comp.getServices().add(ServiceType.DELIVERY);
+        comp.getServices().add(ServiceType.TAKE_AWAY);
+        CompanyAdminService.saveCompany(comp);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbCompany rest2 = createComp(name + 2, numBranches);
+
+        rest2.getServices().add(ServiceType.DELIVERY);
+        rest2.getServices().add(ServiceType.TAKE_AWAY);
+        CompanyAdminService.saveCompany(rest2);
+
+        tearDownPMF();
+        setUpPMF();
+
+        List<ServiceType> services = new ArrayList<ServiceType>();
+        services.add(ServiceType.DELIVERY);
+        List<DbCompany> comps = ClientService.findCompany(name, services);
+        assertNotNull(comps);
+        assertEquals(2, comps.size());
+
+        comps = ClientService.findCompany("FDASDASDA", services);
+        assertNotNull(comps);
+        assertEquals(0, comps.size());
+    }
+
 }

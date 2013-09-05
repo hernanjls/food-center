@@ -7,6 +7,8 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.modules.DbCompany;
+import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;
@@ -77,6 +79,7 @@ public class PrivilegeManager
         return getPrivilege(rest, user.getEmail());
     }
     
+    
     public static UserPrivilege getPrivilege(DbRestaurantBranch branch)
     {
         if (userService.isUserAdmin())
@@ -92,7 +95,37 @@ public class PrivilegeManager
         return getPrivilege(branch, user.getEmail());
     }
     
-    
+
+    public static UserPrivilege getPrivilege(DbCompany comp)
+    {
+        if (userService.isUserAdmin())
+        {
+            return UserPrivilege.Admin;
+        }
+        DbUser user = getCurrentUser();
+        UserPrivilege result = getPrivilege(user);
+        if (UserPrivilege.User != result)
+        {
+            return result;
+        }
+        return getPrivilege(comp, user.getEmail());
+    }
+
+    public static UserPrivilege getPrivilege(DbCompanyBranch branch)
+    {
+        if (userService.isUserAdmin())
+        {
+            return UserPrivilege.Admin;
+        }
+        DbUser user = getCurrentUser();
+        UserPrivilege result = getPrivilege(user);
+        if (UserPrivilege.User != result)
+        {
+            return result;
+        }
+        return getPrivilege(branch, user.getEmail());
+    }
+
     
     /***********************************************************************************/
     
@@ -109,7 +142,6 @@ public class PrivilegeManager
         }
         return UserPrivilege.User;
     }
-    
     
     private static UserPrivilege getPrivilege(DbRestaurantBranch branch, String email)
     {
@@ -137,6 +169,35 @@ public class PrivilegeManager
         return UserPrivilege.User;
     }
     
+
+    private static UserPrivilege getPrivilege(DbCompany company, String email)
+    {
+        if (null == company)
+        {
+            return UserPrivilege.NotPremited;
+        }
+        if (company.getAdmins().contains(email))
+        {
+            return UserPrivilege.CompanyAdmin;
+        }
+        return UserPrivilege.User;
+    }
+
+    private static UserPrivilege getPrivilege(DbCompanyBranch branch, String email)
+    {
+        UserPrivilege p = getPrivilege();
+        if (UserPrivilege.User != p)
+        {
+            return p;
+        }
+        
+        if (branch.getAdmins().contains(email))
+        {
+            return UserPrivilege.CompanyBranchAdmin;
+        }
+                
+        return UserPrivilege.User;
+    }
     
     
 }

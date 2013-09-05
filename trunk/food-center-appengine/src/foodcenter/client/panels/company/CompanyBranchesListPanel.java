@@ -1,4 +1,4 @@
-package foodcenter.client.panels.restaurant;
+package foodcenter.client.panels.company;
 
 import java.util.List;
 
@@ -10,14 +10,14 @@ import com.google.gwt.user.client.ui.FlexTable;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.service.proxies.CompanyBranchProxy;
 import foodcenter.service.proxies.MenuProxy;
-import foodcenter.service.proxies.RestaurantBranchProxy;
-import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
+import foodcenter.service.requset.CompanyBranchAdminServiceRequest;
 
 /**
  * Panel which represents a {@link MenuProxy}
  */
-public class RestaurantBranchesListPanel extends FlexTable implements RedrawablePanel
+public class CompanyBranchesListPanel extends FlexTable implements RedrawablePanel
 {
 
     private final static int COLUMN_ADDRESS = 0;
@@ -27,25 +27,25 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
     private final static int COLUMN_BUTTON_DEL_BRANCH = 2;
 
     // CTOR variables
-    private final List<RestaurantBranchProxy> branches;
-    private final List<RestaurantBranchProxy> addedBranches;
-    private final PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback;
+    private final List<CompanyBranchProxy> branches;
+    private final List<CompanyBranchProxy> addedBranches;
+    private final PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback;
     private final boolean isEditMode;
     private final boolean isRestAdmin;
 
     // Local variables
     private final RestBranchCallback branchCallback; // callback to pass to restaurants
 
-    public RestaurantBranchesListPanel(List<RestaurantBranchProxy> branches,
-                                       List<RestaurantBranchProxy> addedBranches,
-                                       PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
+    public CompanyBranchesListPanel(List<CompanyBranchProxy> branches,
+                                       List<CompanyBranchProxy> addedBranches,
+                                       PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback)
     {
         this(branches, addedBranches, callback, false, false);
     }
 
-    public RestaurantBranchesListPanel(List<RestaurantBranchProxy> branches,
-                                       List<RestaurantBranchProxy> addedBranches,
-                                       PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback,
+    public CompanyBranchesListPanel(List<CompanyBranchProxy> branches,
+                                       List<CompanyBranchProxy> addedBranches,
+                                       PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback,
                                        boolean isEditMode,
                                        boolean isRestAdmin)
     {
@@ -74,7 +74,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         int row = getRowCount();
         if (null != branches)
         {
-            for (RestaurantBranchProxy rbp : branches)
+            for (CompanyBranchProxy rbp : branches)
             {
                 printRestaurntBranchTableRow(rbp, row);
                 row++;
@@ -82,7 +82,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         }
         if (null != addedBranches)
         {
-            for (RestaurantBranchProxy rbp : addedBranches)
+            for (CompanyBranchProxy rbp : addedBranches)
             {
                 printRestaurntBranchTableRow(rbp, row);
                 row++;
@@ -107,7 +107,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         if (isEditMode)
         {
             Button addBranchButton = new Button("Add Branch");
-            addBranchButton.addClickHandler(new OnClickAddRestaurantBranch());
+            addBranchButton.addClickHandler(new OnClickAddCompanyBranch());
             setWidget(0, COLUMN_BUTTON_ADD_BRANCH, addBranchButton);
         }
     }
@@ -118,24 +118,24 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
      * @param row is the row to set
      * @param branch is the category to print as row
      */
-    private void printRestaurntBranchTableRow(RestaurantBranchProxy branch, int row)
+    private void printRestaurntBranchTableRow(CompanyBranchProxy branch, int row)
     {
         setText(row, COLUMN_ADDRESS, branch.getAddress());
 
         Button view = new Button("View");
-        view.addClickHandler(new OnClickViewRestaurantBranch(branch));
+        view.addClickHandler(new OnClickViewCompanyBranch(branch));
         setWidget(row, COLUMN_BUTTON_VIEW_BRANCH, view);
 
         if (isEditMode)
         {
             Button edit = new Button("Edit");
-            edit.addClickHandler(new OnClickEditRestaurantBranch(branch));
+            edit.addClickHandler(new OnClickEditCompanyBranch(branch));
             setWidget(row, COLUMN_BUTTON_EDIT_BRANCH, edit);
 
             if (isRestAdmin)
             {
                 Button deleteBranchButton = new Button("Delete");
-                deleteBranchButton.addClickHandler(new OnClickDeleteRestaurantBranch(branch));
+                deleteBranchButton.addClickHandler(new OnClickDeleteCompanyBranch(branch));
                 setWidget(row, COLUMN_BUTTON_DEL_BRANCH, deleteBranchButton);
             }
         }
@@ -144,7 +144,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
             if (branch.isEditable())
             {
                 Button edit = new Button("Edit");
-                edit.addClickHandler(new OnClickEditRestaurantBranch(branch));
+                edit.addClickHandler(new OnClickEditCompanyBranch(branch));
                 setWidget(row, COLUMN_BUTTON_EDIT_BRANCH + 1, edit);
             }
         }
@@ -157,30 +157,30 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
 
     private class RestBranchCallback
                                     implements
-                                    PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest>
+                                    PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest>
     {
 
         @Override
-        public void close(RedrawablePanel panel, RestaurantBranchProxy proxy)
+        public void close(RedrawablePanel panel, CompanyBranchProxy proxy)
         {
             if (null != panel)
             {
                 panel.close();
             }
             // should redraw this panel :)
-            callback.close(RestaurantBranchesListPanel.this, proxy);
+            callback.close(CompanyBranchesListPanel.this, proxy);
         }
 
         @Override
         public void
             save(RedrawablePanel panel,
-                 RestaurantBranchProxy proxy,
-                 PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback,
-                 RestaurantBranchAdminServiceRequest service)
+                 CompanyBranchProxy proxy,
+                 PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback,
+                 CompanyBranchAdminServiceRequest service)
         {
             // callback === this
             close(panel, proxy);
-            RestaurantBranchesListPanel.this.callback.save(RestaurantBranchesListPanel.this,
+            CompanyBranchesListPanel.this.callback.save(CompanyBranchesListPanel.this,
                                                            proxy,
                                                            callback,
                                                            service);
@@ -189,13 +189,13 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         @Override
         public void
             view(RedrawablePanel panel,
-                 RestaurantBranchProxy proxy,
-                 PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
+                 CompanyBranchProxy proxy,
+                 PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback)
         {
             // callback === this
 
             close(panel, proxy);
-            RestaurantBranchesListPanel.this.callback.view(RestaurantBranchesListPanel.this,
+            CompanyBranchesListPanel.this.callback.view(CompanyBranchesListPanel.this,
                                                            proxy,
                                                            callback);
         }
@@ -203,13 +203,13 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         @Override
         public void
             edit(RedrawablePanel panel, // branch panel
-                 RestaurantBranchProxy proxy,
-                 PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
+                 CompanyBranchProxy proxy,
+                 PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback)
         {
             // callback === this
 
             close(panel, proxy);
-            RestaurantBranchesListPanel.this.callback.edit(RestaurantBranchesListPanel.this,
+            CompanyBranchesListPanel.this.callback.edit(CompanyBranchesListPanel.this,
                                                            proxy,
                                                            callback);
         }
@@ -217,48 +217,48 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         @Override
         public void
             createNew(RedrawablePanel panel,
-                      PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
+                      PanelCallback<CompanyBranchProxy, CompanyBranchAdminServiceRequest> callback)
         {
             // callback === this
 
-            RestaurantBranchesListPanel.this.callback.createNew(RestaurantBranchesListPanel.this,
+            CompanyBranchesListPanel.this.callback.createNew(CompanyBranchesListPanel.this,
                                                                 callback);
         }
 
         @Override
-        public void del(RedrawablePanel panel, RestaurantBranchProxy proxy)
+        public void del(RedrawablePanel panel, CompanyBranchProxy proxy)
         {
             close(panel, proxy); // Close the edit panel
-            RestaurantBranchesListPanel.this.callback.del(RestaurantBranchesListPanel.this, proxy);
+            CompanyBranchesListPanel.this.callback.del(CompanyBranchesListPanel.this, proxy);
         }
 
         @Override
-        public void error(RedrawablePanel panel, RestaurantBranchProxy proxy, String reason)
+        public void error(RedrawablePanel panel, CompanyBranchProxy proxy, String reason)
         {
-            RestaurantBranchesListPanel.this.callback.error(panel, proxy, reason);
+            CompanyBranchesListPanel.this.callback.error(panel, proxy, reason);
         }
     }
 
     /**
      * Handles add category button click
      */
-    private class OnClickAddRestaurantBranch implements ClickHandler
+    private class OnClickAddCompanyBranch implements ClickHandler
     {
         @Override
         public void onClick(ClickEvent event)
         {
             if (null != callback)
             {
-                callback.createNew(RestaurantBranchesListPanel.this, branchCallback);
+                callback.createNew(CompanyBranchesListPanel.this, branchCallback);
             }
         }
     }
 
-    private class OnClickViewRestaurantBranch implements ClickHandler
+    private class OnClickViewCompanyBranch implements ClickHandler
     {
-        private final RestaurantBranchProxy branch;
+        private final CompanyBranchProxy branch;
 
-        public OnClickViewRestaurantBranch(RestaurantBranchProxy branch)
+        public OnClickViewCompanyBranch(CompanyBranchProxy branch)
         {
             this.branch = branch;
         }
@@ -266,15 +266,15 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         @Override
         public void onClick(ClickEvent event)
         {
-            callback.view(RestaurantBranchesListPanel.this, branch, branchCallback);
+            callback.view(CompanyBranchesListPanel.this, branch, branchCallback);
         }
     }
 
-    private class OnClickEditRestaurantBranch implements ClickHandler
+    private class OnClickEditCompanyBranch implements ClickHandler
     {
-        private RestaurantBranchProxy branch;
+        private CompanyBranchProxy branch;
 
-        public OnClickEditRestaurantBranch(RestaurantBranchProxy branch)
+        public OnClickEditCompanyBranch(CompanyBranchProxy branch)
         {
             this.branch = branch;
         }
@@ -289,14 +289,14 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
     /**
      * Handles delete Branch button
      */
-    private class OnClickDeleteRestaurantBranch implements ClickHandler
+    private class OnClickDeleteCompanyBranch implements ClickHandler
     {
-        private final RestaurantBranchProxy branch;
+        private final CompanyBranchProxy branch;
 
         /**
          * @param index - is the index on the list to delete
          */
-        public OnClickDeleteRestaurantBranch(RestaurantBranchProxy branch)
+        public OnClickDeleteCompanyBranch(CompanyBranchProxy branch)
         {
             this.branch = branch;
         }
@@ -307,7 +307,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
             // Removes the branch and calls redraw
             if (null != callback)
             {
-                callback.del(RestaurantBranchesListPanel.this, branch);
+                callback.del(CompanyBranchesListPanel.this, branch);
             }
         }
     }
