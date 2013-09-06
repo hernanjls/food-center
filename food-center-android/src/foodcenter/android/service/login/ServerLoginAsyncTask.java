@@ -61,7 +61,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
         String message = context.getString(R.string.server_registered);
         CommonUtilities.displayMessage(context, message);
 
-        LoginActivity.closeLoginActivity();
+        LoginActivity.closeLoginActivity(true);
     }
 
     @Override

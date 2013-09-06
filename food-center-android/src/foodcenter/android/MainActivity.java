@@ -2,6 +2,7 @@ package foodcenter.android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -27,6 +29,7 @@ import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 public class MainActivity extends Activity
 {
     private final static String TAG = MainActivity.class.getSimpleName();
+    private final static int REQ_CODE_LOGIN = 0;
 
     private ProgressDialog spin;
 
@@ -59,24 +62,50 @@ public class MainActivity extends Activity
 
         // register msg reciever handler (to show on ui thread)
         registerReceiver(handlePopupReceiver, new IntentFilter(Setup.DISPLAY_POPUP_ACTION));
-    }
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-
-        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
-        {
-            startActivity(new Intent(this, LoginActivity.class));
-        }
-        else
+        if (!gotoLoginActivity())        
         {
             SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
             String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
             showSpinner("logged in as: " + accountName);
-            new RestsGetAsyncTask(this).execute();
+            handleIntent(getIntent());
         }
+
+    }
+
+    private boolean gotoLoginActivity()
+    {
+        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
+        {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, REQ_CODE_LOGIN);
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (REQ_CODE_LOGIN == requestCode)
+        {
+            if (RESULT_OK == resultCode)
+            {
+                handleIntent(data);
+            }
+            else
+            {
+                gotoLoginActivity();
+            }
+        }
+    }
+    
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+//        gotoLoginActivity();
+        
     }
 
     @Override
@@ -84,29 +113,34 @@ public class MainActivity extends Activity
     {
 
         // Inflate the menu; this adds items to the action bar if it is present.
-
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_main, menu);
-        // Invoke the Register activity
-        menu.getItem(0).setIntent(new Intent(getApplicationContext(), LoginActivity.class));
+        inflater.inflate(R.menu.main_menu, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
     }
 
     @Override
+    public boolean onSearchRequested()
+    {
+        // TODO Auto-generated method stub
+        return super.onSearchRequested();
+    }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
         {
-            case R.id.menu_add_msg:
-                // new MsgAddDialog(MainActivity.this);
-                return true;
-            case R.id.menu_update_msgs:
-                new RestsGetAsyncTask(MainActivity.this).execute();
-                return true;
             case R.id.menu_exit:
                 finish();
                 return true;
+            case R.id.menu_login:
+                // Invoke the Register activity
+                startActivityForResult(new Intent(getApplicationContext(), LoginActivity.class), REQ_CODE_LOGIN);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -152,5 +186,16 @@ public class MainActivity extends Activity
             Popup.show(MainActivity.this, newMessage);
         }
     };
+
+    private void handleIntent(Intent intent)
+    {
+        String query = null;
+        if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+        {
+             query = intent.getStringExtra(SearchManager.QUERY);
+        }
+        // use the query to search your data somehow
+        new RestsGetAsyncTask(this).execute(query);
+    }
 
 }

@@ -77,7 +77,7 @@ public class GCMIntentService extends GCMBaseIntentService
             // This callback results from the call to unregister made on
             // ServerUtilities when the registration to the server failed.
             Log.i(TAG, "Ignoring unregister callback");
-            LoginActivity.closeLoginActivity();
+            LoginActivity.closeLoginActivity(false);
         }
     }
 
@@ -146,7 +146,7 @@ class GCMUnRegisterReciever extends Receiver<Void>
 
     public GCMUnRegisterReciever(final Context context)
     {
-        this.context = context;
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -156,14 +156,23 @@ class GCMUnRegisterReciever extends Receiver<Void>
 
         // Delete the current auth cookie from shared preferences
         Editor editor = RequestUtils.getSharedPreferences(context).edit();
+        editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
         editor.putString(RequestUtils.AUTH_COOKIE, null);
         editor.commit();
-        LoginActivity.closeLoginActivity();
+        LoginActivity.closeLoginActivity(false);
     }
 
     @Override
     public void onFailure(ServerFailure error)
     {
+        GCMRegistrar.setRegisteredOnServer(context, false);
+
+        // Delete the current auth cookie from shared preferences
+        Editor editor = RequestUtils.getSharedPreferences(context).edit();
+        editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
+        editor.putString(RequestUtils.AUTH_COOKIE, null);
+        editor.commit();
+        
         // At this point the device is unregistered from GCM, but still
         // registered in the server.
         // We could try to unregister again, but it is not necessary:
@@ -171,6 +180,6 @@ class GCMUnRegisterReciever extends Receiver<Void>
         // a "NotRegistered" error message and should unregister the device.
         String msg = context.getString(R.string.server_unregister_error, error.getMessage());
         LoginActivity.showSpinner(msg);
-        LoginActivity.closeLoginActivity();
+        LoginActivity.closeLoginActivity(false);
     }
 }

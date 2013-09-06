@@ -1,13 +1,11 @@
 package foodcenter.android.service.login;
 
-import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
 import foodcenter.android.LoginActivity;
-import foodcenter.android.service.RequestUtils;
 
 public class UnregisterAsyncTask extends AsyncTask<Void, String, Boolean>
 {
@@ -25,13 +23,9 @@ public class UnregisterAsyncTask extends AsyncTask<Void, String, Boolean>
 	@Override
 	protected Boolean doInBackground(Void... params)
 	{
-		publishProgress("Removing know user...");
-		Editor editor = RequestUtils.getSharedPreferences(context).edit();
-		editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
-
 		publishProgress("Unregistering from GCM service and Server...");
 		Log.i(TAG, "[START] Unregistering from GCM...");
-		GCMRegistrar.unregister(context);
+		GCMRegistrar.unregister(context.getApplicationContext());
 		return true;
 	}
 	
