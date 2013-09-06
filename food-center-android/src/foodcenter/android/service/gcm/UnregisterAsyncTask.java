@@ -39,14 +39,14 @@ public class UnregisterAsyncTask extends AsyncTask<Void, String, Boolean>
 	protected void onPostExecute(Boolean result)
 	{
 		Log.i(TAG, "[DONE] Unregistering from GCM");
-		context.hideSpinner();
-	    context.setScreenContent();
+//		context.hideSpinner();
+//	    context.setScreenContent();
 	}
 
 	@Override
 	protected void onProgressUpdate(String... values)
 	{
 	    String msg = values[0];
-	    context.showSpinner(msg);
+	    LoginActivity.showSpinner(msg);
 	}
 }
