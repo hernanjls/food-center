@@ -25,8 +25,8 @@ import android.widget.TextView;
 import com.google.android.gcm.GCMRegistrar;
 
 import foodcenter.android.service.RequestUtils;
-import foodcenter.android.service.gcm.AuthenticateAsyncTask;
-import foodcenter.android.service.gcm.UnregisterAsyncTask;
+import foodcenter.android.service.login.AuthenticateAndLoginAsyncTask;
+import foodcenter.android.service.login.UnregisterAsyncTask;
 
 public class LoginActivity extends Activity
 {
@@ -242,7 +242,7 @@ public class LoginActivity extends Activity
             // Register in the background and terminate the activity
             mAccountSelectedPosition = listView.getCheckedItemPosition();
             TextView accountTextView = (TextView) listView.getChildAt(mAccountSelectedPosition);
-            new AuthenticateAsyncTask(LoginActivity.this).execute(accountTextView.getText().toString());
+            new AuthenticateAndLoginAsyncTask(LoginActivity.this).execute(accountTextView.getText().toString());
         }
 
     }

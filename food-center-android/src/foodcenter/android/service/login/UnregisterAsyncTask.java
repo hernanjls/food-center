@@ -1,4 +1,4 @@
-package foodcenter.android.service.gcm;
+package foodcenter.android.service.login;
 
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -39,8 +39,7 @@ public class UnregisterAsyncTask extends AsyncTask<Void, String, Boolean>
 	protected void onPostExecute(Boolean result)
 	{
 		Log.i(TAG, "[DONE] Unregistering from GCM");
-//		context.hideSpinner();
-//	    context.setScreenContent();
+		// GCMIntentService onUnregister deals with activity
 	}
 
 	@Override
