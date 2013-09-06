@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="140dip"
     android:layout_gravity="center_vertical"
-    android:background="#000000" >
+    android:background="@color/white" >
 
     <ImageView
         android:id="@+id/rest_grid_item_img"

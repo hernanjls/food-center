@@ -48,10 +48,13 @@ public class LoginActivity extends Activity
 
     private ProgressDialog spin;
     
-    public static void closeLoginActivity()
+    public static void closeLoginActivity(boolean isSuccess)
     {
         if (null != LoginActivity.loginActivity)
         {
+            Intent intent = new Intent();
+            int resCode = isSuccess ? RESULT_OK : RESULT_CANCELED;
+            LoginActivity.loginActivity.setResult(resCode, intent);
             LoginActivity.loginActivity.finish();
             LoginActivity.loginActivity = null;
         }
