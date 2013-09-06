@@ -20,7 +20,7 @@ public class DbRestaurant extends AbstractDbObject
 	 */
     private static final long serialVersionUID = -9053099508081246189L;
 
-    public static final String DEFAULT_ICON_PATH = "images/default_restaurant_icon.png";
+    public static final String DEFAULT_ICON_PATH = "/images/default_restaurant_icon.png";
 
     @Persistent
     @NotNull
