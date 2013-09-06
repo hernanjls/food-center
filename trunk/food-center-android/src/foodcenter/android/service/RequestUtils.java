@@ -28,12 +28,16 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
 import android.os.Debug;
 import android.util.Log;
 
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+
+import foodcenter.android.R;
 
 /**
  * Utility methods for getting the base URL for client-server communication and
@@ -42,175 +46,202 @@ import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 public class RequestUtils
 {
 
-	/**
-	 * Tag for logging.
-	 */
-	private static final String TAG = RequestUtils.class.getSimpleName();
+    /**
+     * Tag for logging.
+     */
+    private static final String TAG = RequestUtils.class.getSimpleName();
 
-	// Shared constants
+    // Shared constants
 
-	/**
-	 * Key for account name in shared preferences.
-	 */
-	public static final String ACCOUNT_NAME = "accountName";
+    /**
+     * Key for account name in shared preferences.
+     */
+    public static final String ACCOUNT_NAME = "accountName";
 
-	/**
-	 * Key for auth cookie name in shared preferences.
-	 */
-	public static final String AUTH_COOKIE = "authCookie";
+    /**
+     * Key for auth cookie name in shared preferences.
+     */
+    public static final String AUTH_COOKIE = "authCookie";
 
-	/*
-	 * URL suffix for the RequestFactory servlet.
-	 */
-	public static final String RF_METHOD = "/gwtRequest";
+    /*
+     * URL suffix for the RequestFactory servlet.
+     */
+    public static final String RF_METHOD = "/gwtRequest";
 
-	/**
-	 * An intent name for receiving registration/unregistration status.
-	 */
-	public static final String UPDATE_UI_INTENT = getPackageName() + ".UPDATE_UI";
+    /**
+     * An intent name for receiving registration/unregistration status.
+     */
+    public static final String UPDATE_UI_INTENT = getPackageName() + ".UPDATE_UI";
 
-	// End shared constants
+    // End shared constants
 
-	/**
-	 * Key for shared preferences.
-	 */
-	private static final String SHARED_PREFS = "FOODCENTER_PREFS";
+    /**
+     * Key for shared preferences.
+     */
+    private static final String SHARED_PREFS = "FOODCENTER_PREFS";
 
-	/**
-	 * Cache containing the base URL for a given context.
-	 */
-	private static final Map<Context, String> URL_MAP = new HashMap<Context, String>();
+    /**
+     * Cache containing the base URL for a given context.
+     */
+    private static final Map<Context, String> URL_MAP = new HashMap<Context, String>();
 
-	/**
-	 * Returns the (debug or production) URL associated with the registration
-	 * service.
-	 */
-	public static String getBaseUrl(Context context)
-	{
-		String url = URL_MAP.get(context);
-		if (null == url && Debug.isDebuggerConnected())
-		{
-			// if a debug_url raw resource exists, use its contents as the url
-			url = getDebugUrl(context);
-			URL_MAP.put(context, url);
-		}
-		if (null == url)
-		{
-			url = Setup.PROD_URL;
-			URL_MAP.put(context, url);
-		}
-		return url;
-	}
+    /**
+     * Returns the (debug or production) URL associated with the registration
+     * service.
+     */
+    public static String getBaseUrl(Context context)
+    {
+        String url = URL_MAP.get(context);
+        if (null == url && Debug.isDebuggerConnected())
+        {
+            // if a debug_url raw resource exists, use its contents as the url
+            url = getDebugUrl(context);
+            URL_MAP.put(context, url);
+        }
+        if (null == url)
+        {
+            url = Setup.PROD_URL;
+            URL_MAP.put(context, url);
+        }
+        return url;
+    }
 
-	/**
-	 * Creates and returns an initialized {@link RequestFactory} of the given
-	 * type, with authCookie added to the request. <br>
-	 * RequestUtils.getSharedPrefs will be used.
-	 */
-	public static <T extends RequestFactory> T getRequestFactory(Context context, Class<T> factoryClass)
-	{
-		T requestFactory = RequestFactorySource.create(factoryClass);
+    /**
+     * Creates and returns an initialized {@link RequestFactory} of the given
+     * type, with authCookie added to the request. <br>
+     * RequestUtils.getSharedPrefs will be used.
+     */
+    public static <T extends RequestFactory> T getRequestFactory(Context context,
+                                                                 Class<T> factoryClass)
+    {
+        T requestFactory = RequestFactorySource.create(factoryClass);
 
-		SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
-		String authCookie = prefs.getString(RequestUtils.AUTH_COOKIE, null);
+        SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
+        String authCookie = prefs.getString(RequestUtils.AUTH_COOKIE, null);
 
-		String uriString = RequestUtils.getBaseUrl(context) + RF_METHOD;
-		URI uri;
-		try
-		{
-			uri = new URI(uriString);
-		}
-		catch (URISyntaxException e)
-		{
-			Log.w(TAG, "Bad URI: " + uriString, e);
-			return null;
-		}
-		requestFactory.initialize(new SimpleEventBus(), new AndroidRequestTransport(uri, authCookie));
+        String uriString = RequestUtils.getBaseUrl(context) + RF_METHOD;
+        URI uri;
+        try
+        {
+            uri = new URI(uriString);
+        }
+        catch (URISyntaxException e)
+        {
+            Log.w(TAG, "Bad URI: " + uriString, e);
+            return null;
+        }
+        requestFactory.initialize(new SimpleEventBus(),
+                                  new AndroidRequestTransport(uri, authCookie));
 
-		return requestFactory;
-	}
+        return requestFactory;
+    }
 
-	/**
-	 * Helper method to get a SharedPreferences instance.
-	 */
-	public static SharedPreferences getSharedPreferences(Context context)
-	{
-		return context.getSharedPreferences(SHARED_PREFS, 0);
-	}
+    /**
+     * Helper method to get a SharedPreferences instance.
+     */
+    public static SharedPreferences getSharedPreferences(Context context)
+    {
+        return context.getApplicationContext().getSharedPreferences(SHARED_PREFS, 0);
+    }
 
-	/**
-	 * Returns true if we are running against a dev mode appengine instance.
-	 */
-	public static boolean isDebug(Context context)
-	{
-		// Although this is a bit roundabout, it has the nice side effect
-		// of caching the result.
-		return !Setup.PROD_URL.equals(getBaseUrl(context));
-	}
+    /**
+     * Returns true if we are running against a dev mode appengine instance.
+     */
+    public static boolean isDebug(Context context)
+    {
+        // Although this is a bit roundabout, it has the nice side effect
+        // of caching the result.
+        return !Setup.PROD_URL.equals(getBaseUrl(context));
+    }
 
-	/**
-	 * Returns a debug url, or null. To set the url, create a file
-	 * {@code assets/debugging_prefs.properties} with a line of the form
-	 * 'url=http:/<ip address>:<port>'. A numeric IP address may be required in
-	 * situations where the device or emulator will not be able to resolve the
-	 * hostname for the dev mode server.
-	 */
-	private static String getDebugUrl(Context context)
-	{
-		BufferedReader reader = null;
-		String url = null;
-		try
-		{
-			AssetManager assetManager = context.getAssets();
-			InputStream is = assetManager.open("debugging_prefs.properties");
-			reader = new BufferedReader(new InputStreamReader(is));
-			while (true)
-			{
-				String s = reader.readLine();
-				if (s == null)
-				{
-					break;
-				}
-				if (s.startsWith("url="))
-				{
-					url = s.substring(4).trim();
-					break;
-				}
-			}
-		}
-		catch (FileNotFoundException e)
-		{
-			// O.K., we will use the production server
-			return null;
-		}
-		catch (Exception e)
-		{
-			Log.w(TAG, "Got exception " + e);
-			Log.w(TAG, Log.getStackTraceString(e));
-		}
-		finally
-		{
-			if (reader != null)
-			{
-				try
-				{
-					reader.close();
-				}
-				catch (IOException e)
-				{
-					Log.w(TAG, "Got exception " + e);
-					Log.w(TAG, Log.getStackTraceString(e));
-				}
-			}
-		}
-		return url;
-	}
+    /**
+     * 
+     * @param context
+     * @return the default display image options for Ultimate Image Loader
+     */
+    public static DisplayImageOptions getDefaultDisplayImageOptions(Context context)
+    {
+        Map<String, String> extra = new HashMap<String, String>();
+        String cookie = getSharedPreferences(context).getString(RequestUtils.AUTH_COOKIE, null);
+        if (null != cookie)
+        {
+            extra.put("Cookie", cookie);
+        }
 
-	/**
-	 * Returns the package name of this class.
-	 */
-	private static String getPackageName()
-	{
-		return RequestUtils.class.getPackage().getName();
-	}
+        return new DisplayImageOptions.Builder().showStubImage(R.drawable.ic_stub)
+            .showImageForEmptyUri(R.drawable.ic_empty)
+            .showImageOnFail(R.drawable.ic_error)
+            .cacheInMemory(true)
+            .cacheOnDisc(true)
+            .extraForDownloader(extra)
+            .bitmapConfig(Bitmap.Config.RGB_565)
+            .build();
+
+    }
+
+    /**
+     * Returns a debug url, or null. To set the url, create a file
+     * {@code assets/debugging_prefs.properties} with a line of the form
+     * 'url=http:/<ip address>:<port>'. A numeric IP address may be required in
+     * situations where the device or emulator will not be able to resolve the
+     * hostname for the dev mode server.
+     */
+    private static String getDebugUrl(Context context)
+    {
+        BufferedReader reader = null;
+        String url = null;
+        try
+        {
+            AssetManager assetManager = context.getAssets();
+            InputStream is = assetManager.open("debugging_prefs.properties");
+            reader = new BufferedReader(new InputStreamReader(is));
+            while (true)
+            {
+                String s = reader.readLine();
+                if (s == null)
+                {
+                    break;
+                }
+                if (s.startsWith("url="))
+                {
+                    url = s.substring(4).trim();
+                    break;
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            // O.K., we will use the production server
+            return null;
+        }
+        catch (Exception e)
+        {
+            Log.w(TAG, "Got exception " + e);
+            Log.w(TAG, Log.getStackTraceString(e));
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch (IOException e)
+                {
+                    Log.w(TAG, "Got exception " + e);
+                    Log.w(TAG, Log.getStackTraceString(e));
+                }
+            }
+        }
+        return url;
+    }
+
+    /**
+     * Returns the package name of this class.
+     */
+    private static String getPackageName()
+    {
+        return RequestUtils.class.getPackage().getName();
+    }
 }
