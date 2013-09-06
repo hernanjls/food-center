@@ -19,7 +19,7 @@ public class DbCompany extends AbstractDbObject
 	 */
     private static final long serialVersionUID = -3140453310619997005L;
 
-    public static final String DEFAULT_ICON_PATH = "images/default_company_icon.jpg";
+    public static final String DEFAULT_ICON_PATH = "/images/default_company_icon.jpg";
 
     @Persistent
     @NotNull
