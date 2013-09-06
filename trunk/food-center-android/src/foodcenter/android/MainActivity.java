@@ -1,5 +1,7 @@
 package foodcenter.android;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -14,8 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
-import foodcenter.android.service.msg.MsgAddDialog;
-import foodcenter.android.service.msg.MsgGetAsyncTask;
+import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 
 public class MainActivity extends Activity
 {
@@ -30,11 +31,19 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-		spin = new ProgressDialog(context);
+		
+        spin = new ProgressDialog(context);
 		spin.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		spin.setCancelable(false);
         
         setContentView(R.layout.activity_main);
+
+        // Make sure the device has the proper dependencies.
+        GCMRegistrar.checkDevice(context);
+
+        // Make sure the manifest was properly set - comment out this line
+        // while developing the app, then uncomment it when it's ready.
+        // TODO GCMRegistrar.checkManifest(context);
 
         // register msg reciever handler (to show on ui thread)
         registerReceiver(handlePopupReceiver, new IntentFilter(Setup.DISPLAY_POPUP_ACTION));
@@ -44,16 +53,17 @@ public class MainActivity extends Activity
     protected void onStart()
     {
         super.onStart();
-        SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
-        if (null == accountName)
+        
+        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
         {
         	startActivity(new Intent(this, LoginActivity.class));
         }
         else
         {
-        	Popup.show(MainActivity.this, "logged in as: " + accountName);
-            new MsgGetAsyncTask(this).execute();
+            SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
+            String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
+        	showSpinner("logged in as: " + accountName);
+            new RestsGetAsyncTask(this).execute();
         }
     }
 
@@ -66,7 +76,7 @@ public class MainActivity extends Activity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_main, menu);
         // Invoke the Register activity
-        menu.getItem(0).setIntent(new Intent(this, LoginActivity.class));        
+        menu.getItem(0).setIntent(new Intent(getApplicationContext(), LoginActivity.class));        
 
         return true;
     }
@@ -77,10 +87,10 @@ public class MainActivity extends Activity
         switch (item.getItemId())
         {
         case R.id.menu_add_msg:
-            new MsgAddDialog(MainActivity.this);
+//            new MsgAddDialog(MainActivity.this);
             return true;
         case R.id.menu_update_msgs:
-            new MsgGetAsyncTask(MainActivity.this).execute();
+            new RestsGetAsyncTask(MainActivity.this).execute();
             return true;
         case R.id.menu_exit:
             finish();
@@ -95,6 +105,8 @@ public class MainActivity extends Activity
     protected void onDestroy()
     {
         unregisterReceiver(handlePopupReceiver);
+        GCMRegistrar.onDestroy(getApplicationContext());
+
 //        GCMRegistrar.onDestroy(MainActivity.this);
         Log.i(TAG, "dismissing spinner");
 		spin.dismiss();

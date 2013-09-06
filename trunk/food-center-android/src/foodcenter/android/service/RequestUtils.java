@@ -54,7 +54,6 @@ public class RequestUtils
 	 */
 	public static final String ACCOUNT_NAME = "accountName";
 
-	public static final String DEBUG_URL = "DEBUGURL";
 	/**
 	 * Key for auth cookie name in shared preferences.
 	 */
