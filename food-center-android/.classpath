@@ -11,8 +11,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="libs/gcm.jar" sourcepath="libs/gcm-src.jar"/>
-	<classpathentry kind="lib" path="libs/requestfactory-client.jar"/>
-	<classpathentry kind="lib" path="libs/validation-api-1.0.0.GA.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

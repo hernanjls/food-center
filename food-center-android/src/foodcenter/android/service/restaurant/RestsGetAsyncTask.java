@@ -38,8 +38,8 @@ public class RestsGetAsyncTask extends AsyncTask<Void, RestaurantProxy, Void>
     {
         try
         {
-            FoodCenterRequestFactory factory = RequestUtils
-                .getRequestFactory(owner, FoodCenterRequestFactory.class);
+            FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(owner,
+                                                                              FoodCenterRequestFactory.class);
             factory.getClientService().getDefaultRestaurants().fire(new RestsGetReciever());
         }
         catch (Exception e)
@@ -56,16 +56,10 @@ public class RestsGetAsyncTask extends AsyncTask<Void, RestaurantProxy, Void>
         GridView gridView = (GridView) owner.findViewById(R.id.rests_gridview);
 
         // update the view for all the restaurants
-
-        RestaurantListAdapter adapter = new RestaurantListAdapter(owner, rests);
+        RestaurantListAdapter adapter = new RestaurantListAdapter(owner,
+                                                                  RequestUtils.getDefaultDisplayImageOptions(owner),
+                                                                  rests);
         gridView.setAdapter(adapter);
-
-//        ArrayAdapter<MsgTextView> adapter = new ArrayAdapter<MsgTextView>(owner, R.layout.msg, msgsArray);
-//        listView.setAdapter(adapter);
-
-        // add all the msgs to the text view
-        // t.addTouchables(views);
-        // listView.setOnItemClickListener(new MsgItemClickListener(msgsArray));
     }
 
     @Override
