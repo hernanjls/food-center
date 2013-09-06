@@ -1,4 +1,4 @@
-package foodcenter.android.service.gcm;
+package foodcenter.android.service.login;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,21 +32,20 @@ import foodcenter.android.GCMIntentService;
 import foodcenter.android.LoginActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
-import foodcenter.android.service.restaurant.ServerLoginAsyncTask;
 
-public class AuthenticateAsyncTask extends AsyncTask<String, String, Boolean>
+public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boolean>
 {
 
     /** Cookie name for authorization. */
     public static final String AUTH_COOKIE_NAME = "SACSID";
 
     /** for logs */
-    private static final String TAG = AuthenticateAsyncTask.class.getSimpleName();
+    private static final String TAG = AuthenticateAndLoginAsyncTask.class.getSimpleName();
 
     private final Context appContext;
     private final LoginActivity loginActivity;
 
-    public AuthenticateAsyncTask(final LoginActivity loginActivity)
+    public AuthenticateAndLoginAsyncTask(final LoginActivity loginActivity)
     {
         this.loginActivity = loginActivity;
         this.appContext = loginActivity.getApplicationContext();

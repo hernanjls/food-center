@@ -29,7 +29,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.service.RequestUtils;
-import foodcenter.android.service.restaurant.ServerLoginAsyncTask;
+import foodcenter.android.service.login.ServerLoginAsyncTask;
 import foodcenter.service.FoodCenterRequestFactory;
 
 /**
