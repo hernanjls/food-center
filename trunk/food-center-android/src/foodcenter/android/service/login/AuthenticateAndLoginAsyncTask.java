@@ -29,9 +29,8 @@ import android.util.Log;
 import com.google.android.gcm.GCMRegistrar;
 
 import foodcenter.android.GCMIntentService;
-import foodcenter.android.LoginActivity;
+import foodcenter.android.activities.main.LoginActivity;
 import foodcenter.android.service.RequestUtils;
-import foodcenter.android.service.Setup;
 
 public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boolean>
 {
@@ -166,8 +165,12 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
         {
             throw new AuthenticatorException("account == null");
         }
-        AccountManagerFuture<Bundle> accountManagerFuture = mgr
-            .getAuthToken(acct, AUTH_TOKEN_TYPE, null, loginActivity, null, null);
+        AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(acct,
+                                                                             AUTH_TOKEN_TYPE,
+                                                                             null,
+                                                                             loginActivity,
+                                                                             null,
+                                                                             null);
         Bundle authTokenBundle = accountManagerFuture.getResult();
         String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
         // String authToken = mgr.blockingGetAuthToken(acct, AUTH_TOKEN_TYPE, false);
@@ -215,8 +218,8 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
     {
         // Get SACSID / ACSID cookie
         DefaultHttpClient client = new DefaultHttpClient();
-        String continueURL = Setup.PROD_URL;
-        URI uri = new URI(Setup.PROD_URL + "/_ah/login?continue="
+        String continueURL = RequestUtils.getBaseUrl(appContext);
+        URI uri = new URI(continueURL + "/_ah/login?continue="
                           + URLEncoder.encode(continueURL, "UTF-8")
                           + "&auth="
                           + authToken);

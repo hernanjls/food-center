@@ -11,8 +11,8 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.CommonUtilities;
 import foodcenter.android.GCMIntentService;
-import foodcenter.android.LoginActivity;
 import foodcenter.android.R;
+import foodcenter.android.activities.main.LoginActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.UserProxy;

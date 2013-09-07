@@ -2,7 +2,6 @@ package foodcenter.android.service.restaurant;
 
 import java.util.List;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.GridView;
@@ -10,8 +9,9 @@ import android.widget.GridView;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.MainActivity;
+import foodcenter.android.CommonUtilities;
 import foodcenter.android.R;
+import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -20,11 +20,10 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 {
 
     private final MainActivity owner;
-    private final PullToRefreshAttacher pullToRefreshAttacher;
-    public RestsGetAsyncTask(MainActivity owner, PullToRefreshAttacher pullToRefreshAttacher)
+
+    public RestsGetAsyncTask(MainActivity owner)
     {
         this.owner = owner;
-        this.pullToRefreshAttacher = pullToRefreshAttacher;        
     }
 
     @Override
@@ -32,7 +31,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     {
         super.onPreExecute();
 
-        owner.showSpinner("Loading restaurants from server...");
+        owner.showSpinner();
     }
 
     @Override
@@ -74,17 +73,12 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         gridView.setAdapter(adapter);
         
         // Notify PullToRefreshAttacher that the refresh has finished
-        if (null != pullToRefreshAttacher)
-        {
-            pullToRefreshAttacher.setRefreshComplete();
-        }
-
+        owner.hideSpinner();
     }
 
     @Override
     protected void onPostExecute(Void result)
     {
-        owner.hideSpinner();
         super.onPostExecute(result);
     }
 
@@ -107,13 +101,10 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         public void onFailure(ServerFailure error)
         {
             Log.e("req context", error.getMessage());
-            owner.showSpinner(error.getMessage());
+            CommonUtilities.displayMessage(owner, error.getMessage());
             
             // Notify PullToRefreshAttacher that the refresh has finished
-            if (null != pullToRefreshAttacher)
-            {
-                pullToRefreshAttacher.setRefreshComplete();
-            }
+            owner.hideSpinner();
         }
     }
 }

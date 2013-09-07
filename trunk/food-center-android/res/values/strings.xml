@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">food-center-android</string>
+    <string name="app_name">Food Center</string>
 
     <!-- GCM -->
     <string name="gcm_registered">[GCM OK] device successfully registered!</string>
@@ -23,14 +23,17 @@
     <string name="menu_update_msgs">Update Msgs</string>
     <string name="menu_exit">Exit</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_login">LoginActivity</string>
-
+    
+	<!-- Restaurant Activity -->
+	<string name="title_activity_restaurant">Restaurant Info</string>
+	
     <!-- LoginActivity -->
+    <string name="title_activity_login">Login Options</string>
     <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="connect_text">This application requests permission to connect your mobile device to the cloud.</string>
+    <string name="connect_text">This application requests permission to connect your mobile device to the server.</string>
 
     <!-- Header text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="connect_to_the_cloud">Connect To The Cloud</string>
+    <string name="connect_to_the_cloud">Food Center</string>
 
     <!-- List view header text [CHAR LIMIT=NONE] -->
     <string name="select_account">Select the account you wish to authorize:</string>
@@ -45,7 +48,7 @@
     <string name="connect">Connect</string>
 
     <!-- Header text for "Connected" screen [CHAR LIMIT=NONE] -->
-    <string name="connected_to_the_cloud">Connected To The Cloud</string>
+    <string name="connected_to_the_cloud">Connected To Server</string>
 
     <!-- Button text [CHAR LIMIT=NONE] -->
     <string name="disconnect">Disconnect</string>
@@ -63,12 +66,12 @@
     <string name="attention">Attention</string>
 
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
-    <string name="disconnect_text">This device is currently connected to the cloud as %1$s.  To disconnect, press the button below.</string>
+    <string name="disconnect_text">This device is currently connected as %1$s.  To disconnect, press the button below.</string>
     
     <string name="menu_refresh">Refresh</string>
     <string name="menu_setting">Setting</string>
     <string name="menu_help">Help</string>
-    <string name="menu_login">Login</string>
+    <string name="menu_signout">Sign Out</string>
     
     <string name="default_desc">This is ignored desc</string>
 
@@ -78,5 +81,8 @@
     <!-- Drawer -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    
+    
+    <string name="unknown_user">Unknown User</string>
     
 </resources>

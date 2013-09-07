@@ -1,11 +1,10 @@
-package foodcenter.android;
+package foodcenter.android.activities.main;
 
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,7 +28,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration.Builder;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
 
-import foodcenter.android.actionbar.ActionBarDrawer;
+import foodcenter.android.CommonUtilities;
+import foodcenter.android.Popup;
+import foodcenter.android.R;
 import foodcenter.android.service.AuthCookieImageDownloader;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
@@ -40,8 +41,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 {
     private final static String TAG = MainActivity.class.getSimpleName();
     private final static int REQ_CODE_LOGIN = 0;
-
-    private ProgressDialog spin;
 
     public MainActivity context = this;
 
@@ -63,11 +62,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        spin = new ProgressDialog(context);
-        spin.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        spin.setCancelable(false);
-
         setContentView(R.layout.main_view);
 
         initGCMService();
@@ -143,7 +137,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
         // DefaultHeaderTransformer allows you to change the color of the progress bar. Here
         // we set it to a dark holo green, loaded from our resources
-        ht.setProgressBarColor(getResources().getColor(R.color.holo_dark_green));
+        ht.setProgressBarColor(getResources().getColor(android.R.color.holo_blue_dark));
     }
 
     private boolean gotoLoginActivity()
@@ -228,7 +222,8 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        actionBarDrawer.getItemAtPosition(position);
+        String s = (String) actionBarDrawer.getItemAtPosition(position);
+        CommonUtilities.displayMessage(this, s + "not supported yet...");
         actionBarDrawer.closeDrawer();
     }
 
@@ -252,7 +247,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
             case R.id.menu_help:
                 CommonUtilities.displayMessage(this, "Currently not supported");
                 return true;
-            case R.id.menu_login:
+            case R.id.menu_signout:
                 // Invoke the Register activity
                 startActivityForResult(new Intent(getApplicationContext(), LoginActivity.class),
                                        REQ_CODE_LOGIN);
@@ -268,28 +263,18 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         unregisterReceiver(handlePopupReceiver);
         GCMRegistrar.onDestroy(getApplicationContext());
 
-        // GCMRegistrar.onDestroy(MainActivity.this);
-        Log.i(TAG, "dismissing spinner");
-        spin.dismiss();
         Log.i(TAG, "super.onDestroy");
         super.onDestroy();
     }
 
-    public void showSpinner(String msg)
+    public void showSpinner()
     {
-        spin.setMessage(msg);
-        if (!spin.isShowing())
-        {
-            spin.show();
-        }
+        mPullToRefreshAttacher.setRefreshing(true);
     }
 
     public void hideSpinner()
     {
-        if (spin.isShowing())
-        {
-            spin.dismiss();
-        }
+        mPullToRefreshAttacher.setRefreshComplete();
     }
 
     private void handleIntent(Intent intent)
@@ -305,9 +290,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
             query = intent.getStringExtra(SearchManager.QUERY);
         }
         // use the query to search your data somehow
-        new RestsGetAsyncTask(this, mPullToRefreshAttacher).execute(query);
+        new RestsGetAsyncTask(this).execute(query);
     }
-
-
-    
 }

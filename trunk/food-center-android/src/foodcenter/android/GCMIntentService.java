@@ -28,6 +28,8 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.android.activities.main.LoginActivity;
+import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.login.ServerLoginAsyncTask;
 import foodcenter.service.FoodCenterRequestFactory;

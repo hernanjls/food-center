@@ -1,4 +1,4 @@
-package foodcenter.android.actionbar;
+package foodcenter.android.activities.main;
 
 import android.app.Activity;
 import android.content.res.Configuration;

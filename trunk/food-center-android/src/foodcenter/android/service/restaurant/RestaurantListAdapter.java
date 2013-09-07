@@ -1,7 +1,9 @@
 package foodcenter.android.service.restaurant;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -12,11 +14,11 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import foodcenter.android.R;
+import foodcenter.android.activities.rest.RestaurantActivity;
 import foodcenter.android.service.RequestUtils;
-import foodcenter.android.service.Setup;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class RestaurantListAdapter extends BaseAdapter
+public class RestaurantListAdapter extends BaseAdapter implements OnClickListener
 {
     private Activity activity;
 
@@ -55,15 +57,18 @@ public class RestaurantListAdapter extends BaseAdapter
         return rests[position];
     }
 
+    
     // Require for structure, not really used in my code. Can
     // be used to get the id of an item in the adapter for
     // manual control.
+    @Override
     public long getItemId(int position)
     {
         return position;
     }
 
     // create a new ImageView for each item referenced by the Adapter
+    @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
         final RelativeLayout layout;
@@ -84,10 +89,22 @@ public class RestaurantListAdapter extends BaseAdapter
         textView.setText(r.getName());
 
         ImageView imageView = (ImageView)layout.getChildAt(0);
-        String url = Setup.PROD_URL + r.getImageUrl();
+        String url = RequestUtils.getBaseUrl(activity) + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
-        
+
+        layout.setTag(R.id.rest_id_tag, r.getId());
+        layout.setOnClickListener(this);
         return layout;
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+        String id = (String) view.getTag(R.id.rest_id_tag);
+        Intent intent = new Intent(activity, RestaurantActivity.class);
+        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, id);
+        activity.startActivity(intent);
+        
     }
 
 }
