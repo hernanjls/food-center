@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import foodcenter.android.LoginActivity;
+import foodcenter.android.activities.main.LoginActivity;
 
 public class UnregisterAsyncTask extends AsyncTask<Void, String, Boolean>
 {

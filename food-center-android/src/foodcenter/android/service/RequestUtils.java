@@ -16,7 +16,6 @@
 package foodcenter.android.service;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -92,17 +91,21 @@ public class RequestUtils
     public static String getBaseUrl(Context context)
     {
         String url = URL_MAP.get(context);
-        if (null == url && Debug.isDebuggerConnected())
+        if (null != url)
+        {
+            return url;
+        }
+
+        if (Debug.isDebuggerConnected())
         {
             // if a debug_url raw resource exists, use its contents as the url
             url = getDebugUrl(context);
             URL_MAP.put(context, url);
+            return url;
         }
-        if (null == url)
-        {
-            url = Setup.PROD_URL;
-            URL_MAP.put(context, url);
-        }
+
+        url = Setup.PROD_URL;
+        URL_MAP.put(context, url);
         return url;
     }
 
@@ -189,7 +192,7 @@ public class RequestUtils
     private static String getDebugUrl(Context context)
     {
         BufferedReader reader = null;
-        String url = null;
+        String url = Setup.PROD_URL;
         try
         {
             AssetManager assetManager = context.getAssets();
@@ -209,15 +212,12 @@ public class RequestUtils
                 }
             }
         }
-        catch (FileNotFoundException e)
-        {
-            // O.K., we will use the production server
-            return null;
-        }
         catch (Exception e)
         {
             Log.w(TAG, "Got exception " + e);
             Log.w(TAG, Log.getStackTraceString(e));
+
+            // O.K., we will use the production server
         }
         finally
         {

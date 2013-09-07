@@ -1,4 +1,4 @@
-package foodcenter.android;
+package foodcenter.android.activities.main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,10 @@ import android.widget.TextView;
 
 import com.google.android.gcm.GCMRegistrar;
 
+import foodcenter.android.R;
+import foodcenter.android.R.id;
+import foodcenter.android.R.layout;
+import foodcenter.android.R.string;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.login.AuthenticateAndLoginAsyncTask;
 import foodcenter.android.service.login.UnregisterAsyncTask;
