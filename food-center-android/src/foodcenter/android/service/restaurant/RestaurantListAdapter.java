@@ -48,6 +48,10 @@ public class RestaurantListAdapter extends BaseAdapter
     @Override
     public RestaurantProxy getItem(int position)
     {
+        if (position >= getCount())
+        {
+            return null;
+        }
         return rests[position];
     }
 
