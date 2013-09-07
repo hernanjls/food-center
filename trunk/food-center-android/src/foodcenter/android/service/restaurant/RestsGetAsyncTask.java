@@ -1,9 +1,8 @@
 package foodcenter.android.service.restaurant;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.GridView;
@@ -15,17 +14,17 @@ import foodcenter.android.MainActivity;
 import foodcenter.android.R;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 {
 
     private final MainActivity owner;
-
-    public RestsGetAsyncTask(MainActivity owner)
+    private final PullToRefreshAttacher pullToRefreshAttacher;
+    public RestsGetAsyncTask(MainActivity owner, PullToRefreshAttacher pullToRefreshAttacher)
     {
         this.owner = owner;
+        this.pullToRefreshAttacher = pullToRefreshAttacher;        
     }
 
     @Override
@@ -65,13 +64,21 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     protected void onProgressUpdate(RestaurantProxy... rests)
     {
         // find the text view to add the text to.
-        GridView gridView = (GridView) owner.findViewById(R.id.rests_gridview);
+        GridView gridView = (GridView) owner.findViewById(R.id.rest_grid_view);
 
         // update the view for all the restaurants
         RestaurantListAdapter adapter = new RestaurantListAdapter(owner,
                                                                   RequestUtils.getDefaultDisplayImageOptions(owner),
                                                                   rests);
+
         gridView.setAdapter(adapter);
+        
+        // Notify PullToRefreshAttacher that the refresh has finished
+        if (null != pullToRefreshAttacher)
+        {
+            pullToRefreshAttacher.setRefreshComplete();
+        }
+
     }
 
     @Override
@@ -101,6 +108,12 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         {
             Log.e("req context", error.getMessage());
             owner.showSpinner(error.getMessage());
+            
+            // Notify PullToRefreshAttacher that the refresh has finished
+            if (null != pullToRefreshAttacher)
+            {
+                pullToRefreshAttacher.setRefreshComplete();
+            }
         }
     }
 }

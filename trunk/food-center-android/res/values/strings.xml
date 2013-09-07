@@ -65,13 +65,18 @@
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
     <string name="disconnect_text">This device is currently connected to the cloud as %1$s.  To disconnect, press the button below.</string>
     
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_setting">Setting</string>
+    <string name="menu_help">Help</string>
     <string name="menu_login">Login</string>
     
     <string name="default_desc">This is ignored desc</string>
 
     <string name="search_title">Search</string>
     <string name="search_hint">Search Restaurant</string>
+
+    <!-- Drawer -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
     
-    <!--  Colors  -->
-    <color name="white">#FFFFFF</color>
 </resources>
