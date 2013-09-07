@@ -88,6 +88,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />
         </activity>
+                <activity
+            android:name="foodcenter.android.activities.rest.BranchActivity"
+            android:label="@string/title_activity_branch"
+            android:theme="@style/FoodCenterTheme.Branch" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="foodcenter.android.activities.main.MainActivity" />
+        </activity>
+        
     </application>
 
 </manifest>

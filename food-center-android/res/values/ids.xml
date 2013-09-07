@@ -3,5 +3,6 @@
 
     <item type="id" name="rest_id_tag"/>
     <item type="id" name="branch_id_tag"/>
+    <item type="id" name="adapter_position_tag"/>
     
 </resources>

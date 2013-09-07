@@ -1,13 +1,15 @@
 package foodcenter.android.service.restaurant;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.activities.rest.BranchActivity;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 
 public class BranchListAdapter extends BaseAdapter implements OnClickListener
@@ -76,15 +78,16 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
     @Override
     public void onClick(View view)
     {
-
-        // RestaurantBranchProxy b = (RestaurantBranchProxy) view.getTag(R.id.rest_id_tag);
-        CommonUtilities.displayMessage(activity.getApplicationContext(),
-                                       "Branch click is not implemented yet...");
-        // Intent intent = new Intent(activity, RestaurantActivity.class);
-        // intent.putExtra(RestaurantActivity.EXTRA_REST_ID, b.getId());
-        // // TODO put branch in IntentStore :)
-        // activity.startActivity(intent);
-
+        // Get branch from tag and store it in ObjectStore
+        RestaurantBranchProxy b = (RestaurantBranchProxy) view.getTag(R.id.branch_id_tag);
+        ObjectStore.put(b.getId(), b);
+        
+        //Add branch id to the intent
+        Intent intent = new Intent(activity, BranchActivity.class);
+        intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, b.getId());
+        
+        // Activity gets the id from intent and branch from ObjectStore
+        activity.startActivity(intent);
     }
 
 }

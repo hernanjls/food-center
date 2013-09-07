@@ -1,0 +1,10 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/branch_view_list_header"
+    android:layout_width="match_parent"
+    android:layout_height="30sp"
+    android:gravity="center_vertical"
+    android:layout_margin="5sp"
+    android:text="@string/default_desc"
+    android:textSize="14sp" 
+    android:textColor="@android:color/holo_red_dark"
+    android:background="?android:attr/selectableItemBackground" />
