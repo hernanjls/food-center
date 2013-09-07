@@ -10,23 +10,24 @@
     <string name="gcm_error">[GCM ERROR] %1$s.</string>
     <string name="gcm_recoverable_error">[GCM ERROR] recoverable error (%1$s).</string>
     <string name="gcm_deleted">[GCM INFO] server deleted %1$d pending messages!</string>
-    
+
     <!-- Appspot Server -->
-    <!--  <string name="server_registering">Trying (attempt %1$d/%2$d) to register device on Appspot Server.</string> -->
+    <!-- <string name="server_registering">Trying (attempt %1$d/%2$d) to register device on Appspot Server.</string> -->
     <string name="server_registered">[APPSPOT OK] successfully login to server</string>
-    <!--  <string name="server_unregistered">From Appspot Server: successfully removed device!</string> -->
+    <!-- <string name="server_unregistered">From Appspot Server: successfully removed device!</string> -->
     <string name="server_register_error">[APPSPOT ERROR] Could not register device on Server after %1$d attempts.</string>
     <string name="server_unregister_error">[APPSPOT ERROR] Could not unregister device on Server (%1$s).</string>
-    
+
     <!-- Menu options -->
     <string name="menu_add_msg">Add Msg</string>
     <string name="menu_update_msgs">Update Msgs</string>
     <string name="menu_exit">Exit</string>
     <string name="menu_settings">Settings</string>
-    
-	<!-- Restaurant Activity -->
-	<string name="title_activity_restaurant">Restaurant Info</string>
-	
+
+    <!-- Restaurant Activity -->
+    <string name="title_activity_restaurant">Restaurant Info</string>
+    <string name="title_activity_branch">Branch Info</string>
+
     <!-- LoginActivity -->
     <string name="title_activity_login">Login Options</string>
     <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
@@ -67,29 +68,29 @@
 
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
     <string name="disconnect_text">This device is currently connected as %1$s.  To disconnect, press the button below.</string>
-    
     <string name="menu_refresh">Refresh</string>
     <string name="menu_setting">Setting</string>
     <string name="menu_help">Help</string>
     <string name="menu_signout">Sign Out</string>
-    
     <string name="default_desc">This is ignored desc</string>
-
     <string name="search_title">Search</string>
     <string name="search_hint">Search Restaurant</string>
 
     <!-- Drawer -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    
-    
     <string name="unknown_user">Unknown User</string>
-	<string name="rest_branches_header">Branches</string>
-	<string name="rest_info_header">Restaurant Info</string>
-	<string name="rest_info_txt">Restaurant Info will be shown here</string>
-	<string name="rest_info_img">Restaurant Image here</string>
-	
-	<string name="swipe_down_to_refresh">Swipe down to refresh</string>
-	<string name="load_restaurants">Loading restaurants ...</string>
-	<string name="load_restaurant">Loading restaurant info ...</string>
+    <string name="rest_branches_header">Branches</string>
+    <string name="rest_info_header">Restaurant Info</string>
+    <string name="rest_info_txt">Restaurant Info will be shown here</string>
+    <string name="rest_info_img">Restaurant Image here</string>
+    <string name="swipe_down_to_refresh">Swipe down to refresh</string>
+    <string name="load_restaurants">Loading restaurants ...</string>
+    <string name="load_restaurant">Loading restaurant info ...</string>
+    
+    
+    <string name="course_name">Course</string>
+    <string name="course_price">0</string>
+    <string name="category_name">Category</string>
+
 </resources>
