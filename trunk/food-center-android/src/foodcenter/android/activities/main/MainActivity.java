@@ -3,7 +3,6 @@ package foodcenter.android.activities.main;
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -109,7 +108,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
     private void initActionBar()
     {
-        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE, ActionBar.DISPLAY_SHOW_TITLE);
+        getActionBar().setDisplayShowTitleEnabled(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
     }
@@ -132,8 +131,8 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
         // As we're using a DefaultHeaderTransformer we can change the text which is displayed.
         // You should load these values from localised resources, but we'll just use static strings.
-        ht.setPullText("Swipe down to refresh");
-        ht.setRefreshingText("Refreshing ...");
+        ht.setPullText(getString(R.string.swipe_down_to_refresh));
+        ht.setRefreshingText(getString(R.string.load_restaurants));
 
         // DefaultHeaderTransformer allows you to change the color of the progress bar. Here
         // we set it to a dark holo green, loaded from our resources

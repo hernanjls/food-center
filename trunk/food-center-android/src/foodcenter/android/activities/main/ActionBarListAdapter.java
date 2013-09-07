@@ -73,7 +73,7 @@ public class ActionBarListAdapter extends BaseAdapter
         if (convertView == null)
         {
             layout = (LinearLayout) activity.getLayoutInflater()
-                .inflate(R.layout.drawer_list_item, parent, false);
+                .inflate(R.layout.main_view_drawer_list_item, parent, false);
         }
         else
         {

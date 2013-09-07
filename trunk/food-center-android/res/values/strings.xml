@@ -84,5 +84,12 @@
     
     
     <string name="unknown_user">Unknown User</string>
-    
+	<string name="rest_branches_header">Branches</string>
+	<string name="rest_info_header">Restaurant Info</string>
+	<string name="rest_info_txt">Restaurant Info will be shown here</string>
+	<string name="rest_info_img">Restaurant Image here</string>
+	
+	<string name="swipe_down_to_refresh">Swipe down to refresh</string>
+	<string name="load_restaurants">Loading restaurants ...</string>
+	<string name="load_restaurant">Loading restaurant info ...</string>
 </resources>

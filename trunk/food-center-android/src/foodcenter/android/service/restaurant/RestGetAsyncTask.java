@@ -1,15 +1,22 @@
 package foodcenter.android.service.restaurant;
 
+import java.util.List;
+
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import foodcenter.android.CommonUtilities;
+import foodcenter.android.R;
 import foodcenter.android.activities.rest.RestaurantActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
@@ -42,7 +49,10 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
             FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(owner,
                                                                               FoodCenterRequestFactory.class);
 
-                factory.getClientService().getRestaurantById(restId[0]).with(RestaurantProxy.REST_WITH).fire(new RestGetReciever());
+            factory.getClientService()
+                .getRestaurantById(restId[0])
+                .with(RestaurantProxy.REST_WITH)
+                .fire(new RestGetReciever());
         }
         catch (Exception e)
         {
@@ -54,25 +64,39 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     @Override
     protected void onProgressUpdate(RestaurantProxy... rest)
     {
-        //TODO onProgressUpdate
-//        // find the text view to add the text to.
-//        GridView gridView = (GridView) owner.findViewById(R.id.rest_grid_view);
-//
-//        // update the view for all the restaurants
-//        RestaurantListAdapter adapter = new RestaurantAdapter(owner,
-//                                                             RequestUtils.getDefaultDisplayImageOptions(owner),
-//                                                             rest[0]);
-//
-//        gridView.setAdapter(adapter);
-        
-        // Notify PullToRefreshAttacher that the refresh has finished
+        // // find the text view to add the text to.
         owner.hideSpinner();
-    }
+        if (null == rest || rest.length < 1)
+        {
+            return;
+        }
 
-    @Override
-    protected void onPostExecute(Void result)
-    {
-        super.onPostExecute(result);
+        ListView branchesListView = (ListView) owner.findViewById(R.id.rest_branch_list);
+
+        RestaurantProxy r = rest[0];
+        // update the view for all the restaurant branches
+        List<RestaurantBranchProxy> branches = r.getBranches();
+        if (null != branches)
+        {
+            RestaurantBranchProxy[] branchesArray = new RestaurantBranchProxy[branches.size()];
+            rest[0].getBranches().toArray(branchesArray);
+            BranchListAdapter adapter = new BranchListAdapter(owner, branchesArray);
+
+            branchesListView.setAdapter(adapter);
+        }
+
+        // Set action bar and activity title
+        owner.setTitle(r.getName());
+
+        // Load the image of this restaurant
+        ImageView imageView = (ImageView) owner.findViewById(R.id.rest_info_img);
+        String url = RequestUtils.getBaseUrl(owner) + r.getImageUrl();
+
+        ImageLoader.getInstance().displayImage(url,
+                                               imageView,
+                                               RequestUtils.getDefaultDisplayImageOptions(owner));
+        
+        // TODO Load the info of this restaurant
     }
 
     private class RestGetReciever extends Receiver<RestaurantProxy>
@@ -88,7 +112,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         {
             Log.e("req context", error.getMessage());
             CommonUtilities.displayMessage(owner, error.getMessage());
-            
+
             // Notify PullToRefreshAttacher that the refresh has finished
             owner.hideSpinner();
         }
