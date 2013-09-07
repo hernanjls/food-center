@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/restaurant_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/rest_info_img"
+            android:layout_width="120sp"
+            android:layout_height="120sp"
+            android:layout_margin="10sp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/rest_info_img"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_empty" />
+
+        <TextView
+            android:id="@+id/rest_info_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:text="@string/rest_info_txt"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/rest_branches_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5sp"
+        android:text="@string/rest_branches_header" />
+
+    <ListView
+        android:id="@+id/rest_branch_list"
+        android:layout_width="match_parent"
+        android:layout_height="320sp"
+        android:layout_margin="5sp"
+        android:background="@drawable/stroke"
+        android:orientation="vertical">
+    </ListView>
+
+</LinearLayout>

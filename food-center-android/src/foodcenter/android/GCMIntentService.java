@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -70,8 +71,8 @@ public class GCMIntentService extends GCMBaseIntentService
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
             Log.i(TAG, "unregistering device (regId = " + regId + ")");
-            FoodCenterRequestFactory factory = RequestUtils
-                .getRequestFactory(context, FoodCenterRequestFactory.class);
+            FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context,
+                                                                              FoodCenterRequestFactory.class);
             factory.getClientService().logout().fire(new GCMUnRegisterReciever(context));
         }
         else
@@ -124,20 +125,33 @@ public class GCMIntentService extends GCMBaseIntentService
      */
     private static void generateNotification(Context context, String message)
     {
-        int icon = R.drawable.ic_stat_gcm;
-        long when = System.currentTimeMillis();
-        NotificationManager notificationManager = (NotificationManager) context
-            .getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
-        String title = context.getString(R.string.app_name);
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        // set intent so it does not start a new activity
-        notificationIntent
-            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, message, intent);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(0, notification);
+
+        Notification.Builder builder = new Notification.Builder(context);
+        builder.setSmallIcon(R.drawable.ic_food_center)
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText(message);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(context, MainActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+                                                                          PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(0, builder.getNotification());
     }
 }
 
@@ -174,7 +188,7 @@ class GCMUnRegisterReciever extends Receiver<Void>
         editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
         editor.putString(RequestUtils.AUTH_COOKIE, null);
         editor.commit();
-        
+
         // At this point the device is unregistered from GCM, but still
         // registered in the server.
         // We could try to unregister again, but it is not necessary:

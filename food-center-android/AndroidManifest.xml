@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--
     Gcm premissions (This permission is not required if you are targeting 
-    your application to 4.1 or above minSdkVersion=16)
+    your application to 4.1 or above minSdkVersion=16)
     -->
     <permission
         android:name="foodcenter.android.permission.C2D_MESSAGE"
@@ -38,7 +38,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_food_center"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/FoodCenterTheme.App" >
         <activity
             android:name="foodcenter.android.activities.main.MainActivity"
             android:label="@string/app_name" >
@@ -75,14 +75,19 @@
 
         <activity
             android:name="foodcenter.android.activities.main.LoginActivity"
-            android:theme="@style/LoginTheme"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:theme="@style/FoodCenterTheme.Login" >
         </activity>
-        <activity 
+        <activity
             android:name="foodcenter.android.activities.rest.RestaurantActivity"
-            android:theme="@style/RestaurantTheme"
-            android:label="@string/title_activity_restaurant" >
-            ></activity>
+            android:label="@string/title_activity_restaurant"
+            android:theme="@style/FoodCenterTheme.Restaurant" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="foodcenter.android.activities.main.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

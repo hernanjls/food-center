@@ -74,7 +74,7 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
         final RelativeLayout layout;
         if (convertView == null)
         {
-            layout = (RelativeLayout) activity.getLayoutInflater().inflate(R.layout.rest_grid_item,
+            layout = (RelativeLayout) activity.getLayoutInflater().inflate(R.layout.main_view_rest_grid_item,
                                                                            parent,
                                                                            false);
         }
@@ -92,7 +92,7 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
         String url = RequestUtils.getBaseUrl(activity) + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
 
-        layout.setTag(R.id.rest_id_tag, r.getId());
+        layout.setTag(R.id.rest_id_tag, r);
         layout.setOnClickListener(this);
         return layout;
     }
@@ -100,9 +100,9 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
     @Override
     public void onClick(View view)
     {
-        String id = (String) view.getTag(R.id.rest_id_tag);
+        RestaurantProxy r = (RestaurantProxy) view.getTag(R.id.rest_id_tag);
         Intent intent = new Intent(activity, RestaurantActivity.class);
-        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, id);
+        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, r.getId());
         activity.startActivity(intent);
         
     }

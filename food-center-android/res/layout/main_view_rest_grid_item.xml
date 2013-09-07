@@ -2,29 +2,29 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rest_grid_item"
     android:layout_width="fill_parent"
-    android:layout_height="140dip"
+    android:layout_height="140sp"
     android:layout_gravity="center_vertical"
-    android:background="@color/white" >
+    android:background="@drawable/stroke" >
 
     <ImageView
         android:id="@+id/rest_grid_item_img"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="115sp"
+        android:layout_margin="5sp"
+        android:layout_alignParentBottom="true"
         android:adjustViewBounds="true"
         android:contentDescription="@string/default_desc"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/rest_grid_item_txt"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="23sp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/gradient"
+        android:layout_alignParentTop="true"
         android:gravity="center_vertical"
-        android:paddingLeft="10dip"
+        android:padding="2sp"
         android:text="@string/default_desc"
-        android:textColor="#ffffff"
+        android:textColor="@android:color/black"
         android:textSize="14sp" />
 
 </RelativeLayout>
