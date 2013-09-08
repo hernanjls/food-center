@@ -2,21 +2,19 @@
     android:id="@+id/branch_view_list_item"
     android:layout_width="match_parent"
     android:layout_height="40sp"
-    android:background="?android:attr/selectableItemBackground" 
-    android:layout_marginLeft="10sp"
-    android:layout_marginRight="10sp">
+    android:background="?android:attr/activatedBackgroundIndicator" >
     	
-    
-    <CheckBox
+    <TextView
         android:id="@+id/branch_view_list_item_txt"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_margin="10sp"
         android:layout_alignParentLeft="true"
-        android:text="@string/course_name"
-        android:textSize="16sp" 
+        android:layout_margin="10sp"
+        android:clickable="false"
         android:focusable="false"
-        android:clickable="false"/>
+        android:paddingLeft="5sp"
+        android:text="@string/course_name"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/branch_view_list_item_price"

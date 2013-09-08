@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+      <item
+        android:id="@+id/branch_menu_delivery"
+        android:icon="@drawable/delivery"
+        android:showAsAction="always"
+        android:title="@string/branch_menu_delivery"/>
+      <item
+        android:id="@+id/branch_menu_takeaway"
+        android:icon="@drawable/takeaway"
+        android:showAsAction="always"
+        android:title="@string/branch_menu_takeaway"/>
+      
+    
+</menu>

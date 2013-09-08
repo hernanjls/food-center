@@ -1,5 +1,9 @@
 package foodcenter.android.activities.rest;
 
+import java.util.List;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.Activity;
@@ -8,19 +12,26 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ListView;
 import foodcenter.android.CommonUtilities;
 import foodcenter.android.R;
 import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.restaurant.BranchListAdapter;
 import foodcenter.android.service.restaurant.RestGetAsyncTask;
+import foodcenter.service.proxies.RestaurantBranchProxy;
+import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestaurantActivity extends Activity
 {
-    //private final static String TAG = RestaurantActivity.class.getSimpleName();
+    // private final static String TAG = RestaurantActivity.class.getSimpleName();
 
     public final static String EXTRA_REST_ID = "Extra Restaurant ID";
 
     // this is not pullable, but help changing action bar :)
     private PullToRefreshAttacher mPullToRefreshAttacher;
+
+    private static RestaurantProxy rest = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,7 +71,7 @@ public class RestaurantActivity extends Activity
 
         // As we're using a DefaultHeaderTransformer we can change the text which is displayed.
         // You should load these values from localised resources, but we'll just use static strings.
-        
+
         ht.setPullText(getString(R.string.swipe_down_to_refresh));
         ht.setRefreshingText(getString(R.string.load_restaurant));
 
@@ -115,11 +126,48 @@ public class RestaurantActivity extends Activity
         mPullToRefreshAttacher.setRefreshComplete();
     }
 
+    public void showRestaurant(RestaurantProxy rest)
+    {
+        RestaurantActivity.rest = rest;
+        ListView branchesListView = (ListView) findViewById(R.id.rest_branch_list);
+
+        // update the view for all the restaurant branches
+        List<RestaurantBranchProxy> branches = rest.getBranches();
+        if (null != branches)
+        {
+            RestaurantBranchProxy[] branchesArray = new RestaurantBranchProxy[branches.size()];
+            rest.getBranches().toArray(branchesArray);
+            BranchListAdapter adapter = new BranchListAdapter(this, branchesArray);
+
+            branchesListView.setAdapter(adapter);
+        }
+
+        // Set action bar and activity title
+        setTitle(rest.getName());
+
+        // Load the image of this restaurant
+        ImageView imageView = (ImageView) findViewById(R.id.rest_info_img);
+        String url = RequestUtils.getBaseUrl(this) + rest.getImageUrl();
+
+        ImageLoader.getInstance().displayImage(url,
+                                               imageView,
+                                               RequestUtils.getDefaultDisplayImageOptions(this));
+
+        // TODO Load the info of this restaurant
+
+    }
+
     private void handleIntent(Intent intent)
     {
         String restId = intent.getExtras().getString(EXTRA_REST_ID);
+
         if (null != restId)
         {
+            if (null != RestaurantActivity.rest && restId.equals(RestaurantActivity.rest.getId()))
+            {
+                showRestaurant(RestaurantActivity.rest);
+                return;
+            }
             new RestGetAsyncTask(this).execute(restId);
         }
         else

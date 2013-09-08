@@ -85,10 +85,10 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
 
         RestaurantProxy r = getItem(position);
 
-        TextView textView = (TextView)layout.getChildAt(1);
+        TextView textView = (TextView)layout.findViewById(R.id.main_view_rest_grid_item_txt);
         textView.setText(r.getName());
 
-        ImageView imageView = (ImageView)layout.getChildAt(0);
+        ImageView imageView = (ImageView)layout.findViewById(R.id.main_view_rest_grid_item_img);
         String url = RequestUtils.getBaseUrl(activity) + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
 

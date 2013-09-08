@@ -6,10 +6,8 @@ import java.util.TreeMap;
 
 import android.app.Activity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import foodcenter.android.R;
@@ -17,13 +15,12 @@ import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
 
-public class MenuListAdapter extends BaseAdapter implements OnClickListener
+public class MenuListAdapter extends BaseAdapter
 {
 
     private final Activity activity;
     private CourseProxy courses[] = null;
     private TreeMap<Integer, String> categoryNames;
-
     private static final int layoutId_item = R.layout.branch_view_list_course_item;
     private static final int layoutId_header = R.layout.branch_view_list_category_item;
 
@@ -34,6 +31,7 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
         this.activity = activity;
 
         categoryNames = new TreeMap<Integer, String>();
+        
         List<CourseProxy> coursesList = new LinkedList<CourseProxy>();
         if (null == menu.getCategories())
         {
@@ -69,7 +67,7 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
     @Override
     public int getCount()
     {
-        return (null != courses) ? courses.length : 0;            
+        return (null != courses) ? courses.length : 0;
     }
 
     @Override
@@ -81,7 +79,7 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
         }
         return courses[position];
     }
-
+    
     // Require for structure, not really used in my code. Can
     // be used to get the id of an item in the adapter for
     // manual control.
@@ -96,6 +94,7 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
     {
         return null != getItem(position);
     }
+
     // create a new ImageView for each item referenced by the Adapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
@@ -119,7 +118,7 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
         res.setText(txt);
         return res;
     }
-    
+
     private View getCourseView(int position, View convertView, ViewGroup parent)
     {
         CourseProxy c = getItem(position);
@@ -127,37 +126,21 @@ public class MenuListAdapter extends BaseAdapter implements OnClickListener
         {
             return null;
         }
-        
+
         if (convertView == null)
         {
             convertView = activity.getLayoutInflater().inflate(layoutId_item, parent, false);
         }
-        
+
         RelativeLayout res = (RelativeLayout) convertView;
-        
-        CheckBox chkBoxView = (CheckBox)res.findViewById(R.id.branch_view_list_item_txt);
-        chkBoxView.setText(c.getName());
-        
-        TextView priceView = (TextView)res.findViewById(R.id.branch_view_list_item_price);
+
+        TextView txtView = (TextView) res.findViewById(R.id.branch_view_list_item_txt);
+        txtView.setText(c.getName());
+
+        TextView priceView = (TextView) res.findViewById(R.id.branch_view_list_item_price);
         priceView.setText(c.getPrice().toString());
-     
-        res.setOnClickListener(this);
+
         res.setTag(R.id.adapter_position_tag, position);
         return res;
     }
-    @Override
-    public void onClick(View view)
-    {
-        view.setSelected(!view.isSelected());
-             
-        // ObjectStore.put(b.getId(), b);
-        //
-        // //Add branch id to the intent
-        // Intent intent = new Intent(activity, BranchActivity.class);
-        // intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, b.getId());
-        //
-        // // Activity gets the id from intent and branch from ObjectStore
-        // activity.startActivity(intent);
-    }
-
 }

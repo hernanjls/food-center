@@ -66,37 +66,14 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     {
         // // find the text view to add the text to.
         owner.hideSpinner();
+        
         if (null == rest || rest.length < 1)
         {
             return;
         }
 
-        ListView branchesListView = (ListView) owner.findViewById(R.id.rest_branch_list);
+        owner.showRestaurant(rest[0]);
 
-        RestaurantProxy r = rest[0];
-        // update the view for all the restaurant branches
-        List<RestaurantBranchProxy> branches = r.getBranches();
-        if (null != branches)
-        {
-            RestaurantBranchProxy[] branchesArray = new RestaurantBranchProxy[branches.size()];
-            rest[0].getBranches().toArray(branchesArray);
-            BranchListAdapter adapter = new BranchListAdapter(owner, branchesArray);
-
-            branchesListView.setAdapter(adapter);
-        }
-
-        // Set action bar and activity title
-        owner.setTitle(r.getName());
-
-        // Load the image of this restaurant
-        ImageView imageView = (ImageView) owner.findViewById(R.id.rest_info_img);
-        String url = RequestUtils.getBaseUrl(owner) + r.getImageUrl();
-
-        ImageLoader.getInstance().displayImage(url,
-                                               imageView,
-                                               RequestUtils.getDefaultDisplayImageOptions(owner));
-        
-        // TODO Load the info of this restaurant
     }
 
     private class RestGetReciever extends Receiver<RestaurantProxy>
