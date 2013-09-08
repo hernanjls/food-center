@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="15"
-        android:targetSdkVersion="15" />
+        android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--
     Gcm premissions (This permission is not required if you are targeting 
-    your application to 4.1 or above minSdkVersion=16)
+    your application to 4.1 or above minSdkVersion=16)
     -->
     <permission
         android:name="foodcenter.android.permission.C2D_MESSAGE"
@@ -88,7 +88,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />
         </activity>
-                <activity
+        <activity
             android:name="foodcenter.android.activities.rest.BranchActivity"
             android:label="@string/title_activity_branch"
             android:theme="@style/FoodCenterTheme.Branch" >
@@ -98,7 +98,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />
         </activity>
-        
     </application>
 
 </manifest>

@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/branch_menu_table"
+        android:icon="@drawable/table"
+        android:showAsAction="always"
+        android:title="@string/branch_menu_table"/>
+
+</menu>
