@@ -1,5 +1,7 @@
 package foodcenter.android.activities.rest;
 
+import java.text.DecimalFormat;
+
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.ListActivity;
@@ -169,7 +171,7 @@ public class BranchActivity extends ListActivity
 
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {
-        private double totalCost = 0;
+        private Double totalCost = 0.0;
         
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu)
@@ -221,10 +223,21 @@ public class BranchActivity extends ListActivity
                                               boolean checked)
         {
 
-            Double price = adapter.getItem(position).getPrice();
+            final int checkedCount = getListView().getCheckedItemCount();
+            final DecimalFormat df = new DecimalFormat("#.0");
+            if (0 == checkedCount)
+            {
+                // Overriding the error in calc ...
+                totalCost = 0.0;
+            }
+            else
+            {
+                Double price = adapter.getItem(position).getPrice();
+                price = Double.parseDouble(df.format(price));
+                totalCost += (checked) ? price : (-1 * price);
+            }
             
-            totalCost += (checked) ? price : (-1 * price);
-            mode.setSubtitle("Total price: " + totalCost);
+            mode.setSubtitle("Total price: " + df.format(totalCost));
 
         }
 
