@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
@@ -20,6 +22,7 @@ public class MenuListAdapter extends BaseAdapter
 
     private final Activity activity;
     private CourseProxy courses[] = null;
+    private TreeMap<Integer, Integer> counter = null; // position -> counter
     private TreeMap<Integer, String> categoryNames;
     private static final int layoutId_item = R.layout.branch_view_list_course_item;
     private static final int layoutId_header = R.layout.branch_view_list_category_item;
@@ -31,6 +34,7 @@ public class MenuListAdapter extends BaseAdapter
         this.activity = activity;
 
         categoryNames = new TreeMap<Integer, String>();
+        counter = new TreeMap<Integer, Integer>();
         
         List<CourseProxy> coursesList = new LinkedList<CourseProxy>();
         if (null == menu.getCategories())
@@ -56,14 +60,65 @@ public class MenuListAdapter extends BaseAdapter
             for (int j = 0; j < m; ++j)
             {
                 coursesList.add(cat.getCourses().get(j));
+                counter.put(idx, 0);
                 ++idx;
             }
         }
         courses = new CourseProxy[coursesList.size()];
         coursesList.toArray(courses);
-
     }
 
+    public void increaseCounter(int position)
+    {
+        int old = counter.get(position);
+        counter.put(position, old+1);
+        notifyDataSetChanged();
+    }
+    
+    /**
+     * 
+     * @param position
+     * @return true if can still decrease
+     */
+    public boolean decreaseCounter(int position)
+    {
+        int old = counter.get(position);
+        if (old > 0)
+        {
+            int i = old-1;
+            counter.put(position, i);
+            notifyDataSetChanged();
+            return (0 != i);
+        }
+        return false;
+    }
+    
+    public void clearCounter(int pos)
+    {
+        counter.put(pos, 0);
+        notifyDataSetChanged();
+    }
+    
+    public void clearCounters()
+    {
+        for (Integer pos : counter.keySet())
+        {
+            counter.put(pos, 0);
+        }
+        notifyDataSetChanged();
+
+    }
+    
+    public Double getPrice(int pos)
+    {
+        CourseProxy b = getItem(pos);
+        if (null == b)
+        {
+            return 0.0;
+        }
+        return b.getPrice() * counter.get(pos);
+    }
+    
     @Override
     public int getCount()
     {
@@ -140,7 +195,11 @@ public class MenuListAdapter extends BaseAdapter
         TextView priceView = (TextView) res.findViewById(R.id.branch_view_list_item_price);
         priceView.setText(c.getPrice().toString());
 
-        res.setTag(R.id.adapter_position_tag, position);
+        EditText cntView = (EditText) res.findViewById(R.id.branch_view_list_item_cnt);
+        cntView.setText(counter.get(position).toString());
+        
+        ObjectCashe.put(CourseProxy.class, c.getId(), c);
+        res.setTag(R.id.adapter_id_tag, c.getId());
         return res;
     }
 }

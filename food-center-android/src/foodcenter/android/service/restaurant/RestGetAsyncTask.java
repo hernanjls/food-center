@@ -1,22 +1,16 @@
 package foodcenter.android.service.restaurant;
 
-import java.util.List;
-
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import foodcenter.android.CommonUtilities;
-import foodcenter.android.R;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.activities.rest.RestaurantActivity;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
-import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
@@ -82,6 +76,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         public void onSuccess(RestaurantProxy response)
         {
             publishProgress(response);
+            ObjectCashe.put(RestaurantProxy.class, response.getId(), response);
         }
 
         @Override

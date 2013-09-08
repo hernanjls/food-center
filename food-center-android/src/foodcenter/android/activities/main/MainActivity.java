@@ -28,6 +28,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration.Builder;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
 
 import foodcenter.android.CommonUtilities;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.Popup;
 import foodcenter.android.R;
 import foodcenter.android.service.AuthCookieImageDownloader;
@@ -177,6 +178,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     @Override
     public void onRefreshStarted(View view)
     {
+        ObjectCashe.clear();
         handleIntent(getIntent());
     }
 
@@ -238,7 +240,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         switch (item.getItemId())
         {
             case R.id.menu_refresh:
-                handleIntent(getIntent());
+                onRefreshStarted(null);
                 return true;
             case R.id.menu_setting:
                 CommonUtilities.displayMessage(this, "Currently not supported");

@@ -10,6 +10,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.CommonUtilities;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
 import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.RequestUtils;
@@ -21,6 +22,8 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 
     private final MainActivity owner;
 
+    private String query = null;
+    
     public RestsGetAsyncTask(MainActivity owner)
     {
         this.owner = owner;
@@ -44,11 +47,26 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 
             if (null == arg0 || arg0.length == 0 || null == arg0[0])
             {
+                query = "";
+                @SuppressWarnings("unchecked")
+                List<RestaurantProxy> rests =  ObjectCashe.get(List.class, query);
+                if (null != rests)
+                {
+                    publishProgress(rests.toArray(new RestaurantProxy[0]));
+                    return null;
+                }
                 factory.getClientService().getDefaultRestaurants().fire(new RestsGetReciever());
             }
             else
             {
-                String query = arg0[0];
+                query = arg0[0];
+                @SuppressWarnings("unchecked")
+                List<RestaurantProxy> rests =  ObjectCashe.get(List.class, query);
+                if (null != rests)
+                {
+                    publishProgress(rests.toArray(new RestaurantProxy[0]));
+                    return null;
+                }
                 factory.getClientService().findRestaurant(query, null).fire(new RestsGetReciever());
             }
         }
@@ -89,6 +107,8 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         {
             if (null != response)
             {
+                // Save the response in cache!
+                ObjectCashe.put(List.class, query, response);
                 publishProgress(response.toArray(new RestaurantProxy[0]));
             }
             else

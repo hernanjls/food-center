@@ -89,8 +89,9 @@
     <string name="load_restaurant">Loading restaurant info ...</string>
     <string name="course_name">Course</string>
     <string name="course_price">0</string>
+    <string name="course_cnt">0</string>
     <string name="category_name">Category</string>
-    <string name="press_to_select">Long press to start selecting</string>
+    <string name="press_to_select">To select - swipe items to the right</string>
     <string name="branch_menu_table">Table</string>
     <string name="branch_menu_takeaway">Take-Away</string>
     <string name="branch_menu_delivery">Delivery</string>

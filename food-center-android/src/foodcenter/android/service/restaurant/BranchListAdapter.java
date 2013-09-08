@@ -7,9 +7,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import foodcenter.android.ObjectStore;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
 import foodcenter.android.activities.rest.BranchActivity;
+import foodcenter.android.activities.rest.RestaurantActivity;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 
 public class BranchListAdapter extends BaseAdapter implements OnClickListener
@@ -17,14 +18,16 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
 
     private final Activity activity;
     private final RestaurantBranchProxy[] branches;
+    private final String restId;
     private static final int layoutId = R.layout.rest_view_branch_list_item;
 
-    public BranchListAdapter(Activity activity, RestaurantBranchProxy[] branches)
+    public BranchListAdapter(Activity activity, RestaurantBranchProxy[] branches, String restId)
     {
         super();
 
         this.activity = activity;
         this.branches = branches;
+        this.restId = restId;
     }
 
     @Override
@@ -67,10 +70,11 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
         }
 
         RestaurantBranchProxy b = getItem(position);
-
+        ObjectCashe.put(RestaurantBranchProxy.class, b.getId(), b);
+        
         layout.setText(b.getAddress());
 
-        layout.setTag(R.id.branch_id_tag, b);
+        layout.setTag(R.id.adapter_id_tag, b.getId());
         layout.setOnClickListener(this);
         return layout;
     }
@@ -78,13 +82,13 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
     @Override
     public void onClick(View view)
     {
-        // Get branch from tag and store it in ObjectStore
-        RestaurantBranchProxy b = (RestaurantBranchProxy) view.getTag(R.id.branch_id_tag);
-        ObjectStore.put(b.getId(), b);
+        // Get branch from tag and store it in ObjectCashe
+        String branchId = (String) view.getTag(R.id.adapter_id_tag);
         
         //Add branch id to the intent
         Intent intent = new Intent(activity, BranchActivity.class);
-        intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, b.getId());
+        intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, branchId);
+        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, restId);
         
         // Activity gets the id from intent and branch from ObjectStore
         activity.startActivity(intent);

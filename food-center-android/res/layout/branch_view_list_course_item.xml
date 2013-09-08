@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="40sp"
     android:background="?android:attr/activatedBackgroundIndicator" >
-    	
+
     <TextView
         android:id="@+id/branch_view_list_item_txt"
         android:layout_width="wrap_content"
@@ -20,10 +20,21 @@
         android:id="@+id/branch_view_list_item_price"
         android:layout_width="40sp"
         android:layout_height="match_parent"
-        android:layout_margin="10sp"
         android:layout_alignParentRight="true"
+        android:layout_margin="10sp"
         android:text="@string/course_price"
         android:textSize="16sp" />
 
+    <EditText
+        android:id="@+id/branch_view_list_item_cnt"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@id/branch_view_list_item_price"
+        android:clickable="false"
+        android:focusable="false"
+        android:inputType="text"
+        android:text="@string/course_cnt" >
+    </EditText>
 
 </RelativeLayout>
