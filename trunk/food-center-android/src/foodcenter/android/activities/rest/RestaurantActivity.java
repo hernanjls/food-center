@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
 import foodcenter.android.CommonUtilities;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.restaurant.BranchListAdapter;
@@ -31,7 +32,7 @@ public class RestaurantActivity extends Activity
     // this is not pullable, but help changing action bar :)
     private PullToRefreshAttacher mPullToRefreshAttacher;
 
-    private static RestaurantProxy rest = null;
+    private RestaurantProxy rest = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -128,7 +129,7 @@ public class RestaurantActivity extends Activity
 
     public void showRestaurant(RestaurantProxy rest)
     {
-        RestaurantActivity.rest = rest;
+        this.rest = rest;
         ListView branchesListView = (ListView) findViewById(R.id.rest_branch_list);
 
         // update the view for all the restaurant branches
@@ -137,7 +138,7 @@ public class RestaurantActivity extends Activity
         {
             RestaurantBranchProxy[] branchesArray = new RestaurantBranchProxy[branches.size()];
             rest.getBranches().toArray(branchesArray);
-            BranchListAdapter adapter = new BranchListAdapter(this, branchesArray);
+            BranchListAdapter adapter = new BranchListAdapter(this, branchesArray, rest.getId());
 
             branchesListView.setAdapter(adapter);
         }
@@ -161,18 +162,19 @@ public class RestaurantActivity extends Activity
     {
         String restId = intent.getExtras().getString(EXTRA_REST_ID);
 
-        if (null != restId)
-        {
-            if (null != RestaurantActivity.rest && restId.equals(RestaurantActivity.rest.getId()))
-            {
-                showRestaurant(RestaurantActivity.rest);
-                return;
-            }
-            new RestGetAsyncTask(this).execute(restId);
-        }
-        else
+        if (null == restId)
         {
             setTitle("Can't find restaurant id");
+            return;
         }
+        
+        rest = ObjectCashe.get(RestaurantProxy.class, restId);
+        if (null == rest)
+        {
+            new RestGetAsyncTask(this).execute(restId);
+            return;            
+        }
+        
+        showRestaurant(rest);
     }
 }

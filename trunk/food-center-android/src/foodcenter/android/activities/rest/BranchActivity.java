@@ -1,39 +1,45 @@
 package foodcenter.android.activities.rest;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.ListActivity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ListView;
-import foodcenter.android.ObjectStore;
+import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
-import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.restaurant.MenuListAdapter;
+import foodcenter.android.service.restaurant.SwipeListViewTouchListener;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
+import foodcenter.service.proxies.RestaurantProxy;
 
-public class BranchActivity extends ListActivity
+public class BranchActivity extends ListActivity implements
+                                                SwipeListViewTouchListener.OnSwipeCallback
 {
 
     public static final String EXTRA_BRANCH_ID = "Extra Branch ID";
 
     private final static String TAG = BranchActivity.class.getSimpleName();
 
+
     // this is not pull-able, but helps animating action bar :)
     private PullToRefreshAttacher mPullToRefreshAttacher;
 
-    private static RestaurantBranchProxy branch = null;
+    private RestaurantBranchProxy branch = null;
+    private List<ServiceType> services = null; // TODO resolve branch service workaround :)
 
     private MenuListAdapter adapter;
 
@@ -45,6 +51,12 @@ public class BranchActivity extends ListActivity
         ListView lv = getListView();
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
+
+        SwipeListViewTouchListener touchListener = new SwipeListViewTouchListener(lv,
+                                                                                  this,
+                                                                                  false,
+                                                                                  false);
+        lv.setOnTouchListener(touchListener);
 
         initActionBar();
         initPullToRefresh();
@@ -83,15 +95,41 @@ public class BranchActivity extends ListActivity
     }
 
     @Override
+    public void onSwipeLeft(ListView lv, int[] reverseSortedPositions)
+    {
+        int pos = reverseSortedPositions[0];
+        
+        if (null != adapter.getItem(pos) && !adapter.decreaseCounter(pos))
+        {
+            lv.setItemChecked(pos, false);
+        }
+    }
+
+    @Override
+    public void onSwipeRight(ListView lv, int[] reverseSortedPositions)
+    {
+        int pos = reverseSortedPositions[0];
+        if (null != adapter.getItem(pos))
+        {
+            adapter.increaseCounter(pos);
+            lv.setItemChecked(pos, true);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        if (null == branch)
+        {
+            return true;
+        }
 
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.branch_menu, menu);
 
-        boolean isTable = branch.getServices().contains(ServiceType.TABLE);
-        // TODO menu.findItem(R.id.branch_menu_table).setVisible(isTable);
+        boolean isTable = services.contains(ServiceType.TABLE);
+        menu.findItem(R.id.branch_menu_table).setVisible(isTable);
 
         return true;
     }
@@ -101,13 +139,6 @@ public class BranchActivity extends ListActivity
     {
         super.setTitle(title);
         getActionBar().setTitle(title);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        branch = null;
-        super.onBackPressed();
     }
 
     @Override
@@ -125,6 +156,12 @@ public class BranchActivity extends ListActivity
 
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id)
+    {
+        onSwipeRight(l, new int[] {position});
+    }
+
     public void showSpinner()
     {
         mPullToRefreshAttacher.setRefreshing(true);
@@ -137,53 +174,49 @@ public class BranchActivity extends ListActivity
 
     private void handleIntent(Intent intent)
     {
-        String branchId = intent.getExtras().getString(EXTRA_BRANCH_ID);;
-
-        if (null == branchId)
+        // Get the id from the intent
+        String branchId = intent.getExtras().getString(EXTRA_BRANCH_ID);
+        ;
+        String restId = intent.getExtras().getString(RestaurantActivity.EXTRA_REST_ID);
+        if (null == branchId || null == restId)
         {
             setTitle("Can't find branch id");
             Log.e(TAG, "Can't find branch id - null");
             return;
         }
 
-        if (null != branch && branch.getId().equals(branchId))
+        // Get
+        branch = ObjectCashe.get(RestaurantBranchProxy.class, branchId);
+        if (null == branch)
         {
-            ObjectStore.getOnce(branchId);
+            setTitle("Can't find branch");
+            Log.e(TAG, "Can't find branch id in ObjectStore: " + branchId);
+            return;
         }
-        else
-        {
-            branch = (RestaurantBranchProxy) ObjectStore.getOnce(branchId);
-            if (null == branch)
-            {
-                setTitle("Can't find branch");
-                Log.e(TAG, "Can't find branch id in ObjectStore: " + branchId);
-                return;
-            }
-        }
-        
+
+        RestaurantProxy rest = ObjectCashe.get(RestaurantProxy.class, restId);
+        services = (null != rest) ? rest.getServices() : new ArrayList<ServiceType>();
+
         ListView branchView = getListView();
-
         adapter = new MenuListAdapter(this, branch.getMenu());
-
         branchView.setAdapter(adapter);
-
     }
 
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {
-        private Double totalCost = 0.0;
-        
+        private final DecimalFormat df = new DecimalFormat("#.0");
+                
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu)
         {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.branch_course_list_select_menu, menu);
 
-            boolean isTakeAway = branch.getServices().contains(ServiceType.TAKE_AWAY);
-            // TODO menu.findItem(R.id.branch_menu_takeaway).setVisible(isTakeAway);
+            boolean isTakeAway = services.contains(ServiceType.TAKE_AWAY);
+            menu.findItem(R.id.branch_menu_takeaway).setVisible(isTakeAway);
 
-            boolean isDelivery = branch.getServices().contains(ServiceType.DELIVERY);
-            // TODO menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
+            boolean isDelivery = services.contains(ServiceType.DELIVERY);
+            menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
 
             mode.setTitle("Select Items");
             return true;
@@ -214,6 +247,7 @@ public class BranchActivity extends ListActivity
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
+            adapter.clearCounters();
         }
 
         @Override
@@ -224,22 +258,29 @@ public class BranchActivity extends ListActivity
         {
 
             final int checkedCount = getListView().getCheckedItemCount();
-            final DecimalFormat df = new DecimalFormat("#.0");
-            if (0 == checkedCount)
-            {
-                // Overriding the error in calc ...
-                totalCost = 0.0;
-            }
-            else
-            {
-                Double price = adapter.getItem(position).getPrice();
-                price = Double.parseDouble(df.format(price));
-                totalCost += (checked) ? price : (-1 * price);
-            }
+            Double totalCost = 0.0;
             
+            if (0 != checkedCount)
+            {
+                SparseBooleanArray arr = getListView().getCheckedItemPositions();
+                int n = adapter.getCount();
+                for (int i=0; i<n; ++i)
+                {
+                    if (arr.get(i))
+                    {
+                        totalCost += adapter.getPrice(i);
+                    }
+                }
+            }
+
             mode.setSubtitle("Total price: " + df.format(totalCost));
+            if (!checked)
+            {
+                adapter.clearCounter(position);
+            }
 
         }
 
     }
+
 }

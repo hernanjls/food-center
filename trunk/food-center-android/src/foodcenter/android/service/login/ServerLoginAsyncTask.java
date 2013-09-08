@@ -31,7 +31,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
 
-    private final String regId;
+    private final String regId;     // GCM reg id
     private int attempt;
     private long backoff;
 
@@ -55,7 +55,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
     }
 
     @Override
-    public void onSuccess(UserProxy arg0)
+    public void onSuccess(UserProxy user)
     {
         GCMRegistrar.setRegisteredOnServer(context, true);
         String message = context.getString(R.string.server_registered);

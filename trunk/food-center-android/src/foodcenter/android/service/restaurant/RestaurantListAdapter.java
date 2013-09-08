@@ -57,7 +57,6 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
         return rests[position];
     }
 
-    
     // Require for structure, not really used in my code. Can
     // be used to get the id of an item in the adapter for
     // manual control.
@@ -71,40 +70,36 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        final RelativeLayout layout;
-        if (convertView == null)
+        if (null == convertView)
         {
-            layout = (RelativeLayout) activity.getLayoutInflater().inflate(R.layout.main_view_rest_grid_item,
-                                                                           parent,
-                                                                           false);
-        }
-        else
-        {
-            layout = (RelativeLayout) convertView;
+            convertView = activity.getLayoutInflater().inflate(R.layout.main_view_rest_grid_item,
+                                                                 parent,
+                                                                 false);
         }
 
         RestaurantProxy r = getItem(position);
 
-        TextView textView = (TextView)layout.findViewById(R.id.main_view_rest_grid_item_txt);
+        TextView textView = (TextView) convertView.findViewById(R.id.main_view_rest_grid_item_txt);
         textView.setText(r.getName());
 
-        ImageView imageView = (ImageView)layout.findViewById(R.id.main_view_rest_grid_item_img);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.main_view_rest_grid_item_img);
         String url = RequestUtils.getBaseUrl(activity) + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
 
-        layout.setTag(R.id.rest_id_tag, r);
-        layout.setOnClickListener(this);
-        return layout;
+        // Restaurant is not fully loaded => don't add it to obj cache
+        convertView.setTag(R.id.adapter_id_tag, r.getId());
+        convertView.setOnClickListener(this);
+        return convertView;
     }
 
     @Override
     public void onClick(View view)
     {
-        RestaurantProxy r = (RestaurantProxy) view.getTag(R.id.rest_id_tag);
+        String restId = (String) view.getTag(R.id.adapter_id_tag);
         Intent intent = new Intent(activity, RestaurantActivity.class);
-        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, r.getId());
+        intent.putExtra(RestaurantActivity.EXTRA_REST_ID, restId);
         activity.startActivity(intent);
-        
+
     }
 
 }
