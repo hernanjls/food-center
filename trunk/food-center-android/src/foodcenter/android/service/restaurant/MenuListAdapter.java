@@ -21,7 +21,7 @@ public class MenuListAdapter extends BaseAdapter
 {
 
     private final Activity activity;
-    private CourseProxy courses[] = null;
+    private List<CourseProxy> courses = null;
     private TreeMap<Integer, Integer> counter = null; // position -> counter
     private TreeMap<Integer, String> categoryNames;
     private static final int layoutId_item = R.layout.branch_view_list_course_item;
@@ -33,10 +33,10 @@ public class MenuListAdapter extends BaseAdapter
 
         this.activity = activity;
 
+        courses = new LinkedList<CourseProxy>();
         categoryNames = new TreeMap<Integer, String>();
         counter = new TreeMap<Integer, Integer>();
         
-        List<CourseProxy> coursesList = new LinkedList<CourseProxy>();
         if (null == menu.getCategories())
         {
             return;
@@ -44,13 +44,13 @@ public class MenuListAdapter extends BaseAdapter
 
         // For each idx if courses is null than there is a category (or end of items)
         int n = menu.getCategories().size();
-        int idx = 0;
         for (int i = 0; i < n; ++i)
         {
             MenuCategoryProxy cat = menu.getCategories().get(i);
-            categoryNames.put(idx, cat.getCategoryTitle());
-            coursesList.add(null);
-            ++idx;
+            int k = courses.size();
+            categoryNames.put(k, cat.getCategoryTitle());
+            courses.add(null);
+
             if (null == cat.getCourses() || 0 == cat.getCourses().size())
             {
                 continue;
@@ -59,13 +59,11 @@ public class MenuListAdapter extends BaseAdapter
             int m = cat.getCourses().size();
             for (int j = 0; j < m; ++j)
             {
-                coursesList.add(cat.getCourses().get(j));
-                counter.put(idx, 0);
-                ++idx;
+                k = courses.size();
+                counter.put(k, 0);
+                courses.add(cat.getCourses().get(j));
             }
         }
-        courses = new CourseProxy[coursesList.size()];
-        coursesList.toArray(courses);
     }
 
     public void increaseCounter(int position)
@@ -118,21 +116,22 @@ public class MenuListAdapter extends BaseAdapter
         }
         return b.getPrice() * counter.get(pos);
     }
-    
+
+    public Integer getCounter(int pos)
+    {
+        return counter.get(pos);
+    }
+
     @Override
     public int getCount()
     {
-        return (null != courses) ? courses.length : 0;
+        return (null != courses) ? courses.size() : 0;
     }
 
     @Override
     public CourseProxy getItem(int position)
     {
-        if (position >= getCount())
-        {
-            return null;
-        }
-        return courses[position];
+        return courses.get(position);
     }
     
     // Require for structure, not really used in my code. Can
@@ -162,19 +161,21 @@ public class MenuListAdapter extends BaseAdapter
         return getHeaderView(position, convertView, parent);
     }
 
-    private View getHeaderView(int position, View convertView, ViewGroup parent)
+    private View getHeaderView(int position, View view, ViewGroup parent)
     {
         String txt = categoryNames.get(position);
-        if (convertView == null)
+        if (view == null || !(view instanceof TextView))
         {
-            convertView = activity.getLayoutInflater().inflate(layoutId_header, parent, false);
+        	// on scrolling view can be course view
+            view = activity.getLayoutInflater().inflate(layoutId_header, parent, false);
         }
-        TextView res = (TextView) convertView;
+        TextView res = (TextView) view;
         res.setText(txt);
+        view.setTag(R.id.swipable, false);
         return res;
     }
 
-    private View getCourseView(int position, View convertView, ViewGroup parent)
+    private View getCourseView(int position, View view, ViewGroup parent)
     {
         CourseProxy c = getItem(position);
         if (null == c)
@@ -182,24 +183,24 @@ public class MenuListAdapter extends BaseAdapter
             return null;
         }
 
-        if (convertView == null)
+        if (view == null || !(view instanceof RelativeLayout))
         {
-            convertView = activity.getLayoutInflater().inflate(layoutId_item, parent, false);
+        	// on scrolling view can be category view
+            view = activity.getLayoutInflater().inflate(layoutId_item, parent, false);
         }
 
-        RelativeLayout res = (RelativeLayout) convertView;
-
-        TextView txtView = (TextView) res.findViewById(R.id.branch_view_list_item_txt);
+        TextView txtView = (TextView) view.findViewById(R.id.branch_view_list_item_txt);
         txtView.setText(c.getName());
 
-        TextView priceView = (TextView) res.findViewById(R.id.branch_view_list_item_price);
+        TextView priceView = (TextView) view.findViewById(R.id.branch_view_list_item_price);
         priceView.setText(c.getPrice().toString());
 
-        EditText cntView = (EditText) res.findViewById(R.id.branch_view_list_item_cnt);
+        EditText cntView = (EditText) view.findViewById(R.id.branch_view_list_item_cnt);
         cntView.setText(counter.get(position).toString());
         
         ObjectCashe.put(CourseProxy.class, c.getId(), c);
-        res.setTag(R.id.adapter_id_tag, c.getId());
-        return res;
+        view.setTag(R.id.adapter_id_tag, c.getId());
+        view.setTag(R.id.swipable, true);
+        return view;
     }
 }

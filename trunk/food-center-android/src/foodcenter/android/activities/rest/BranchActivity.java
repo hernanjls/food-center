@@ -198,7 +198,12 @@ public class BranchActivity extends ListActivity implements
         services = (null != rest) ? rest.getServices() : new ArrayList<ServiceType>();
 
         ListView branchView = getListView();
-        adapter = new MenuListAdapter(this, branch.getMenu());
+        adapter = ObjectCashe.get(MenuListAdapter.class, branch.getId());
+        if (null == adapter)
+        {
+            adapter = new MenuListAdapter(this, branch.getMenu());
+            ObjectCashe.put(MenuListAdapter.class, branch.getId(), adapter);
+        }
         branchView.setAdapter(adapter);
     }
 
@@ -257,9 +262,19 @@ public class BranchActivity extends ListActivity implements
                                               boolean checked)
         {
 
-            final int checkedCount = getListView().getCheckedItemCount();
-            Double totalCost = 0.0;
+            // Select & add 1 to counter
+            if (checked && 0 == adapter.getCounter(position))
+            {
+                onSwipeRight(getListView(), new int[]{position});
+            }
+            else if (!checked)
+            {
+                adapter.clearCounter(position);
+            }
             
+            // Calculate the total cost to show on action bar
+            Double totalCost = 0.0;
+            final int checkedCount = getListView().getCheckedItemCount();
             if (0 != checkedCount)
             {
                 SparseBooleanArray arr = getListView().getCheckedItemPositions();
@@ -273,12 +288,8 @@ public class BranchActivity extends ListActivity implements
                 }
             }
 
+            // Show total cost on action bar
             mode.setSubtitle("Total price: " + df.format(totalCost));
-            if (!checked)
-            {
-                adapter.clearCounter(position);
-            }
-
         }
 
     }

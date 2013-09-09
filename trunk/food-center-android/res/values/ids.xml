@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item type="id" name="adapter_id_tag"/>
-    
+    <item name="adapter_id_tag" type="id"/>
+    <item name="swipable" type="id"/>
+
 </resources>
