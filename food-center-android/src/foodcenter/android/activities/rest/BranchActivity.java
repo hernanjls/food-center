@@ -15,7 +15,6 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 import foodcenter.android.ObjectCashe;
@@ -33,7 +32,6 @@ public class BranchActivity extends ListActivity implements
     public static final String EXTRA_BRANCH_ID = "Extra Branch ID";
 
     private final static String TAG = BranchActivity.class.getSimpleName();
-
 
     // this is not pull-able, but helps animating action bar :)
     private PullToRefreshAttacher mPullToRefreshAttacher;
@@ -98,7 +96,7 @@ public class BranchActivity extends ListActivity implements
     public void onSwipeLeft(ListView lv, int[] reverseSortedPositions)
     {
         int pos = reverseSortedPositions[0];
-        
+
         if (null != adapter.getItem(pos) && !adapter.decreaseCounter(pos))
         {
             lv.setItemChecked(pos, false);
@@ -159,7 +157,7 @@ public class BranchActivity extends ListActivity implements
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
-        onSwipeRight(l, new int[] {position});
+        onSwipeRight(l, new int[] { position });
     }
 
     public void showSpinner()
@@ -210,7 +208,7 @@ public class BranchActivity extends ListActivity implements
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {
         private final DecimalFormat df = new DecimalFormat("#.0");
-                
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu)
         {
@@ -224,6 +222,7 @@ public class BranchActivity extends ListActivity implements
             menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
 
             mode.setTitle("Select Items");
+            showTotalCost(mode);
             return true;
         }
 
@@ -265,13 +264,18 @@ public class BranchActivity extends ListActivity implements
             // Select & add 1 to counter
             if (checked && 0 == adapter.getCounter(position))
             {
-                onSwipeRight(getListView(), new int[]{position});
+                onSwipeRight(getListView(), new int[] { position });
             }
             else if (!checked)
             {
                 adapter.clearCounter(position);
             }
             
+            showTotalCost(mode);
+        }
+
+        public void showTotalCost(ActionMode mode)
+        {
             // Calculate the total cost to show on action bar
             Double totalCost = 0.0;
             final int checkedCount = getListView().getCheckedItemCount();
@@ -279,7 +283,7 @@ public class BranchActivity extends ListActivity implements
             {
                 SparseBooleanArray arr = getListView().getCheckedItemPositions();
                 int n = adapter.getCount();
-                for (int i=0; i<n; ++i)
+                for (int i = 0; i < n; ++i)
                 {
                     if (arr.get(i))
                     {
@@ -290,8 +294,8 @@ public class BranchActivity extends ListActivity implements
 
             // Show total cost on action bar
             mode.setSubtitle("Total price: " + df.format(totalCost));
-        }
 
+        }
     }
 
 }
