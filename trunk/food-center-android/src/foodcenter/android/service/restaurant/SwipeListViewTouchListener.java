@@ -21,6 +21,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
 {
     private final static int MAX_X_THRESHOLD = 100;
     private final static int MIN_Y_THRESHOLD = 150;
+    
     // Cached ViewConfiguration and system-wide constant values
     private int mSlop;
     private int mMinFlingVelocity;
@@ -39,7 +40,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
     private int mDismissAnimationRefCount = 0;
     private float xPosOnDown;
     private float yPosOnDown;
-    private boolean mSwiping;
     private VelocityTracker mVelocityTracker;
     private int mViewItemPosition;
     private View mViewItem;
@@ -140,6 +140,13 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
         };
     }
 
+    /**
+     * A pressed gesture has started, the motion contains the initial starting location.
+     * 
+     * @param view
+     * @param motionEvent
+     * @return
+     */
     private boolean onTouchDown(View view, MotionEvent motionEvent)
     {
         if (mPaused)
@@ -182,6 +189,15 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
 
     }
 
+    /**
+     * A change has happened during a press gesture (between ACTION_DOWN <br>
+     * and ACTION_UP). The motion contains the most recent point, as well as <br>
+     * any intermediate points since the last down or move event.
+     * 
+     * @param view
+     * @param motionEvent
+     * @return
+     */
     private boolean onTouchMove(View view, MotionEvent motionEvent)
     {
         if (mVelocityTracker == null || mPaused)
@@ -206,25 +222,30 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
 
         if (deltaXAbs > mSlop)
         {
-            mSwiping = true;
             mListView.requestDisallowInterceptTouchEvent(true);
 
             // Cancel ListView's touch (un-highlighting the item)
             MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
-            cancelEvent.setAction(MotionEvent.ACTION_CANCEL | (motionEvent.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+            cancelEvent.setAction(MotionEvent.ACTION_CANCEL //
+                                  | (motionEvent.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
             mListView.onTouchEvent(cancelEvent);
-        }
 
-        if (mSwiping)
-        {
             mViewItem.setTranslationX(deltaX);
             mViewItem.setAlpha(Math.max(0f, Math.min(1f, 1f - 2f * deltaXAbs / mViewWidth)));
             return true;
         }
-        return false;
 
+        return false;
     }
 
+    /**
+     * A pressed gesture has finished, the motion contains the final release <br>
+     * location as well as any intermediate points since the last down or move event.
+     * 
+     * @param view
+     * @param motionEvent
+     * @return
+     */
     private boolean onTouchUp(View view, MotionEvent motionEvent)
     {
         if (mVelocityTracker == null)
@@ -251,7 +272,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
             swipe = true;
             swipeRight = deltaX > 0;
         }
-        else if (mMinFlingVelocity <= velocityX && velocityX <= mMaxFlingVelocity
+        else if (mMinFlingVelocity <= velocityX //
+                 && velocityX <= mMaxFlingVelocity
                  && velocityY < velocityX)
         {
             swipe = true;
@@ -263,6 +285,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
             final View downView = mViewItem; // mDownView gets null'd before animation ends
             final int downPosition = mViewItemPosition;
             final boolean toTheRight = swipeRight;
+
             ++mDismissAnimationRefCount;
             mViewItem.animate()
                 .translationX(swipeRight ? mViewWidth : -mViewWidth)
@@ -293,7 +316,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
         xPosOnDown = 0;
         mViewItem = null;
         mViewItemPosition = ListView.INVALID_POSITION;
-        mSwiping = false;
         return false;
     }
 
@@ -359,10 +381,14 @@ public class SwipeListViewTouchListener implements View.OnTouchListener
 
         ValueAnimator animator;
         if (dismiss)
+        {
             animator = ValueAnimator.ofInt(originalHeight, 1).setDuration(mAnimationTime);
+        }
         else
+        {
             animator = ValueAnimator.ofInt(originalHeight, originalHeight - 1)
                 .setDuration(mAnimationTime);
+        }
 
         animator.addListener(new AnimatorListenerAdapter()
         {
