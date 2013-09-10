@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import foodcenter.android.CommonUtilities;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
@@ -130,6 +131,14 @@ public class RestaurantActivity extends Activity
     public void showRestaurant(RestaurantProxy rest)
     {
         this.rest = rest;
+        
+        TextView info = (TextView) findViewById(R.id.rest_info_txt);
+        if (null != rest.getInfo())
+        {
+            String i = rest.getInfo().replace("<br>", "\n");
+            info.setText(i);
+        }
+        
         ListView branchesListView = (ListView) findViewById(R.id.rest_branch_list);
 
         // update the view for all the restaurant branches
