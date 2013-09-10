@@ -44,4 +44,8 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
     public List<String> getAdmins();
 
     public void setAdmins(List<String> admins);
+    
+    public String getInfo();
+    
+    public void setInfo(String info);
 }

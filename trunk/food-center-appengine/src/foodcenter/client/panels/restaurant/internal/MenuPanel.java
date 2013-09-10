@@ -120,7 +120,7 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
 
         if (isEditMode)
         {
-            Button addButton = new Button("Add Category", new OnClickAddCategory());
+            Button addButton = new Button("+Cat", new OnClickAddCategory());
             setWidget(0, COLUMN_CATEGORIES_ADD_BUTTON, addButton);
         }
     }
@@ -142,7 +142,7 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         {
             catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(cat));
 
-            Button delButton = new Button("Delete", new OnClickDeleteCategory(cat));
+            Button delButton = new Button("-", new OnClickDeleteCategory(cat));
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, delButton);
         }
 

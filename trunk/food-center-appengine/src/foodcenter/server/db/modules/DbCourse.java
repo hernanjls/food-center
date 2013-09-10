@@ -22,7 +22,11 @@ public class DbCourse extends AbstractDbObject
 	private String name;
 
 	@Persistent
+    private String info;
+
+	@Persistent
 	private Double price;
+
 
 //	@Persistent
 //	DbMenuCategory category;
@@ -49,6 +53,16 @@ public class DbCourse extends AbstractDbObject
 	{
 		this.name = name;
 	}
+
+	public String getInfo()
+    {
+        return info;
+    }
+
+    public void setInfo(String info)
+    {
+        this.info = info;
+    }
 
 	public Double getPrice()
 	{

@@ -2,17 +2,24 @@ package foodcenter.client.panels.restaurant;
 
 import java.util.List;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import foodcenter.client.ClientUtils;
 import foodcenter.client.callbacks.ImageUploadedCallback;
@@ -25,6 +32,8 @@ import foodcenter.service.proxies.RestaurantProxy;
 public class RestaurantProfilePannel extends HorizontalPanel
 {
 
+    private static final Integer MAX_PROFILE_LEN = 150;
+    
     private final RestaurantProxy rest;
     private EditableImage img;
     private final boolean isEditMode;
@@ -57,6 +66,8 @@ public class RestaurantProfilePannel extends HorizontalPanel
 
         // Add the information panel
         add(createProfileInfoPanel());
+        
+        add(createInfoPanel());
     }
 
     public VerticalPanel createProfileInfoPanel()
@@ -70,6 +81,36 @@ public class RestaurantProfilePannel extends HorizontalPanel
         return res;
     }
 
+    public Widget createInfoPanel()
+    {
+        if (isEditMode)
+        {
+            VerticalPanel p = new VerticalPanel();
+            
+            Label counter = new Label();
+            p.add(counter);
+                
+            RichTextArea area = new RichTextArea();
+            ClientUtils.setNotNullHtml(area, rest.getInfo());
+            p.add(area);
+            area.setSize("90%", "100px");
+            area.addKeyUpHandler(new AreaKeyUpHandler(area, counter));
+
+            counter.setWidth("90%");
+            counter.setText("using characters: " + area.getHTML().length() + " out of " + MAX_PROFILE_LEN);
+
+            Button b = new Button("Set");
+            b.addClickHandler(new OnClickSetButton(area));
+            b.setWidth("90%");
+            p.add(b);
+
+            return p;
+        }
+        InlineHTML res = new InlineHTML();
+        ClientUtils.setNotNullHtml(res, rest.getInfo());
+        return res;
+    }
+    
     private Panel createNamePanel()
     {
         HorizontalPanel res = new HorizontalPanel();
@@ -79,7 +120,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox nameBox = new TextBox();
         ClientUtils.setNotNullText(nameBox, rest.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
-        nameBox.setEnabled(isEditMode);
+        nameBox.setReadOnly(isEditMode);
         res.add(nameBox);
 
         return res;
@@ -94,7 +135,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox phoneBox = new TextBox();
         ClientUtils.setNotNullText(phoneBox, rest.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
-        phoneBox.setEnabled(isEditMode);
+        phoneBox.setReadOnly(isEditMode);
         res.add(phoneBox);
 
         return res;
@@ -165,6 +206,39 @@ public class RestaurantProfilePannel extends HorizontalPanel
 
     }
 
+    
+    private class OnClickSetButton implements ClickHandler
+    {
+        private final RichTextArea txtArea;
+
+        public OnClickSetButton(RichTextArea titleBox)
+        {
+            this.txtArea = titleBox;
+        }
+
+        @Override
+        public void onClick(ClickEvent event)
+        {
+            String html = txtArea.getHTML();
+            if (html.length() > MAX_PROFILE_LEN)
+            {
+                Window.alert("Up to " + MAX_PROFILE_LEN + " characters. " + html);
+                if (html.endsWith("<br>"))
+                {
+                    html.substring(0, html.length() - "<br>".length());
+                }
+                else
+                {
+                    html = html.substring(0, MAX_PROFILE_LEN-1);
+                }
+                ClientUtils.setNotNullHtml(txtArea, html);
+                return;
+            }
+            rest.setInfo(html);
+    
+        }
+    }
+
     private class NameKeyUpHandler implements KeyUpHandler
     {
         private final TextBox titleBox;
@@ -196,6 +270,24 @@ public class RestaurantProfilePannel extends HorizontalPanel
             rest.setPhone(titleBox.getText());
         }
 
+    }
+    
+    private class AreaKeyUpHandler implements KeyUpHandler
+    {
+        private final RichTextArea area;
+        private final Label counter;
+        
+        public AreaKeyUpHandler(RichTextArea area, Label counter)
+        {
+            this.area = area;
+            this.counter = counter;
+        }
+        
+        @Override
+        public void onKeyUp(KeyUpEvent event)
+        {
+            counter.setText("using characters: " + area.getHTML().length() + " out of " + MAX_PROFILE_LEN);
+        }
     }
 
 }

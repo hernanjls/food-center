@@ -1,5 +1,7 @@
 package foodcenter.client;
 
+import com.google.gwt.safehtml.client.HasSafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.ValueBoxBase;
 
 public class ClientUtils
@@ -13,6 +15,18 @@ public class ClientUtils
         {
             w.setText(s);
         }
+    }
+    
+    public static void setNotNullHtml(HasSafeHtml w, String html)
+    {
+        if (null == html)
+        {
+            return;
+        }
+        
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.appendHtmlConstant(html);
+        w.setHTML(builder.toSafeHtml());
     }
 
 }

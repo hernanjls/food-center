@@ -190,13 +190,26 @@ public class MenuListAdapter extends BaseAdapter
         }
 
         TextView txtView = (TextView) view.findViewById(R.id.branch_view_list_item_txt);
-        txtView.setText(c.getName());
+        if (null != c.getName())
+        {
+            txtView.setText(c.getName());
+        }
 
         TextView priceView = (TextView) view.findViewById(R.id.branch_view_list_item_price);
-        priceView.setText(c.getPrice().toString());
+        if (null != c.getPrice())
+        {
+            priceView.setText(c.getPrice().toString());
+        }
 
         EditText cntView = (EditText) view.findViewById(R.id.branch_view_list_item_cnt);
         cntView.setText(counter.get(position).toString());
+
+        TextView infoView =  (TextView) view.findViewById(R.id.branch_view_list_item_info);
+        if (null != c.getInfo())
+        {
+            String info = c.getInfo().replace("\\n", "\n");
+            infoView.setText(info);
+        }
         
         ObjectCashe.put(CourseProxy.class, c.getId(), c);
         view.setTag(R.id.adapter_id_tag, c.getId());

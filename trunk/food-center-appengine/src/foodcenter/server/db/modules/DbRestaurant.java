@@ -41,6 +41,9 @@ public class DbRestaurant extends AbstractDbObject
     @Persistent
     private List<ServiceType> services = new ArrayList<ServiceType>();
 
+    @Persistent
+    private String info = "";
+    
     public DbRestaurant()
     {
         super();
@@ -129,5 +132,15 @@ public class DbRestaurant extends AbstractDbObject
     public void setServices(List<ServiceType> services)
     {
         this.services = services;
+    }
+
+    public String getInfo()
+    {
+        return info;
+    }
+
+    public void setInfo(String info)
+    {
+        this.info = info;
     }
 }

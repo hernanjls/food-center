@@ -27,6 +27,7 @@
     <!-- Restaurant Activity -->
     <string name="title_activity_restaurant">Restaurant Info</string>
     <string name="title_activity_branch">Branch Info</string>
+    <string name="title_activity_branch_map">Map</string>
 
     <!-- LoginActivity -->
     <string name="title_activity_login">Login Options</string>
@@ -90,6 +91,7 @@
     <string name="course_name">Course</string>
     <string name="course_price">0</string>
     <string name="course_cnt">0</string>
+    <string name="course_info">this is a 2 lines course info \n is this a new line ?</string>
     <string name="category_name">Category</string>
     <string name="press_to_select">To select - swipe items to the right</string>
     <string name="branch_menu_table">Table</string>

@@ -8,16 +8,23 @@
         android:minSdkVersion="15"
         android:targetSdkVersion="18" />
 
+    <!-- Because version 2 of the Google Maps Android API requires OpenGL ES version 2 -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+    
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Permission to request authtokens from the AccountManager -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-    <!-- Include next permission if you want to allow Ult-Img-Loader to cache images on SD card -->
+    <!-- Ult-Img-loader: Include next permission if you want to allow cacheing images on SD card -->
+    <!-- GMAPS:  Allows the API to access Google web-based services -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!--
     Gcm premissions (This permission is not required if you are targeting 
-    your application to 4.1 or above minSdkVersion=16)
+    your application to 4.1 or above minSdkVersion=16)
     -->
     <permission
         android:name="foodcenter.android.permission.C2D_MESSAGE"
@@ -34,11 +41,28 @@
     <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- GMAPS: Allows the API to check the connection status in order to determine whether data can be downloaded -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- GMAPS: Allows the API to access Google web-based services -->
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    
+    <!-- GMAPS:  Allows the API to use WiFi or mobile cell data (or both) to determine the device's location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- GMAPS:  Allows the API to use the Global Positioning System (GPS) to determine the device's location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_food_center"
         android:label="@string/app_name"
         android:theme="@style/FoodCenterTheme.App" >
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBLW3G58cVOAJguGIUNNlBm_EKQwmX7UTk" />
+
         <activity
             android:name="foodcenter.android.activities.main.MainActivity"
             android:label="@string/app_name" >
@@ -97,6 +121,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="foodcenter.android.service.restaurant.BranchMap"
+            android:label="@string/title_activity_branch_map"
+            android:theme="@style/FoodCenterTheme.Branch" >
         </activity>
     </application>
 

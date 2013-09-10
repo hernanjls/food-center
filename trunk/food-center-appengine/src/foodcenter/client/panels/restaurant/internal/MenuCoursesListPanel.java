@@ -19,9 +19,10 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 {
 
     private static final int COLUMN_NAME = 0;
-    private static final int COLUMN_PRICE = 1;
-    private static final int COLUMN_BUTTON_ADD_COURSE = 2;
-    private static final int COLUMN_BUTTON_DEL_COURSE = 2;
+    private static final int COLUMN_INFO = 1;
+    private static final int COLUMN_PRICE = 2;
+    private static final int COLUMN_BUTTON_ADD_COURSE = 3;
+    private static final int COLUMN_BUTTON_DEL_COURSE = 3;
 
     private final List<CourseProxy> courses;
     private final List<CourseProxy> addedCourses;
@@ -81,10 +82,11 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
     private void createHeader()
     {
         this.setText(0, COLUMN_NAME, "name");
+        this.setText(0, COLUMN_INFO, "info");
         this.setText(0, COLUMN_PRICE, "price");
         if (isEditMode)
         {
-            Button addCourseButton = new Button("Add Course");
+            Button addCourseButton = new Button("+Course");
             addCourseButton.addClickHandler(new OnClickAddCourse());
             this.setWidget(0, COLUMN_BUTTON_ADD_COURSE, addCourseButton);
         }
@@ -95,8 +97,12 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
     {
         TextBox name = new TextBox();
         name.setText(courseProxy.getName());
-        name.addKeyUpHandler(new OnKeyUpCourseName(name, courseProxy));
         setWidget(row, COLUMN_NAME, name);
+
+        TextBox info = new TextBox();
+        info.setText(courseProxy.getInfo());
+        
+        setWidget(row, COLUMN_INFO, info);
 
         TextBox price = new TextBox();
         Double coursePrice = courseProxy.getPrice();
@@ -108,14 +114,17 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 
         if (isEditMode)
         {
+            name.addKeyUpHandler(new OnKeyUpCourseName(name, courseProxy));
+            info.addKeyUpHandler(new OnKeyUpCourseInfo(info, courseProxy));
             price.addKeyUpHandler(new OnKeyUpCoursePrice(price, courseProxy));
 
-            Button delete = new Button("delete", new OnClickDelCourse(courseProxy));
+            Button delete = new Button("-", new OnClickDelCourse(courseProxy));
             setWidget(row, COLUMN_BUTTON_DEL_COURSE, delete);
         }
         else
         {
             name.setEnabled(false);
+            info.setEnabled(false);
             price.setEnabled(false);
         }
     }
@@ -162,8 +171,26 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
         {
             course.setName(titleBox.getText());
         }
-
     }
+    
+    class OnKeyUpCourseInfo implements KeyUpHandler
+    {
+        private final TextBox titleBox;
+        private final CourseProxy course;
+
+        public OnKeyUpCourseInfo(TextBox titleBox, CourseProxy course)
+        {
+            this.titleBox = titleBox;
+            this.course = course;
+        }
+
+        @Override
+        public void onKeyUp(KeyUpEvent event)
+        {
+            course.setInfo(titleBox.getText());
+        }
+    }
+
 
     class OnKeyUpCoursePrice implements KeyUpHandler
     {

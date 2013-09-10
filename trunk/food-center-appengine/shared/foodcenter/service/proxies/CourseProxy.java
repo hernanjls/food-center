@@ -12,6 +12,10 @@ public interface CourseProxy extends EntityProxy, AbstractEntityInterface
 
     public void setName(String name);
 
+    public String getInfo();
+
+    public void setInfo(String info);
+    
     public Double getPrice();
 
     public void setPrice(Double price);

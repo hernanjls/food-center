@@ -34,6 +34,7 @@ import foodcenter.android.R;
 import foodcenter.android.service.AuthCookieImageDownloader;
 import foodcenter.android.service.RequestUtils;
 import foodcenter.android.service.Setup;
+import foodcenter.android.service.restaurant.BranchMap;
 import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 
 public class MainActivity extends Activity implements PullToRefreshAttacher.OnRefreshListener, ListView.OnItemClickListener
@@ -77,6 +78,8 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         {
             handleIntent(getIntent());
         }
+        
+//        startActivity(new Intent(this, BranchMap.class));
 
     }
 
