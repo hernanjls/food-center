@@ -23,7 +23,7 @@ import foodcenter.client.panels.common.BlockingPopupPanel;
 import foodcenter.client.panels.common.UsersPanel;
 import foodcenter.client.panels.restaurant.branch.RestaurantBranchPanel;
 import foodcenter.client.panels.restaurant.internal.MenuPanel;
-import foodcenter.client.service.RequestUtils;
+import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
@@ -250,7 +250,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
             }
             else
             {
-                branchService = RequestUtils.getRequestFactory().getRestaurantAdminService();
+                branchService = WebRequestUtils.getRequestFactory().getRestaurantAdminService();
                 branch = branchService.edit(branch);
             }
 
@@ -318,12 +318,12 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
             }
             else
             {
-                admin = RequestUtils.getRequestFactory().getRestaurantAdminService(); // RestaurantAdmin
+                admin = WebRequestUtils.getRequestFactory().getRestaurantAdminService(); // RestaurantAdmin
                                                                                       // on purpose!
             }
 
             blockingPopup.show();
-            RestaurantBranchProxy newBranch = RequestUtils.createRestaurantBranchProxy(admin);
+            RestaurantBranchProxy newBranch = WebRequestUtils.createRestaurantBranchProxy(admin);
             new RestaurantBranchPanel(newBranch, callback, admin);
         }
 

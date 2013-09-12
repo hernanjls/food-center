@@ -30,7 +30,7 @@ import com.google.android.gcm.GCMRegistrar;
 
 import foodcenter.android.GCMIntentService;
 import foodcenter.android.activities.main.LoginActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 
 public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boolean>
 {
@@ -60,9 +60,9 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
 
     /**
      * Registers for GCM messaging with the given account name, <br>
-     * stores in {@link RequestUtils#getSharedPreferences(Context)}: <br>
-     * - {@link RequestUtils#ACCOUNT_NAME} <br>
-     * - {@link RequestUtils#AUTH_COOKIE}
+     * stores in {@link AndroidRequestUtils#getSharedPreferences(Context)}: <br>
+     * - {@link AndroidRequestUtils#ACCOUNT_NAME} <br>
+     * - {@link AndroidRequestUtils#AUTH_COOKIE}
      * 
      * @param accountName a String containing a Google account name
      * 
@@ -75,10 +75,10 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
         {
             String accountName = params[0];
             // Store the account name in shared preferences and clear auth cookie
-            final SharedPreferences prefs = RequestUtils.getSharedPreferences(appContext);
+            final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(RequestUtils.ACCOUNT_NAME, accountName);
-            editor.putString(RequestUtils.AUTH_COOKIE, null);
+            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, accountName);
+            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
             editor.commit();
 
             // Obtain an auth token and save it as a cookie
@@ -88,8 +88,8 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
             publishProgress("Getting authentication cookie...");
             String authCookie = getAuthCookie(authToken);
 
-            editor.putString(RequestUtils.AUTH_COOKIE, authCookie);
-            editor.putString(RequestUtils.ACCOUNT_NAME, accountName);
+            editor.putString(AndroidRequestUtils.AUTH_COOKIE, authCookie);
+            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, accountName);
             editor.commit();
 
             publishProgress("Registering on server...");
@@ -218,7 +218,7 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
     {
         // Get SACSID / ACSID cookie
         DefaultHttpClient client = new DefaultHttpClient();
-        String continueURL = RequestUtils.getBaseUrl(appContext);
+        String continueURL = AndroidRequestUtils.getBaseUrl(appContext);
         URI uri = new URI(continueURL + "/_ah/login?continue="
                           + URLEncoder.encode(continueURL, "UTF-8")
                           + "&auth="

@@ -24,7 +24,7 @@ import foodcenter.client.panels.company.CompanyPanel;
 import foodcenter.client.panels.main.CompaniesListPanel;
 import foodcenter.client.panels.main.RestaurantsListPanel;
 import foodcenter.client.panels.restaurant.RestaurantPanel;
-import foodcenter.client.service.RequestUtils;
+import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 import foodcenter.service.proxies.UserProxy;
@@ -89,15 +89,15 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
     {
 
         // load the maps api!
-        Maps.loadMapsApi(ClientUtils.GOOGLE_API_MAPS_KEY,
-                         ClientUtils.GOOGLE_API_MAPS_VER,
+        Maps.loadMapsApi(WebClientUtils.GOOGLE_API_MAPS_KEY,
+                         WebClientUtils.GOOGLE_API_MAPS_VER,
                          false,
                          this);
 
         showPopup("Loading user data...");
 
         // Load the user's data
-        ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+        ClientServiceRequest service = WebRequestUtils.getRequestFactory().getClientService();
         service.login(null).fire(this);
     }
 
@@ -124,11 +124,11 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         tabs.add(compsPanel, TAB_COMPS_NAME);
 
         // Load the restaurants when map loading is done!
-        RequestUtils.getRequestFactory().getClientService().getDefaultRestaurants()
+        WebRequestUtils.getRequestFactory().getClientService().getDefaultRestaurants()
             .fire(new GetRestListReceiver());
         
         // Load the restaurants when map loading is done!
-        RequestUtils.getRequestFactory().getClientService().getDefaultCompanies()
+        WebRequestUtils.getRequestFactory().getClientService().getDefaultCompanies()
             .fire(new GetCompListReceiver());
     }
 
@@ -228,7 +228,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             blockingPopup.show();
             showPopup("Loading restaurant...");
 
-            ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+            ClientServiceRequest service = WebRequestUtils.getRequestFactory().getClientService();
             service.getRestaurantById(proxy.getId()).with(RestaurantProxy.REST_WITH)
                 .fire(new RestaurantReceiver(callback, false));
         }
@@ -247,7 +247,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             blockingPopup.show();
             showPopup("Loading restaurant ...");
 
-            ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+            ClientServiceRequest service = WebRequestUtils.getRequestFactory().getClientService();
             service.getRestaurantById(rest.getId()).with(RestaurantProxy.REST_WITH)
                 .fire(new RestaurantReceiver(callback, true));
         }
@@ -264,9 +264,9 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             }
 
             blockingPopup.show();
-            RestaurantAdminServiceRequest service = RequestUtils.getRequestFactory()
+            RestaurantAdminServiceRequest service = WebRequestUtils.getRequestFactory()
                 .getRestaurantAdminService();
-            RestaurantProxy rest = RequestUtils.createRestaurantProxy(service);
+            RestaurantProxy rest = WebRequestUtils.createRestaurantProxy(service);
             new RestaurantPanel(rest, callback, service);
         }
 
@@ -287,7 +287,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
             blockingPopup.show();
             showPopup("Deleting restaurant ...");
-            AdminServiceRequest service = RequestUtils.getRequestFactory().getAdminService();
+            AdminServiceRequest service = WebRequestUtils.getRequestFactory().getAdminService();
             service.deleteRestaurant(rest.getId()).fire(new DelRestReceiver(rest));
 
         }
@@ -343,7 +343,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             RestaurantAdminServiceRequest service = null;
             if (isEditMode)
             {
-                service = RequestUtils.getRequestFactory().getRestaurantAdminService();
+                service = WebRequestUtils.getRequestFactory().getRestaurantAdminService();
                 response = service.edit(response);
             }
 
@@ -400,7 +400,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         {
             showPopup("Loading Restaurants ...");
 
-            RequestUtils.getRequestFactory().getClientService()
+            WebRequestUtils.getRequestFactory().getClientService()
                 .findRestaurant(options.getPattern(), options.getServices())
                 .fire(new GetRestListReceiver());
         }
@@ -478,7 +478,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             blockingPopup.show();
             showPopup("Loading company...");
 
-            ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+            ClientServiceRequest service = WebRequestUtils.getRequestFactory().getClientService();
             service.getCompanyById(proxy.getId()).with(CompanyProxy.COMP_WITH)
                 .fire(new CompanyReceiver(callback, false));
         }
@@ -497,7 +497,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             blockingPopup.show();
             showPopup("Loading restaurant ...");
 
-            ClientServiceRequest service = RequestUtils.getRequestFactory().getClientService();
+            ClientServiceRequest service = WebRequestUtils.getRequestFactory().getClientService();
             service.getCompanyById(comp.getId()).with(CompanyProxy.COMP_WITH)
                 .fire(new CompanyReceiver(callback, true));
         }
@@ -514,9 +514,9 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             }
 
             blockingPopup.show();
-            CompanyAdminServiceRequest service = RequestUtils.getRequestFactory()
+            CompanyAdminServiceRequest service = WebRequestUtils.getRequestFactory()
                 .getCompanyAdminService();
-            CompanyProxy comp = RequestUtils.createCompanyProxy(service);
+            CompanyProxy comp = WebRequestUtils.createCompanyProxy(service);
             new CompanyPanel(comp, callback, service);
         }
 
@@ -537,7 +537,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
 
             blockingPopup.show();
             showPopup("Deleting company ...");
-            AdminServiceRequest service = RequestUtils.getRequestFactory().getAdminService();
+            AdminServiceRequest service = WebRequestUtils.getRequestFactory().getAdminService();
             service.deleteRestaurant(comp.getId()).fire(new DelCompReceiver(comp));
 
         }
@@ -593,7 +593,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             CompanyAdminServiceRequest service = null;
             if (isEditMode)
             {
-                service = RequestUtils.getRequestFactory().getCompanyAdminService();
+                service = WebRequestUtils.getRequestFactory().getCompanyAdminService();
                 response = service.edit(response);
             }
 
@@ -649,7 +649,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         {
             showPopup("Loading Restaurants ...");
 
-            RequestUtils.getRequestFactory().getClientService().findCompany(options.getPattern(),
+            WebRequestUtils.getRequestFactory().getClientService().findCompany(options.getPattern(),
                                                                             options.getServices())
                 .fire(new GetCompListReceiver());
         }

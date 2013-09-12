@@ -21,11 +21,11 @@ import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class RequestUtils
+public class WebRequestUtils
 {
     private static FoodCenterRequestFactory requestFactory = null;
     
-    private RequestUtils()
+    private WebRequestUtils()
     {
         
     }

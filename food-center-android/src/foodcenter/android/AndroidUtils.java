@@ -15,15 +15,14 @@
  */
 package foodcenter.android;
 
-import foodcenter.android.service.Setup;
 import android.content.Context;
 import android.content.Intent;
-
+import foodcenter.android.service.Setup;
 /**
  * Helper class providing methods and constants common to other classes in the
  * app.
  */
-public final class CommonUtilities
+public final class AndroidUtils
 {
 
     /**
@@ -41,6 +40,5 @@ public final class CommonUtilities
         intent.putExtra(Setup.EXTRA_MESSAGE, message);
         context.sendBroadcast(intent);
     }
-    
     
 }

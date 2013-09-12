@@ -9,11 +9,11 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.GCMIntentService;
 import foodcenter.android.R;
 import foodcenter.android.activities.main.LoginActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.UserProxy;
 import foodcenter.service.requset.ClientServiceRequest;
@@ -47,7 +47,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
 
     public void execute()
     {
-        FoodCenterRequestFactory factory = RequestUtils
+        FoodCenterRequestFactory factory = AndroidRequestUtils
             .getRequestFactory(context, FoodCenterRequestFactory.class);
         ClientServiceRequest service = factory.getClientService();
 
@@ -59,7 +59,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
     {
         GCMRegistrar.setRegisteredOnServer(context, true);
         String message = context.getString(R.string.server_registered);
-        CommonUtilities.displayMessage(context, message);
+        AndroidUtils.displayMessage(context, message);
 
         LoginActivity.closeLoginActivity(true);
     }
@@ -88,7 +88,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
             String msg = context.getString(R.string.server_register_error,
                                            GCMIntentService.MAX_ATTEMPTS);
 
-            CommonUtilities.displayMessage(context, msg);
+            AndroidUtils.displayMessage(context, msg);
 
             GCMRegistrar.unregister(context);
         }

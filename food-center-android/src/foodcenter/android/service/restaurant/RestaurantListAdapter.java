@@ -7,7 +7,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -15,7 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import foodcenter.android.R;
 import foodcenter.android.activities.rest.RestaurantActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.proxies.RestaurantProxy;
 
 public class RestaurantListAdapter extends BaseAdapter implements OnClickListener
@@ -37,7 +36,7 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
         this.options = options;
         if (null == this.options)
         {
-            this.options = RequestUtils.getDefaultDisplayImageOptions(activity);
+            this.options = AndroidRequestUtils.getDefaultDisplayImageOptions(activity);
         }
     }
 
@@ -83,7 +82,7 @@ public class RestaurantListAdapter extends BaseAdapter implements OnClickListene
         textView.setText(r.getName());
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.main_view_rest_grid_item_img);
-        String url = RequestUtils.getBaseUrl(activity) + r.getImageUrl();
+        String url = AndroidRequestUtils.getBaseUrl(activity) + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
 
         // Restaurant is not fully loaded => don't add it to obj cache

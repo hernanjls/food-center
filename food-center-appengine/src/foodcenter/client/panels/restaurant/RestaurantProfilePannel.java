@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import foodcenter.client.ClientUtils;
+import foodcenter.client.WebClientUtils;
 import foodcenter.client.callbacks.ImageUploadedCallback;
 import foodcenter.client.callbacks.OnClickServiceCheckBox;
 import foodcenter.client.panels.common.EditableImage;
@@ -91,7 +91,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
             p.add(counter);
                 
             RichTextArea area = new RichTextArea();
-            ClientUtils.setNotNullHtml(area, rest.getInfo());
+            WebClientUtils.setNotNullHtml(area, rest.getInfo());
             p.add(area);
             area.setSize("90%", "100px");
             area.addKeyUpHandler(new AreaKeyUpHandler(area, counter));
@@ -107,7 +107,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
             return p;
         }
         InlineHTML res = new InlineHTML();
-        ClientUtils.setNotNullHtml(res, rest.getInfo());
+        WebClientUtils.setNotNullHtml(res, rest.getInfo());
         return res;
     }
     
@@ -118,7 +118,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         res.add(new Label("Name: "));
 
         TextBox nameBox = new TextBox();
-        ClientUtils.setNotNullText(nameBox, rest.getName());
+        WebClientUtils.setNotNullText(nameBox, rest.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
         nameBox.setReadOnly(isEditMode);
         res.add(nameBox);
@@ -133,7 +133,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
 
         res.add(new Label("Phone: "));
         TextBox phoneBox = new TextBox();
-        ClientUtils.setNotNullText(phoneBox, rest.getPhone());
+        WebClientUtils.setNotNullText(phoneBox, rest.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
         phoneBox.setReadOnly(isEditMode);
         res.add(phoneBox);
@@ -231,7 +231,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
                 {
                     html = html.substring(0, MAX_PROFILE_LEN-1);
                 }
-                ClientUtils.setNotNullHtml(txtArea, html);
+                WebClientUtils.setNotNullHtml(txtArea, html);
                 return;
             }
             rest.setInfo(html);

@@ -6,10 +6,10 @@ import android.util.Log;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.activities.rest.RestaurantActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
 
@@ -40,7 +40,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         }
         try
         {
-            FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(owner,
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(owner,
                                                                               FoodCenterRequestFactory.class);
 
             factory.getClientService()
@@ -83,7 +83,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         public void onFailure(ServerFailure error)
         {
             Log.e("req context", error.getMessage());
-            CommonUtilities.displayMessage(owner, error.getMessage());
+            AndroidUtils.displayMessage(owner, error.getMessage());
 
             // Notify PullToRefreshAttacher that the refresh has finished
             owner.hideSpinner();

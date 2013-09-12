@@ -11,7 +11,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 
-import foodcenter.client.service.RequestUtils;
+import foodcenter.client.service.WebRequestUtils;
 import foodcenter.server.AbstractGAETest;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.CompanyBranchProxy;
@@ -62,12 +62,12 @@ public abstract class AbstractRequestTest extends AbstractGAETest
                                                      int numBranchMenuCats,
                                                      int numBranchMenuCatCourses)
     {
-        RestaurantBranchProxy branch = RequestUtils.createRestaurantBranchProxy(service);
+        RestaurantBranchProxy branch = WebRequestUtils.createRestaurantBranchProxy(service);
         branch.setAddress("addr" + Math.random());
         for (int j = 0; j < numBranchMenuCats; ++j)
         {
 
-            MenuCategoryProxy category = RequestUtils.createMenuCategoryProxy(service);
+            MenuCategoryProxy category = WebRequestUtils.createMenuCategoryProxy(service);
             category.setCategoryTitle("branch" + Math.random());
 
             branch.getMenu().getCategories().add(category);
@@ -91,13 +91,13 @@ public abstract class AbstractRequestTest extends AbstractGAETest
                                          int numBranchMenuCatCourses)
     {
 
-        RestaurantProxy r = RequestUtils.createRestaurantProxy(service);
+        RestaurantProxy r = WebRequestUtils.createRestaurantProxy(service);
 
         r.setName(name);
 
         for (int i = 0; i < menuCats; ++i)
         {
-            MenuCategoryProxy category = RequestUtils.createMenuCategoryProxy(service);
+            MenuCategoryProxy category = WebRequestUtils.createMenuCategoryProxy(service);
             category.setCategoryTitle("rest" + Math.random());
 
             r.getMenu().getCategories().add(category);
@@ -128,7 +128,7 @@ public abstract class AbstractRequestTest extends AbstractGAETest
                                      RestaurantBranchProxy branch,
                                      int maxCourses)
     {
-        OrderProxy order = RequestUtils.createOrder(rContext);
+        OrderProxy order = WebRequestUtils.createOrder(rContext);
         int cnt = 0;
 
         int numCats = branch.getMenu().getCategories().size();
@@ -152,7 +152,7 @@ public abstract class AbstractRequestTest extends AbstractGAETest
 
     protected CompanyBranchProxy createCompBranch(RequestContext service)
     {
-        CompanyBranchProxy branch = RequestUtils.createCompanyBranchProxy(service);
+        CompanyBranchProxy branch = WebRequestUtils.createCompanyBranchProxy(service);
         branch.setAddress("addr" + Math.random());
         return branch;
     }
@@ -160,7 +160,7 @@ public abstract class AbstractRequestTest extends AbstractGAETest
     protected CompanyProxy createComp(RequestContext service, String name, int numBranches)
     {
 
-        CompanyProxy r = RequestUtils.createCompanyProxy(service);
+        CompanyProxy r = WebRequestUtils.createCompanyProxy(service);
         r.setName(name);
 
         for (int i = 0; i < numBranches; ++i)

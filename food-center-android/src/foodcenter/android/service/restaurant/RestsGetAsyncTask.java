@@ -9,11 +9,11 @@ import android.widget.GridView;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
 import foodcenter.android.activities.main.MainActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
 
@@ -42,7 +42,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     {
         try
         {
-            FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(owner,
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(owner,
                                                                               FoodCenterRequestFactory.class);
 
             if (null == arg0 || arg0.length == 0 || null == arg0[0])
@@ -85,7 +85,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 
         // update the view for all the restaurants
         RestaurantListAdapter adapter = new RestaurantListAdapter(owner,
-                                                                  RequestUtils.getDefaultDisplayImageOptions(owner),
+                                                                  AndroidRequestUtils.getDefaultDisplayImageOptions(owner),
                                                                   rests);
 
         gridView.setAdapter(adapter);
@@ -121,7 +121,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         public void onFailure(ServerFailure error)
         {
             Log.e("req context", error.getMessage());
-            CommonUtilities.displayMessage(owner, error.getMessage());
+            AndroidUtils.displayMessage(owner, error.getMessage());
             
             // Notify PullToRefreshAttacher that the refresh has finished
             owner.hideSpinner();

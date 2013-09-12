@@ -25,7 +25,7 @@ import android.widget.TextView;
 import com.google.android.gcm.GCMRegistrar;
 
 import foodcenter.android.R;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.login.AuthenticateAndLoginAsyncTask;
 import foodcenter.android.service.login.UnregisterAsyncTask;
 
@@ -167,8 +167,8 @@ public class LoginActivity extends Activity
      */
     private void setDisconnectScreenContent()
     {
-        final SharedPreferences prefs = RequestUtils.getSharedPreferences(getApplicationContext());
-        String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, "error");
+        final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(getApplicationContext());
+        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, "error");
 
         // Format the disconnect message with the currently connected account
         // name

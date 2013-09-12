@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.ClientUtils;
+import foodcenter.client.WebClientUtils;
 import foodcenter.client.callbacks.ImageUploadedCallback;
 import foodcenter.client.callbacks.OnClickServiceCheckBox;
 import foodcenter.client.panels.common.EditableImage;
@@ -77,7 +77,7 @@ public class CompanyProfilePannel extends HorizontalPanel
         res.add(new Label("Name: "));
 
         TextBox nameBox = new TextBox();
-        ClientUtils.setNotNullText(nameBox, comp.getName());
+        WebClientUtils.setNotNullText(nameBox, comp.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
         nameBox.setEnabled(isEditMode);
         res.add(nameBox);
@@ -92,7 +92,7 @@ public class CompanyProfilePannel extends HorizontalPanel
 
         res.add(new Label("Phone: "));
         TextBox phoneBox = new TextBox();
-        ClientUtils.setNotNullText(phoneBox, comp.getPhone());
+        WebClientUtils.setNotNullText(phoneBox, comp.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
         phoneBox.setEnabled(isEditMode);
         res.add(phoneBox);
