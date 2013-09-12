@@ -31,7 +31,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.activities.main.LoginActivity;
 import foodcenter.android.activities.main.MainActivity;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.login.ServerLoginAsyncTask;
 import foodcenter.service.FoodCenterRequestFactory;
 
@@ -56,7 +56,7 @@ public class GCMIntentService extends GCMBaseIntentService
     protected void onRegistered(Context context, String regId)
     {
         Log.i(TAG, "GCM: Device registered: regId = " + regId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_registered));
+        AndroidUtils.displayMessage(context, getString(R.string.gcm_registered));
 
         Log.i(TAG, "Server: registering gcm device (regId = " + regId + ")");
         new ServerLoginAsyncTask(context, regId, 5).execute();
@@ -66,12 +66,12 @@ public class GCMIntentService extends GCMBaseIntentService
     protected void onUnregistered(Context context, String regId)
     {
         Log.i(TAG, "Device unregistered");
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_unregistered));
+        AndroidUtils.displayMessage(context, getString(R.string.gcm_unregistered));
 
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
             Log.i(TAG, "unregistering device (regId = " + regId + ")");
-            FoodCenterRequestFactory factory = RequestUtils.getRequestFactory(context,
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(context,
                                                                               FoodCenterRequestFactory.class);
             factory.getClientService().logout().fire(new GCMUnRegisterReciever(context));
         }
@@ -89,7 +89,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received message");
         String message = intent.getExtras().getString("msg");
-        CommonUtilities.displayMessage(context, message);
+        AndroidUtils.displayMessage(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -99,7 +99,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received deleted messages notification");
         String message = getString(R.string.gcm_deleted, total);
-        CommonUtilities.displayMessage(context, message);
+        AndroidUtils.displayMessage(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -108,7 +108,7 @@ public class GCMIntentService extends GCMBaseIntentService
     public void onError(Context context, String errorId)
     {
         Log.e(TAG, "Received error: " + errorId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_error, errorId));
+        AndroidUtils.displayMessage(context, getString(R.string.gcm_error, errorId));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         // log message
         Log.i(TAG, "Received recoverable error: " + errorId);
-        CommonUtilities.displayMessage(context, getString(R.string.gcm_recoverable_error, errorId));
+        AndroidUtils.displayMessage(context, getString(R.string.gcm_recoverable_error, errorId));
         return super.onRecoverableError(context, errorId);
     }
 
@@ -171,9 +171,9 @@ class GCMUnRegisterReciever extends Receiver<Void>
         GCMRegistrar.setRegisteredOnServer(context, false);
 
         // Delete the current auth cookie from shared preferences
-        Editor editor = RequestUtils.getSharedPreferences(context).edit();
-        editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
-        editor.putString(RequestUtils.AUTH_COOKIE, null);
+        Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
+        editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
+        editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
         editor.commit();
         LoginActivity.closeLoginActivity(false);
     }
@@ -184,9 +184,9 @@ class GCMUnRegisterReciever extends Receiver<Void>
         GCMRegistrar.setRegisteredOnServer(context, false);
 
         // Delete the current auth cookie from shared preferences
-        Editor editor = RequestUtils.getSharedPreferences(context).edit();
-        editor.putString(RequestUtils.ACCOUNT_NAME, null).commit();
-        editor.putString(RequestUtils.AUTH_COOKIE, null);
+        Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
+        editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
+        editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
         editor.commit();
 
         // At this point the device is unregistered from GCM, but still

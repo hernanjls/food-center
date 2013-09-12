@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import foodcenter.android.R;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 
 public class ActionBarListAdapter extends BaseAdapter
 {
@@ -34,11 +34,11 @@ public class ActionBarListAdapter extends BaseAdapter
         this.options = options;
         if (null == this.options)
         {
-            this.options = RequestUtils.getDefaultDisplayImageOptions(activity);
+            this.options = AndroidRequestUtils.getDefaultDisplayImageOptions(activity);
         }
 
-        txt[PROFILE_POSITION] = RequestUtils.getSharedPreferences(activity)
-            .getString(RequestUtils.ACCOUNT_NAME, "Unknown Account");
+        txt[PROFILE_POSITION] = AndroidRequestUtils.getSharedPreferences(activity)
+            .getString(AndroidRequestUtils.ACCOUNT_NAME, "Unknown Account");
 
     }
 

@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import foodcenter.client.ClientUtils;
+import foodcenter.client.WebClientUtils;
 import foodcenter.client.panels.common.GoogleMapsComposite;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 
@@ -71,7 +71,7 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
         // add the map and the pannels
         if (!Maps.isLoaded())
         {
-            Maps.loadMapsApi(ClientUtils.GOOGLE_API_MAPS_KEY, ClientUtils.GOOGLE_API_MAPS_VER, false, new OnApiLoadRunnable());
+            Maps.loadMapsApi(WebClientUtils.GOOGLE_API_MAPS_KEY, WebClientUtils.GOOGLE_API_MAPS_VER, false, new OnApiLoadRunnable());
         }
         else
         {

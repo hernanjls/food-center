@@ -15,10 +15,10 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.restaurant.BranchListAdapter;
 import foodcenter.android.service.restaurant.RestGetAsyncTask;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -54,8 +54,8 @@ public class RestaurantActivity extends Activity
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
-        SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME,
+        SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(this);
+        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME,
                                              getString(R.string.unknown_user));
         getActionBar().setSubtitle(accountName);
     }
@@ -110,7 +110,7 @@ public class RestaurantActivity extends Activity
                 onBackPressed();
                 return true;
             case R.id.menu_help:
-                CommonUtilities.displayMessage(this, "Currently not supported");
+                AndroidUtils.displayMessage(this, "Currently not supported");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -157,11 +157,11 @@ public class RestaurantActivity extends Activity
 
         // Load the image of this restaurant
         ImageView imageView = (ImageView) findViewById(R.id.rest_info_img);
-        String url = RequestUtils.getBaseUrl(this) + rest.getImageUrl();
+        String url = AndroidRequestUtils.getBaseUrl(this) + rest.getImageUrl();
 
         ImageLoader.getInstance().displayImage(url,
                                                imageView,
-                                               RequestUtils.getDefaultDisplayImageOptions(this));
+                                               AndroidRequestUtils.getDefaultDisplayImageOptions(this));
 
         // TODO Load the info of this restaurant
 

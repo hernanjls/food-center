@@ -27,12 +27,12 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration.Builder;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
 
-import foodcenter.android.CommonUtilities;
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.Popup;
 import foodcenter.android.R;
 import foodcenter.android.service.AuthCookieImageDownloader;
-import foodcenter.android.service.RequestUtils;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.Setup;
 import foodcenter.android.service.restaurant.BranchMap;
 import foodcenter.android.service.restaurant.RestsGetAsyncTask;
@@ -227,7 +227,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
         String s = (String) actionBarDrawer.getItemAtPosition(position);
-        CommonUtilities.displayMessage(this, s + "not supported yet...");
+        AndroidUtils.displayMessage(this, s + "not supported yet...");
         actionBarDrawer.closeDrawer();
     }
 
@@ -246,10 +246,10 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
                 onRefreshStarted(null);
                 return true;
             case R.id.menu_setting:
-                CommonUtilities.displayMessage(this, "Currently not supported");
+                AndroidUtils.displayMessage(this, "Currently not supported");
                 return true;
             case R.id.menu_help:
-                CommonUtilities.displayMessage(this, "Currently not supported");
+                AndroidUtils.displayMessage(this, "Currently not supported");
                 return true;
             case R.id.menu_signout:
                 // Invoke the Register activity
@@ -285,8 +285,8 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     {
         String query = null;
 
-        SharedPreferences prefs = RequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(RequestUtils.ACCOUNT_NAME, null);
+        SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(this);
+        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, null);
         getActionBar().setSubtitle(accountName);
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction()))

@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.TextBox;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
-import foodcenter.client.service.RequestUtils;
+import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
@@ -197,7 +197,7 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         public void createNew(RedrawablePanel coursesPanel,
                               PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
         {
-            CourseProxy course = RequestUtils.createCourseProxy(service);
+            CourseProxy course = WebRequestUtils.createCourseProxy(service);
             MenuCategoryProxy cat = panelCategory.get(coursesPanel);
             
             addedCourses.get(cat).add(course);
@@ -260,7 +260,7 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
-            MenuCategoryProxy cat = RequestUtils.createMenuCategoryProxy(service); 
+            MenuCategoryProxy cat = WebRequestUtils.createMenuCategoryProxy(service); 
             addedCats.add(cat);
             addedCourses.put(cat, new LinkedList<CourseProxy>());
             service.addMenuCategory(menu, cat);

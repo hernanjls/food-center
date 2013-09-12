@@ -42,13 +42,13 @@ import foodcenter.android.R;
  * Utility methods for getting the base URL for client-server communication and
  * retrieving shared preferences.
  */
-public class RequestUtils
+public class AndroidRequestUtils
 {
 
     /**
      * Tag for logging.
      */
-    private static final String TAG = RequestUtils.class.getSimpleName();
+    private static final String TAG = AndroidRequestUtils.class.getSimpleName();
 
     // Shared constants
 
@@ -119,10 +119,10 @@ public class RequestUtils
     {
         T requestFactory = RequestFactorySource.create(factoryClass);
 
-        SharedPreferences prefs = RequestUtils.getSharedPreferences(context);
-        String authCookie = prefs.getString(RequestUtils.AUTH_COOKIE, null);
+        SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(context);
+        String authCookie = prefs.getString(AndroidRequestUtils.AUTH_COOKIE, null);
 
-        String uriString = RequestUtils.getBaseUrl(context) + RF_METHOD;
+        String uriString = AndroidRequestUtils.getBaseUrl(context) + RF_METHOD;
         URI uri;
         try
         {
@@ -165,7 +165,7 @@ public class RequestUtils
     public static DisplayImageOptions getDefaultDisplayImageOptions(Context context)
     {
         Map<String, String> extra = new HashMap<String, String>();
-        String cookie = getSharedPreferences(context).getString(RequestUtils.AUTH_COOKIE, null);
+        String cookie = getSharedPreferences(context).getString(AndroidRequestUtils.AUTH_COOKIE, null);
         if (null != cookie)
         {
             extra.put("Cookie", cookie);
@@ -242,6 +242,6 @@ public class RequestUtils
      */
     private static String getPackageName()
     {
-        return RequestUtils.class.getPackage().getName();
+        return AndroidRequestUtils.class.getPackage().getName();
     }
 }
