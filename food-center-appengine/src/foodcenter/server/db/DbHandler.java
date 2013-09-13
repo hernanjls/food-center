@@ -1,9 +1,7 @@
 package foodcenter.server.db;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.jdo.Extent;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -18,8 +16,6 @@ import com.beoui.geocell.model.Point;
 
 import foodcenter.server.db.modules.AbstractDbGeoObject;
 import foodcenter.server.db.modules.AbstractDbObject;
-import foodcenter.server.db.modules.DbMsg;
-import foodcenter.server.db.modules.DbRestaurant;
 
 /**
  * Class for simplifying calls the the DB. <br>
@@ -279,70 +275,70 @@ public class DbHandler
     
     
     
-    @Deprecated
-    public static DbRestaurant searchRestaurantByName(String name)
-    {
-        return find(DbRestaurant.class, "name == value", "String value", new Object[]{name});        
-    }
-
-    
-    @Deprecated
-    public static void saveMsg(String email, String msg)
-    {
-        PersistenceManager pm = PMF.get();
-
-        DbMsg m = new DbMsg(email, msg);
-
-        try
-        {
-            pm.makePersistent(m);
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
-
-    
-    @Deprecated
-    public static long deleteMsg(String msg)
-    {
-        PersistenceManager pm = PMF.get();
-        try
-        {
-            Query q = pm.newQuery(DbMsg.class);
-            q.setFilter("msg == value");
-            q.declareParameters("String value");
-            return q.deletePersistentAll(msg);
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
-
-    
-    @Deprecated
-    public static List<DbMsg> getMsgs()
-    {
-        PersistenceManager pm = PMF.get();
-        try
-        {
-            List<DbMsg> res = new LinkedList<DbMsg>();
-            Extent<DbMsg> extent = pm.getExtent(DbMsg.class, false);
-            for (DbMsg m : extent)
-            {
-                res.add(m);
-            }
-            return res;
-        }
-        finally
-        {
-//            pm.close();
-        }
-    }
-
-
+//    @Deprecated
+//    public static DbRestaurant searchRestaurantByName(String name)
+//    {
+//        return find(DbRestaurant.class, "name == value", "String value", new Object[]{name});        
+//    }
+//
+//    
+//    @Deprecated
+//    public static void saveMsg(String email, String msg)
+//    {
+//        PersistenceManager pm = PMF.get();
+//
+//        DbMsg m = new DbMsg(email, msg);
+//
+//        try
+//        {
+//            pm.makePersistent(m);
+//        }
+//        finally
+//        {
+////            pm.close();
+//        }
+//    }
+//
+//    
+//    @Deprecated
+//    public static long deleteMsg(String msg)
+//    {
+//        PersistenceManager pm = PMF.get();
+//        try
+//        {
+//            Query q = pm.newQuery(DbMsg.class);
+//            q.setFilter("msg == value");
+//            q.declareParameters("String value");
+//            return q.deletePersistentAll(msg);
+//        }
+//        finally
+//        {
+////            pm.close();
+//        }
+//    }
+//
+//    
+//    @Deprecated
+//    public static List<DbMsg> getMsgs()
+//    {
+//        PersistenceManager pm = PMF.get();
+//        try
+//        {
+//            List<DbMsg> res = new LinkedList<DbMsg>();
+//            Extent<DbMsg> extent = pm.getExtent(DbMsg.class, false);
+//            for (DbMsg m : extent)
+//            {
+//                res.add(m);
+//            }
+//            return res;
+//        }
+//        finally
+//        {
+////            pm.close();
+//        }
+//    }
+//
+//
 //    @Deprecated
 //    public static List<String> getGcmRegistered()
 //    {

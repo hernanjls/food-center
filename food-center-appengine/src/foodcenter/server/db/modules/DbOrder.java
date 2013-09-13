@@ -22,13 +22,19 @@ public class DbOrder extends AbstractDbObject
 	private DbUser user; // user which made this order
 
 	@Persistent
+    private String compId;
+
+	@Persistent
 	private String compBranchId;
+
+	@Persistent
+    private String restId;
 
 	@Persistent
 	private String restBranchId;
 
 	@Persistent
-	private List<String> courses = new ArrayList<String>(); // Courses IDs
+	private List<DbCourseOrder> courses = new ArrayList<DbCourseOrder>(); // Courses IDs
 
 	@Persistent
 	private Date date;
@@ -57,6 +63,16 @@ public class DbOrder extends AbstractDbObject
 		this.user = user;
 	}
 
+	public String getCompId()
+    {
+        return compId;
+    }
+
+    public void setCompId(String compId)
+    {
+        this.compId = compId;
+    }
+    
 	public String getCompBranchId()
 	{
 		return compBranchId;
@@ -67,6 +83,16 @@ public class DbOrder extends AbstractDbObject
 		this.compBranchId = compBranchId;
 	}
 
+	public String getRestId()
+    {
+        return restId;
+    }
+
+    public void setRestId(String restId)
+    {
+        this.restId = restId;
+    }
+    
 	public String getRestBranchId()
 	{
 		return restBranchId;
@@ -77,12 +103,12 @@ public class DbOrder extends AbstractDbObject
 		this.restBranchId = restBranchId;
 	}
 
-	public List<String> getCourses()
+	public List<DbCourseOrder> getCourses()
 	{
 		return courses;
 	}
 
-	public void setCourses(List<String> courses)
+	public void setCourses(List<DbCourseOrder> courses)
 	{
 		this.courses = courses;
 	}

@@ -13,6 +13,7 @@ import org.junit.Test;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCourse;
+import foodcenter.server.db.modules.DbCourseOrder;
 import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -140,7 +141,13 @@ public class ClientServiceTest extends AbstractServiceTest
         for (int i = 0; i < numBranchMenuCourses; ++i)
         {
             DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
-            order.getCourses().add(course.getId());
+            DbCourseOrder courseOrder = new DbCourseOrder();
+            courseOrder.setCnt(1);
+            courseOrder.setCourseId(course.getId());
+            courseOrder.setName(course.getName());
+            courseOrder.setInfo(course.getInfo());
+            courseOrder.setPrice(course.getPrice());
+            order.getCourses().add(courseOrder);
         }
 
         // save the order
@@ -187,13 +194,18 @@ public class ClientServiceTest extends AbstractServiceTest
         {
             DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
 
-            order.getCourses().add(course.getId());
+            DbCourseOrder courseOrder = new DbCourseOrder();
+            courseOrder.setCnt(1);
+            courseOrder.setCourseId(course.getId());
+            courseOrder.setName(course.getName());
+            courseOrder.setInfo(course.getInfo());
+            courseOrder.setPrice(course.getPrice());
+            order.getCourses().add(courseOrder);
         }
 
         // save the order
         DbOrder result = ClientService.makeOrder(order);
         assertNotNull(result);
-
     }
 
     /**

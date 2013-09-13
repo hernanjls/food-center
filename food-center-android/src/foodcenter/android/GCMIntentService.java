@@ -71,8 +71,7 @@ public class GCMIntentService extends GCMBaseIntentService
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
             Log.i(TAG, "unregistering device (regId = " + regId + ")");
-            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(context,
-                                                                              FoodCenterRequestFactory.class);
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
             factory.getClientService().logout().fire(new GCMUnRegisterReciever(context));
         }
         else

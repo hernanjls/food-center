@@ -6,8 +6,7 @@ import javax.jdo.annotations.Persistent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@PersistenceCapable(detachable = "true")
-//@FetchGroup(name = "DbCourse", members = { @Persistent(name = "category") })
+@PersistenceCapable
 public class DbCourse extends AbstractDbObject
 {
 
@@ -26,10 +25,6 @@ public class DbCourse extends AbstractDbObject
 
 	@Persistent
 	private Double price;
-
-
-//	@Persistent
-//	DbMenuCategory category;
 
 	public DbCourse()
 	{

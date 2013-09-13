@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ListView;
 import foodcenter.android.ObjectCashe;
 import foodcenter.android.R;
+import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.restaurant.MenuListAdapter;
 import foodcenter.android.service.restaurant.SwipeListViewTouchListener;
 import foodcenter.service.enums.ServiceType;
@@ -29,7 +30,8 @@ public class BranchActivity extends ListActivity implements
                                                 SwipeListViewTouchListener.OnSwipeCallback
 {
 
-    public static final String EXTRA_BRANCH_ID = "Extra Branch ID";
+    public final static int REQ_CODE_ORDER = 1;
+    public final static String EXTRA_BRANCH_ID = "Extra Branch ID";
 
     private final static String TAG = BranchActivity.class.getSimpleName();
 
@@ -128,7 +130,6 @@ public class BranchActivity extends ListActivity implements
 
         boolean isTable = services.contains(ServiceType.TABLE);
         menu.findItem(R.id.branch_menu_table).setVisible(isTable);
-
         return true;
     }
 
@@ -148,16 +149,23 @@ public class BranchActivity extends ListActivity implements
                 onBackPressed();
                 return true;
             case R.id.branch_menu_table:
-            default:
-                return super.onOptionsItemSelected(item);
+                break;
         }
-
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
         onSwipeRight(l, new int[] { position });
+    }
+
+    private void OpenOrderVerification(ServiceType service)
+    {
+        AndroidRequestUtils.getFoodCenterRF(this);
+        Intent intent = new Intent(this, OrderVerificationActivity.class);
+        intent.putExtra(EXTRA_BRANCH_ID, branch.getId());
+        startActivityForResult(intent, REQ_CODE_ORDER);
     }
 
     public void showSpinner()
@@ -238,10 +246,16 @@ public class BranchActivity extends ListActivity implements
             switch (item.getItemId())
             {
                 case R.id.branch_view_list_item:
+//                    mode.finish();
+                    break;
+                case R.id.branch_menu_delivery:
                     mode.finish();
+                    OpenOrderVerification(ServiceType.DELIVERY);
                     break;
                 case R.id.branch_menu_takeaway:
-                case R.id.branch_menu_delivery:
+                    mode.finish();
+                    OpenOrderVerification(ServiceType.TAKE_AWAY);
+                    break;
                 default:
                     break;
             }
@@ -270,7 +284,7 @@ public class BranchActivity extends ListActivity implements
             {
                 adapter.clearCounter(position);
             }
-            
+
             showTotalCost(mode);
         }
 
