@@ -1,15 +1,12 @@
 package foodcenter.server.db.modules;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 import foodcenter.server.service.ClientService;
 
-@PersistenceCapable(detachable = "true")
+@PersistenceCapable//(detachable="true")
 public class DbUser extends AbstractDbObject
 {
 

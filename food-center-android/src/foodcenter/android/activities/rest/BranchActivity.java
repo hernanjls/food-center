@@ -257,7 +257,7 @@ public class BranchActivity extends ListActivity implements
 
         private void showTotalPrice(ActionMode mode)
         {
-            String s = getString(R.string.total_price) + adapter.getTotalPrice();
+            String s = getString(R.string.total_price) + " " + df.format(adapter.getTotalPrice());
 
             // Show total price on action bar
             mode.setSubtitle(s);
