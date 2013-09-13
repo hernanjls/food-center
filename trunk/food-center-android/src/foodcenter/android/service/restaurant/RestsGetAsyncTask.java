@@ -42,8 +42,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     {
         try
         {
-            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(owner,
-                                                                              FoodCenterRequestFactory.class);
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
 
             if (null == arg0 || arg0.length == 0 || null == arg0[0])
             {

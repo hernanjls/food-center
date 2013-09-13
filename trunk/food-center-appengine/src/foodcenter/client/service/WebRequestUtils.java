@@ -14,6 +14,7 @@ import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CompanyBranchProxy;
 import foodcenter.service.proxies.CompanyProxy;
+import foodcenter.service.proxies.CourseOrderProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
@@ -52,7 +53,20 @@ public class WebRequestUtils
     {
         return rContext.create(CourseProxy.class);
     }
-    
+
+    public static CourseOrderProxy createCourseOrderProxy(RequestContext rContext, CourseProxy course, int cnt)
+    {
+        CourseOrderProxy res = rContext.create(CourseOrderProxy.class);
+        
+        res.setCnt(cnt);
+        res.setCourseId(course.getId());
+        res.setName(course.getName());
+        res.setInfo(course.getInfo());
+        res.setPrice(course.getPrice());
+        
+        return res;
+    }
+
     public static MenuCategoryProxy createMenuCategoryProxy(RequestContext rContext)
     {
     	MenuCategoryProxy res = rContext.create(MenuCategoryProxy.class);
@@ -124,7 +138,7 @@ public class WebRequestUtils
     public static OrderProxy createOrder(RequestContext rContext)
     {
     	OrderProxy res = rContext.create(OrderProxy.class);
-    	res.setCourses(new ArrayList<String>());
+    	res.setCourses(new ArrayList<CourseOrderProxy>());
     	return res;
     }
 }

@@ -37,6 +37,7 @@ import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import foodcenter.android.R;
+import foodcenter.service.FoodCenterRequestFactory;
 
 /**
  * Utility methods for getting the base URL for client-server communication and
@@ -45,44 +46,33 @@ import foodcenter.android.R;
 public class AndroidRequestUtils
 {
 
-    /**
-     * Tag for logging.
-     */
+    /** Tag for logging. */
     private static final String TAG = AndroidRequestUtils.class.getSimpleName();
 
     // Shared constants
 
-    /**
-     * Key for account name in shared preferences.
-     */
+    /** Key for account name in shared preferences. */
     public static final String ACCOUNT_NAME = "accountName";
 
-    /**
-     * Key for auth cookie name in shared preferences.
-     */
+    /** Key for auth cookie name in shared preferences. */
     public static final String AUTH_COOKIE = "authCookie";
 
-    /*
-     * URL suffix for the RequestFactory servlet.
-     */
+    /** URL suffix for the RequestFactory servlet. */
     public static final String RF_METHOD = "/gwtRequest";
 
-    /**
-     * An intent name for receiving registration/unregistration status.
-     */
+    /** An intent name for receiving registration/unregistration status. */
     public static final String UPDATE_UI_INTENT = getPackageName() + ".UPDATE_UI";
 
     // End shared constants
 
-    /**
-     * Key for shared preferences.
-     */
+    /** Key for shared preferences. */
     private static final String SHARED_PREFS = "FOODCENTER_PREFS";
 
-    /**
-     * Cache containing the base URL for a given context.
-     */
+    /** Cache containing the base URL for a given context. */
     private static final Map<Context, String> URL_MAP = new HashMap<Context, String>();
+
+    /** Container for the request factory. */
+    private static FoodCenterRequestFactory foodCenterRF = null;
 
     /**
      * Returns the (debug or production) URL associated with the registration
@@ -110,12 +100,26 @@ public class AndroidRequestUtils
     }
 
     /**
+     * Creates and returns an initialized {@link FoodCenterRequestFactory} of the given
+     * type, with authCookie added to the request. <br>
+     * RequestUtils.getSharedPrefs will be used.
+     */
+    public static FoodCenterRequestFactory getFoodCenterRF(Context context)
+    {
+        if (null == foodCenterRF)
+        {
+            foodCenterRF = getRequestFactory(context, FoodCenterRequestFactory.class);
+        }
+        return foodCenterRF;
+    }
+
+    /**
      * Creates and returns an initialized {@link RequestFactory} of the given
      * type, with authCookie added to the request. <br>
      * RequestUtils.getSharedPrefs will be used.
      */
-    public static <T extends RequestFactory> T getRequestFactory(Context context,
-                                                                 Class<T> factoryClass)
+    private static <T extends RequestFactory> T getRequestFactory(Context context,
+                                                                  Class<T> factoryClass)
     {
         T requestFactory = RequestFactorySource.create(factoryClass);
 
@@ -165,7 +169,8 @@ public class AndroidRequestUtils
     public static DisplayImageOptions getDefaultDisplayImageOptions(Context context)
     {
         Map<String, String> extra = new HashMap<String, String>();
-        String cookie = getSharedPreferences(context).getString(AndroidRequestUtils.AUTH_COOKIE, null);
+        String cookie = getSharedPreferences(context).getString(AndroidRequestUtils.AUTH_COOKIE,
+                                                                null);
         if (null != cookie)
         {
             extra.put("Cookie", cookie);

@@ -16,6 +16,7 @@ import foodcenter.server.AbstractGAETest;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.CompanyBranchProxy;
 import foodcenter.service.proxies.CompanyProxy;
+import foodcenter.service.proxies.CourseOrderProxy;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.OrderProxy;
@@ -139,7 +140,8 @@ public abstract class AbstractRequestTest extends AbstractGAETest
             for (int j = 0; j < numCourses; ++j)
             {
                 CourseProxy course = cat.getCourses().get(j);
-                order.getCourses().add(course.getId());
+                CourseOrderProxy courseOrder = WebRequestUtils.createCourseOrderProxy(rContext, course, 1);
+                order.getCourses().add(courseOrder);
                 cnt++;
                 if (cnt >= maxCourses)
                 {

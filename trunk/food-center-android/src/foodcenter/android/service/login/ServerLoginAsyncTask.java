@@ -31,7 +31,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
 
-    private final String regId;     // GCM reg id
+    private final String regId; // GCM reg id
     private int attempt;
     private long backoff;
 
@@ -47,8 +47,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
 
     public void execute()
     {
-        FoodCenterRequestFactory factory = AndroidRequestUtils
-            .getRequestFactory(context, FoodCenterRequestFactory.class);
+        FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
         ClientServiceRequest service = factory.getClientService();
 
         service.login(regId).fire(this);

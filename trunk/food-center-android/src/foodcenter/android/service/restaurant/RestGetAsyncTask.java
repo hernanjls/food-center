@@ -40,8 +40,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         }
         try
         {
-            FoodCenterRequestFactory factory = AndroidRequestUtils.getRequestFactory(owner,
-                                                                              FoodCenterRequestFactory.class);
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
 
             factory.getClientService()
                 .getRestaurantById(restId[0])
