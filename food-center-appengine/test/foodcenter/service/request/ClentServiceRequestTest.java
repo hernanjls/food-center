@@ -76,28 +76,24 @@ public class ClentServiceRequestTest extends AbstractRequestTest
         //FIXME this test failes
         MockTestResponse<RestaurantProxy> restResponse = new MockTestResponse<RestaurantProxy>();
         adminService.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
-
-        // tear down the pmf, because this is going to be a new RF call
         tearDownPMF();
-        // setup a new pmf for the new call
         setUpPMF();
 
         
         ClientServiceRequest service = rf.getClientService();
         MockTestResponse<UserProxy> userResponse = new MockTestResponse<UserProxy>();
         service.login("").fire(userResponse);
-        // tear down the pmf, because this is going to be a new RF call
         tearDownPMF();
-        // setup a new pmf for the new call
         setUpPMF();
 
         RestaurantBranchProxy branch = restResponse.response.getBranches().get(0);
         
-        ClientServiceRequest clientService = rf.getClientService();
-        OrderProxy order = createOrder(clientService, branch, numBranchMenuCatCourses);
+        service = rf.getClientService();
+        OrderProxy order = createOrder(service, branch, numBranchMenuCatCourses);
         MockTestResponse<OrderProxy> orderResponse = new MockTestResponse<OrderProxy>();
-
-        clientService.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+        service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+        tearDownPMF();
+        setUpPMF();
 
         response = orderResponse.response;
         assertNotNull(response);

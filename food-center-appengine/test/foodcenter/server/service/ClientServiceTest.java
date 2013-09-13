@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbCourseOrder;
@@ -85,10 +86,13 @@ public class ClientServiceTest extends AbstractServiceTest
         // check that gcm was returned
         assertEquals(gcmKey2, user.getGcmKey());
 
-        user = DbHandler.find(DbUser.class,
-                              "email == emailP",
-                              "String emailP",
-                              new Object[] { email });
+        String query = "email == emailP";
+
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("emailP", email));
+
+        user = DbHandler.find(DbUser.class, query, params);
+
         assertEquals(gcmKey2, user.getGcmKey());
     }
 
@@ -105,11 +109,14 @@ public class ClientServiceTest extends AbstractServiceTest
         // logout
         ClientService.logout();
 
+        String query = "email == emailP";
+
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("emailP", email));
+
         // make sure the GCM key was removed
-        user = DbHandler.find(DbUser.class,
-                              "email == emailP",
-                              "String emailP",
-                              new Object[] { email });
+        user = DbHandler.find(DbUser.class, query, params);
+        
         assertNotNull(user);
         assertEquals("", user.getGcmKey());
     }
@@ -141,12 +148,7 @@ public class ClientServiceTest extends AbstractServiceTest
         for (int i = 0; i < numBranchMenuCourses; ++i)
         {
             DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
-            DbCourseOrder courseOrder = new DbCourseOrder();
-            courseOrder.setCnt(1);
-            courseOrder.setCourseId(course.getId());
-            courseOrder.setName(course.getName());
-            courseOrder.setInfo(course.getInfo());
-            courseOrder.setPrice(course.getPrice());
+            DbCourseOrder courseOrder = createOrder(course, 1);
             order.getCourses().add(courseOrder);
         }
 
@@ -193,19 +195,64 @@ public class ClientServiceTest extends AbstractServiceTest
         for (int i = 0; i < numBranchMenuCourses; ++i)
         {
             DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
+            DbCourseOrder courseOrder = createOrder(course, 1);
 
-            DbCourseOrder courseOrder = new DbCourseOrder();
-            courseOrder.setCnt(1);
-            courseOrder.setCourseId(course.getId());
-            courseOrder.setName(course.getName());
-            courseOrder.setInfo(course.getInfo());
-            courseOrder.setPrice(course.getPrice());
             order.getCourses().add(courseOrder);
         }
 
         // save the order
         DbOrder result = ClientService.makeOrder(order);
         assertNotNull(result);
+    }
+
+    @Test
+    public void getOrdersTest()
+    {
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+
+        DbRestaurant rest = createRest("rest",
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        rest = RestaurantAdminService.saveRestaurant(rest);
+
+        tearDownPMF();
+        setUpPMF();
+
+        String gcmKey = "hila";
+        // login with GCM key
+        ClientService.login(gcmKey);
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbMenu branchMenu = rest.getBranches().get(0).getMenu();
+
+        // Create an order and fill it with all the courses from branch menu to the order
+        DbOrder order = new DbOrder();
+        for (int i = 0; i < numBranchMenuCourses; ++i)
+        {
+            DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
+            DbCourseOrder courseOrder = createOrder(course, 1);
+
+            order.getCourses().add(courseOrder);
+        }
+
+        // save the order
+        ClientService.makeOrder(order);
+
+        tearDownPMF();
+        setUpPMF();
+
+        List<DbOrder> orders = ClientService.getOrders(0, 100);
+        assertNotNull(orders);
+        assertEquals(1, orders.size());
     }
 
     /**

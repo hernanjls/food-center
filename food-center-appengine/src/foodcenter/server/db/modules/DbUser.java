@@ -120,14 +120,4 @@ public class DbUser extends AbstractDbObject
     {
         this.gcmKey = gcmKey;
     }
-
-    public List<DbOrder> getOrders()
-    {
-        return orders;
-    }
-
-    public void setOrders(List<DbOrder> orders)
-    {
-        this.orders = orders;
-    }
 }

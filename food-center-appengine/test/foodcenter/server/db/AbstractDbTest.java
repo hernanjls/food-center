@@ -4,6 +4,7 @@ import foodcenter.server.AbstractGAETest;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbCourse;
+import foodcenter.server.db.modules.DbCourseOrder;
 import foodcenter.server.db.modules.DbMenuCategory;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
@@ -11,6 +12,17 @@ import foodcenter.server.db.modules.DbRestaurantBranch;
 public abstract class AbstractDbTest extends AbstractGAETest
 {
 
+    protected DbCourseOrder createOrder(DbCourse course, int cnt)
+    {
+        DbCourseOrder res = new DbCourseOrder();
+        res.setCnt(cnt);
+        res.setCourseId(course.getId());
+        res.setName(course.getName());
+        res.setInfo(course.getInfo());
+        res.setPrice(course.getPrice());
+        return res;
+    }
+    
     protected DbRestaurant createRest(String name, //
                                       int numMenuCats, //
                                       int numMenuCourses, //
