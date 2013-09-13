@@ -3,6 +3,7 @@ package foodcenter.server.db;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Transaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ public final class PMF
 		}
 		
 		pm = getPmfInstance().getPersistenceManager();
+		pm.currentTransaction().begin();
 		holder.set(pm);
 		
 		return pm;
@@ -87,6 +89,13 @@ public final class PMF
 		{
 			return;
 		}
+		
+		Transaction tx = pm.currentTransaction(); 
+		if (tx.isActive())
+		{
+		    tx.rollback();
+		}
+		
 		pm.close();
 		holder.set(null);
 	}

@@ -1,4 +1,4 @@
-package foodcenter.android.service.restaurant;
+package foodcenter.android.adapters;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -4,24 +4,21 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import foodcenter.android.ObjectCashe;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
-import foodcenter.android.service.AndroidRequestUtils;
-import foodcenter.android.service.restaurant.MenuListAdapter;
-import foodcenter.android.service.restaurant.SwipeListViewTouchListener;
+import foodcenter.android.activities.helpers.OrderConfData;
+import foodcenter.android.adapters.MenuListAdapter;
+import foodcenter.android.adapters.SwipeListViewTouchListener;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -35,10 +32,8 @@ public class BranchActivity extends ListActivity implements
 
     private final static String TAG = BranchActivity.class.getSimpleName();
 
-    // this is not pull-able, but helps animating action bar :)
-    private PullToRefreshAttacher mPullToRefreshAttacher;
-
     private RestaurantBranchProxy branch = null;
+    private String restId = null;
     private List<ServiceType> services = null; // TODO resolve branch service workaround :)
 
     private MenuListAdapter adapter;
@@ -59,7 +54,6 @@ public class BranchActivity extends ListActivity implements
         lv.setOnTouchListener(touchListener);
 
         initActionBar();
-        initPullToRefresh();
         handleIntent(getIntent());
     }
 
@@ -70,28 +64,6 @@ public class BranchActivity extends ListActivity implements
         getActionBar().setHomeButtonEnabled(true);
 
         getActionBar().setSubtitle(getString(R.string.press_to_select));
-    }
-
-    private void initPullToRefresh()
-    {
-        // Create new PullToRefreshAttacher
-        PullToRefreshAttacher.Options options = new PullToRefreshAttacher.Options();
-        options.refreshMinimizeDelay *= 3;
-        mPullToRefreshAttacher = PullToRefreshAttacher.get(this, options);
-
-        // As we haven't set an explicit HeaderTransformer, we can safely cast the result of
-        // getHeaderTransformer() to DefaultHeaderTransformer
-        DefaultHeaderTransformer ht = (DefaultHeaderTransformer) mPullToRefreshAttacher.getHeaderTransformer();
-
-        // As we're using a DefaultHeaderTransformer we can change the text which is displayed.
-        // You should load these values from localised resources, but we'll just use static strings.
-
-        ht.setPullText(getString(R.string.swipe_down_to_refresh));
-        ht.setRefreshingText(getString(R.string.load_restaurant));
-
-        // DefaultHeaderTransformer allows you to change the color of the progress bar. Here
-        // we set it to a dark holo green, loaded from our resources
-        ht.setProgressBarColor(getResources().getColor(android.R.color.holo_blue_dark));
     }
 
     @Override
@@ -162,28 +134,23 @@ public class BranchActivity extends ListActivity implements
 
     private void OpenOrderVerification(ServiceType service)
     {
-        AndroidRequestUtils.getFoodCenterRF(this);
-        Intent intent = new Intent(this, OrderVerificationActivity.class);
-        intent.putExtra(EXTRA_BRANCH_ID, branch.getId());
-        startActivityForResult(intent, REQ_CODE_ORDER);
-    }
+        Intent intent = new Intent(this, OrderConfActivity.class);
 
-    public void showSpinner()
-    {
-        mPullToRefreshAttacher.setRefreshing(true);
-    }
+        // restId received from intent
+        OrderConfData data = adapter.getOrderConfData(service);
+        data.setRestBranchId(branch.getId());
+        data.setRestId(restId);
+        ObjectStore.put(OrderConfData.class, OrderConfData.CACHE_KEY, data);
 
-    public void hideSpinner()
-    {
-        mPullToRefreshAttacher.setRefreshComplete();
+        startActivity(intent);
     }
 
     private void handleIntent(Intent intent)
     {
-        // Get the id from the intent
+        // Get the ids from the intent
         String branchId = intent.getExtras().getString(EXTRA_BRANCH_ID);
-        ;
-        String restId = intent.getExtras().getString(RestaurantActivity.EXTRA_REST_ID);
+        restId = intent.getExtras().getString(RestaurantActivity.EXTRA_REST_ID);
+
         if (null == branchId || null == restId)
         {
             setTitle("Can't find branch id");
@@ -192,7 +159,7 @@ public class BranchActivity extends ListActivity implements
         }
 
         // Get
-        branch = ObjectCashe.get(RestaurantBranchProxy.class, branchId);
+        branch = ObjectStore.get(RestaurantBranchProxy.class, branchId);
         if (null == branch)
         {
             setTitle("Can't find branch");
@@ -200,15 +167,15 @@ public class BranchActivity extends ListActivity implements
             return;
         }
 
-        RestaurantProxy rest = ObjectCashe.get(RestaurantProxy.class, restId);
+        RestaurantProxy rest = ObjectStore.get(RestaurantProxy.class, restId);
         services = (null != rest) ? rest.getServices() : new ArrayList<ServiceType>();
 
         ListView branchView = getListView();
-        adapter = ObjectCashe.get(MenuListAdapter.class, branch.getId());
+        adapter = ObjectStore.get(MenuListAdapter.class, branch.getId());
         if (null == adapter)
         {
             adapter = new MenuListAdapter(this, branch.getMenu());
-            ObjectCashe.put(MenuListAdapter.class, branch.getId(), adapter);
+            ObjectStore.put(MenuListAdapter.class, branch.getId(), adapter);
         }
         branchView.setAdapter(adapter);
     }
@@ -230,7 +197,7 @@ public class BranchActivity extends ListActivity implements
             menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
 
             mode.setTitle("Select Items");
-            showTotalCost(mode);
+            showTotalPrice(mode);
             return true;
         }
 
@@ -246,14 +213,14 @@ public class BranchActivity extends ListActivity implements
             switch (item.getItemId())
             {
                 case R.id.branch_view_list_item:
-//                    mode.finish();
+                    // mode.finish();
                     break;
                 case R.id.branch_menu_delivery:
-                    mode.finish();
+                    // mode.finish();
                     OpenOrderVerification(ServiceType.DELIVERY);
                     break;
                 case R.id.branch_menu_takeaway:
-                    mode.finish();
+                    // mode.finish();
                     OpenOrderVerification(ServiceType.TAKE_AWAY);
                     break;
                 default:
@@ -285,30 +252,15 @@ public class BranchActivity extends ListActivity implements
                 adapter.clearCounter(position);
             }
 
-            showTotalCost(mode);
+            showTotalPrice(mode);
         }
 
-        public void showTotalCost(ActionMode mode)
+        private void showTotalPrice(ActionMode mode)
         {
-            // Calculate the total cost to show on action bar
-            Double totalCost = 0.0;
-            final int checkedCount = getListView().getCheckedItemCount();
-            if (0 != checkedCount)
-            {
-                SparseBooleanArray arr = getListView().getCheckedItemPositions();
-                int n = adapter.getCount();
-                for (int i = 0; i < n; ++i)
-                {
-                    if (arr.get(i))
-                    {
-                        totalCost += adapter.getPrice(i);
-                    }
-                }
-            }
+            String s = getString(R.string.total_price) + adapter.getTotalPrice();
 
-            // Show total cost on action bar
-            mode.setSubtitle("Total price: " + df.format(totalCost));
-
+            // Show total price on action bar
+            mode.setSubtitle(s);
         }
     }
 

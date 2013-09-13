@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import foodcenter.android.R;
+import foodcenter.android.adapters.ActionBarListAdapter;
 
 public class ActionBarDrawer
 {

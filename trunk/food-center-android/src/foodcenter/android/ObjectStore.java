@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Allows passing objects from one intent to another based on ID
  */
-public class ObjectCashe
+public class ObjectStore
 {
     // class -> (key -> class-object)
     private final static Map<Class<? extends Object>, Map<String, ? extends Object>> objects = 

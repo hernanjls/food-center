@@ -1,4 +1,4 @@
-package foodcenter.android.service.restaurant;
+package foodcenter.android.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import foodcenter.android.ObjectCashe;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.rest.BranchActivity;
 import foodcenter.android.activities.rest.RestaurantActivity;
@@ -70,11 +70,11 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
         }
 
         RestaurantBranchProxy b = getItem(position);
-        ObjectCashe.put(RestaurantBranchProxy.class, b.getId(), b);
-        
+                
         layout.setText(b.getAddress());
-
-        layout.setTag(R.id.adapter_id_tag, b.getId());
+        
+        // pass branch position to the on click event
+        layout.setTag(R.id.adapter_id_tag, position);
         layout.setOnClickListener(this);
         return layout;
     }
@@ -82,12 +82,14 @@ public class BranchListAdapter extends BaseAdapter implements OnClickListener
     @Override
     public void onClick(View view)
     {
-        // Get branch from tag and store it in ObjectCashe
-        String branchId = (String) view.getTag(R.id.adapter_id_tag);
-        
-        //Add branch id to the intent
+        // Get branch from tag, store it in ObjectCashe
+        int branchPos = (Integer) view.getTag(R.id.adapter_id_tag);
+        RestaurantBranchProxy b = getItem(branchPos);
+        ObjectStore.put(RestaurantBranchProxy.class, b.getId(), b);
+
+        //Add branch id to the intent (can be retrieved from ObjectCache
         Intent intent = new Intent(activity, BranchActivity.class);
-        intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, branchId);
+        intent.putExtra(BranchActivity.EXTRA_BRANCH_ID, b.getId());
         intent.putExtra(RestaurantActivity.EXTRA_REST_ID, restId);
         
         // Activity gets the id from intent and branch from ObjectStore

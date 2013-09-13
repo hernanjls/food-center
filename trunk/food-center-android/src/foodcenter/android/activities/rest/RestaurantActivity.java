@@ -16,10 +16,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import foodcenter.android.AndroidUtils;
-import foodcenter.android.ObjectCashe;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.adapters.BranchListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
-import foodcenter.android.service.restaurant.BranchListAdapter;
 import foodcenter.android.service.restaurant.RestGetAsyncTask;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -177,7 +177,7 @@ public class RestaurantActivity extends Activity
             return;
         }
         
-        rest = ObjectCashe.get(RestaurantProxy.class, restId);
+        rest = ObjectStore.get(RestaurantProxy.class, restId);
         if (null == rest)
         {
             new RestGetAsyncTask(this).execute(restId);

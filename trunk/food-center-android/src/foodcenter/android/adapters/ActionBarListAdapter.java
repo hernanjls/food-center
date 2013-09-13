@@ -1,4 +1,4 @@
-package foodcenter.android.activities.main;
+package foodcenter.android.adapters;
 
 import android.app.Activity;
 import android.view.View;

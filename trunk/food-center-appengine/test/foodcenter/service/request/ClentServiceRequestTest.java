@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import foodcenter.server.AbstractGAETest;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -73,21 +74,26 @@ public class ClentServiceRequestTest extends AbstractRequestTest
                                           numBranchMenuCats,
                                           numBranchMenuCatCourses);
 
-        //FIXME this test failes
         MockTestResponse<RestaurantProxy> restResponse = new MockTestResponse<RestaurantProxy>();
         adminService.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResponse);
         tearDownPMF();
         setUpPMF();
 
-        
+        CompanyAdminServiceRequest compService = rf.getCompanyAdminService();
+        MockTestResponse<CompanyProxy> compResponse = new MockTestResponse<CompanyProxy>();
+        CompanyProxy comp = createComp(compService, "comp", numBranches);
+        comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
+        compService.saveCompany(comp).fire(compResponse);
+        tearDownPMF();
+        setUpPMF();
+
         ClientServiceRequest service = rf.getClientService();
         MockTestResponse<UserProxy> userResponse = new MockTestResponse<UserProxy>();
         service.login("").fire(userResponse);
         tearDownPMF();
         setUpPMF();
 
-        RestaurantBranchProxy branch = restResponse.response.getBranches().get(0);
-        
+        RestaurantBranchProxy branch = restResponse.response.getBranches().get(0);        
         service = rf.getClientService();
         OrderProxy order = createOrder(service, branch, numBranchMenuCatCourses);
         MockTestResponse<OrderProxy> orderResponse = new MockTestResponse<OrderProxy>();

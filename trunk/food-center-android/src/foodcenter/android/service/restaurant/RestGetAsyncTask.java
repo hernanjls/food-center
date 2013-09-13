@@ -7,7 +7,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
-import foodcenter.android.ObjectCashe;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.activities.rest.RestaurantActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
@@ -75,7 +75,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         public void onSuccess(RestaurantProxy response)
         {
             publishProgress(response);
-            ObjectCashe.put(RestaurantProxy.class, response.getId(), response);
+            ObjectStore.put(RestaurantProxy.class, response.getId(), response);
         }
 
         @Override
