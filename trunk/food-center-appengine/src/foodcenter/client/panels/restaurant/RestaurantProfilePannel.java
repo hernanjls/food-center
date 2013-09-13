@@ -2,9 +2,6 @@ package foodcenter.client.panels.restaurant;
 
 import java.util.List;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
-
-import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;

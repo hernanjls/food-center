@@ -1,5 +1,7 @@
 package foodcenter.server.db.security;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +9,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -22,21 +25,28 @@ public class PrivilegeManager
     {
         return getDbUser(userService.getCurrentUser().getEmail());
     }
-    
+
     public static DbUser getDbUser(String email)
     {
         logger.info("getDbUser is called");
-        DbUser res = DbHandler.find(DbUser.class, "email == emailP", "String emailP", new Object[] { email });
+
+        String query = "email == emailP";
+
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("emailP", email));
+
+        DbUser res = DbHandler.find(DbUser.class, query, params);
         if (null != res)
         {
             res.setAdmin(userService.isUserAdmin());
         }
         return res;
     }
-    
+
     /**
      * @param user
-     * @return {@link UserPrivilege#Admin}, {@link UserPrivilege#NotPremited} or {@link UserPrivilege#User} 
+     * @return {@link UserPrivilege#Admin}, {@link UserPrivilege#NotPremited} or
+     *         {@link UserPrivilege#User}
      */
     public static UserPrivilege getPrivilege(DbUser user)
     {
@@ -50,9 +60,10 @@ public class PrivilegeManager
         }
         return UserPrivilege.User;
     }
-    
+
     /**
-     * @return {@link UserPrivilege#Admin}, {@link UserPrivilege#NotPremited} or {@link UserPrivilege#User}
+     * @return {@link UserPrivilege#Admin}, {@link UserPrivilege#NotPremited} or
+     *         {@link UserPrivilege#User}
      */
     public static UserPrivilege getPrivilege()
     {
@@ -63,7 +74,7 @@ public class PrivilegeManager
         DbUser user = getCurrentUser();
         return getPrivilege(user);
     }
-    
+
     public static UserPrivilege getPrivilege(DbRestaurant rest)
     {
         if (userService.isUserAdmin())
@@ -78,8 +89,7 @@ public class PrivilegeManager
         }
         return getPrivilege(rest, user.getEmail());
     }
-    
-    
+
     public static UserPrivilege getPrivilege(DbRestaurantBranch branch)
     {
         if (userService.isUserAdmin())
@@ -94,7 +104,6 @@ public class PrivilegeManager
         }
         return getPrivilege(branch, user.getEmail());
     }
-    
 
     public static UserPrivilege getPrivilege(DbCompany comp)
     {
@@ -126,10 +135,8 @@ public class PrivilegeManager
         return getPrivilege(branch, user.getEmail());
     }
 
-    
     /***********************************************************************************/
-    
-    
+
     private static UserPrivilege getPrivilege(DbRestaurant restaurant, String email)
     {
         if (null == restaurant)
@@ -142,7 +149,7 @@ public class PrivilegeManager
         }
         return UserPrivilege.User;
     }
-    
+
     private static UserPrivilege getPrivilege(DbRestaurantBranch branch, String email)
     {
         UserPrivilege p = getPrivilege();
@@ -150,25 +157,24 @@ public class PrivilegeManager
         {
             return p;
         }
-        
+
         if (branch.getAdmins().contains(email))
         {
             return UserPrivilege.RestaurantBranchAdmin;
         }
-        
+
         if (branch.getWaiters().contains(email))
         {
             return UserPrivilege.RestaurantWaiter;
         }
-        
+
         if (branch.getChefs().contains(email))
         {
             return UserPrivilege.RestaurantChef;
         }
-        
+
         return UserPrivilege.User;
     }
-    
 
     private static UserPrivilege getPrivilege(DbCompany company, String email)
     {
@@ -190,14 +196,13 @@ public class PrivilegeManager
         {
             return p;
         }
-        
+
         if (branch.getAdmins().contains(email))
         {
             return UserPrivilege.CompanyBranchAdmin;
         }
-                
+
         return UserPrivilege.User;
     }
-    
-    
+
 }

@@ -10,13 +10,11 @@ import com.google.web.bindery.requestfactory.shared.ProxyForName;
 public interface OrderProxy extends EntityProxy
 {
 
-    public final static String[] ORDER_WITH = { "user", //
-                                               "courses", //
-                                               "date" };
+    public final static String[] ORDER_WITH = { "courses", "date" };
 
-    public UserProxy getUser();
+    public String getUserId();
 
-    public void setUser(UserProxy user);
+    public void setUserId(String userId);
 
     public String getCompId();
 

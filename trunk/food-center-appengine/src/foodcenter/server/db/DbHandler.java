@@ -25,16 +25,16 @@ import foodcenter.server.db.modules.AbstractDbObject;
  * @see {@link PMF#initThreadLocal()} to initialize the current thread PM
  * 
  * @author Dror
- *
+ * 
  */
 public class DbHandler
 {
     private static Logger logger = LoggerFactory.getLogger(DbHandler.class);
 
-    
     /**
      * Saves / updates the object to the DB, <br>
      * also commits the current transaction, and creates a new one
+     * 
      * @param object is the object to persist.
      * @return the persisted object
      * 
@@ -42,8 +42,8 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> T save(T object)
     {
-    	logger.info("save: " + object.getClass() + "state:" + JDOHelper.getObjectState(object));
-    	PersistenceManager pm = PMF.get();
+        logger.info("save: " + object.getClass() + "state:" + JDOHelper.getObjectState(object));
+        PersistenceManager pm = PMF.get();
         try
         {
             T res = pm.makePersistent(object);
@@ -54,23 +54,24 @@ public class DbHandler
         catch (Throwable e)
         {
             logger.error(e.getMessage(), e);
-            
+
             Transaction tx = PMF.get().currentTransaction();
             if (tx.isActive())
             {
-            	tx.rollback();
+                tx.rollback();
             }
         }
         finally
         {
-        	PMF.get().currentTransaction().begin();
+            PMF.get().currentTransaction().begin();
         }
-        
+
         return null;
     }
-    
+
     /**
      * deletes the DB object with the given id
+     * 
      * @param clazz is the DbObject class to delete
      * @param id is the id of the object to delete
      * @return the number of deleted rows
@@ -94,97 +95,105 @@ public class DbHandler
         }
         finally
         {
-//            pm.close();
+            // pm.close();
         }
     }
 
     /**
      * find the clazz object which matches the id, and eager fetch it!
+     * 
      * @param clazz is the class type to search for
      * @param id is the id of the object
      * @return the object of type clazz with the id
      * 
      * @see {@link AbstractDbObject}
-     */    
+     */
     public static <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
         PersistenceManager pm = PMF.get();
-    	T res = null;
+        T res = null;
         try
-    	{
-            res =  pm.getObjectById(clazz, id);
+        {
+            res = pm.getObjectById(clazz, id);
             if (null == res)
             {
-            	logger.warn(clazz.toString() + " with id: " + id + " was not found" );
+                logger.warn(clazz.toString() + " with id: " + id + " was not found");
             }
-//            ThreadLocalPM.get().currentTransaction().commit();
+            // ThreadLocalPM.get().currentTransaction().commit();
         }
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
-//            Transaction tx = ThreadLocalPM.get().currentTransaction();
-//            if (tx.isActive())
-//            {
-//            	tx.rollback();
-//            }
-//            ThreadLocalPM.get().currentTransaction().begin();
+            // Transaction tx = ThreadLocalPM.get().currentTransaction();
+            // if (tx.isActive())
+            // {
+            // tx.rollback();
+            // }
+            // ThreadLocalPM.get().currentTransaction().begin();
         }
         return res;
     }
-    
+
     /**
-     * @param clazz          - is the class to fetch from the DB.
-     * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
-     *                         Ex: "lastName == lastNameParam".<br>
-     *                         if null - no base query will be added <br>
-     *                         or "||" may be used on a single field.
-     * @param declaredParams - Declare the list of parameters query execution. <br>
-     *                         The parameter declaration is a String containing <br>
-     *                         one or more query parameter declarations separated with commas. <br>
-     *                         Ex: "String value, Int x".<br>
-     *                         if null or valus are null, no declared parameters nor values will be used.
-     * @param values		 - the values for the declared parameters.<br>
-     * 						   if null or declared params are null, no declared parameters nor values will be used.
-     * @param maxResults     - max results to get, if null, no limit is taken
+     * @param clazz - is the class to fetch from the DB.
+     * @param baseQuery - Base query string without the declared parameters and without the entity
+     *            name. <br>
+     *            Ex: "lastName == lastNameParam".<br>
+     *            if null - no base query will be added <br>
+     *            or "||" may be used on a single field.
+     * @param declaredParams - Declare the list of parameters and values for query execution. <br>
+     *            if null no declared parameters nor values will be used.
+     * @param sortOrder - the order sorting the result (lower idx is 1st), <br>
+     *            if null default order is used
+     * @param startIdx - get results starting from index (null == 0)
+     * @param endIdx - get results up to from index (null == startIdx + 100)
      * @return list of all objects matching, or null on failure
      */
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractDbObject> List<T> find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values, Integer maxResults)
+    public static <T extends AbstractDbObject> List<T> find(Class<T> clazz,
+                                                            String baseQuery,
+                                                            List<DeclaredParameter> declaredParams,
+                                                            List<SortOrder> sortOrders,
+                                                            Integer startIdx,
+                                                            Integer endIdx)
     {
         PersistenceManager pm = PMF.get();
         try
         {
             Query q = pm.newQuery(clazz);
+            Object[] values = null;
             if (null != baseQuery)
             {
                 q.setFilter(baseQuery);
-                
-                if (null != declaredParams && null != values)
+
+                if (null != declaredParams && declaredParams.size() > 0)
                 {
-                    q.declareParameters(declaredParams);
+                    q.declareParameters(getDeclaredParamsStr(declaredParams).toString());
+                    values = getDeclaredParamsValues(declaredParams);
                 }
             }
-            if (null != maxResults)
+
+            if (null != sortOrders && sortOrders.size() > 0)
             {
-                q.setRange(0, maxResults); // limit query for the 1st result
+                q.setOrdering(getSortOrder(sortOrders).toString());
             }
-            else
-            {
-            	q.setRange(0, 100);
-            }
-            
+
+            startIdx = (null == startIdx) ? 0 : startIdx;
+            endIdx = (null == endIdx) ? startIdx + 100 : endIdx;
+            q.setRange(startIdx, endIdx); // limit query for the 1st result
+
             List<T> attached = null;
-            if (null != declaredParams && null != values)
+            if (null != values)
             {
                 attached = (List<T>) q.executeWithArray(values);
             }
             else
             {
-	            attached = (List<T>) q.execute();
+                attached = (List<T>) q.execute();
             }
-            	
-    		return attached;
-	            
+
+            return attached;
+
         }
         catch (Exception e)
         {
@@ -192,37 +201,59 @@ public class DbHandler
             Transaction tx = PMF.get().currentTransaction();
             if (tx.isActive())
             {
-            	tx.rollback();
+                tx.rollback();
             }
             PMF.get().currentTransaction().begin();
         }
         return null;
     }
-    
-    
+
     /**
-     * @param clazz          - is the class to fetch from the DB.
-     * @param baseQuery      - Base query string without the declared parameters and without the entity name. <br>
-     *                         Ex: "lastName == lastNameParam".<br>
-     *                         if null - no base query will be added
-     * @param declaredParams - Declare the list of parameters query execution. <br>
-     *                         The parameter declaration is a String containing <br>
-     *                         one or more query parameter declarations separated with commas. <br>
-     *                         Ex: "String value, Int x, Date dateP".<br>
-     *                         if null or valus are null, no declared parameters nor values will be used.
-     * @param values		 - the values for the declared parameters.<br>
-     * 						   if null or declared params are null, no declared parameters nor values will be used.
+     * @param clazz - is the class to fetch from the DB.
+     * @param baseQuery - Base query string without the declared parameters and without the entity
+     *            name. <br>
+     *            Ex: "lastName == lastNameParam".<br>
+     *            if null - no base query will be added <br>
+     *            or "||" may be used on a single field.
+     * @param declaredParams - Declare the list of parameters and values for query execution. <br>
+     *            if null no declared parameters nor values will be used.
+     * @param sortOrder - the order sorting the result (lower idx is 1st), <br>
+     *            if null default order is used
+     * @param maxResults - max results to get, if null, no limit is taken
+     * @return list of all objects matching, or null on failure
+     */
+    public static <T extends AbstractDbObject> List<T> find(Class<T> clazz,
+                                                            String baseQuery,
+                                                            List<DeclaredParameter> declaredParams,
+                                                            List<SortOrder> sortOrders,
+                                                            Integer maxResults)
+    {
+
+        return find(clazz, baseQuery, declaredParams, null, 0, maxResults);
+    }
+
+    /**
+     * @param clazz - is the class to fetch from the DB.
+     * @param baseQuery - Base query string without the declared parameters and without the entity
+     *            name. <br>
+     *            Ex: "lastName == lastNameParam".<br>
+     *            if null - no base query will be added <br>
+     *            or "||" may be used on a single field.
+     * @param declaredParams - Declare the list of parameters and values for query execution. <br>
+     *            if null no declared parameters nor values will be used.
      * @return Object matching the criteria, null if not found
      */
-    public static <T extends AbstractDbObject> T find(Class<T> clazz, String baseQuery, String declaredParams, Object[] values)
+    public static <T extends AbstractDbObject> T find(Class<T> clazz,
+                                                      String baseQuery,
+                                                      List<DeclaredParameter> declaredParams)
     {
-        List<T> res = find(clazz, baseQuery, declaredParams, values, 1);
+        List<T> res = find(clazz, baseQuery, declaredParams, null, 1);
         return res.isEmpty() ? null : res.get(0);
     }
-    
-    
+
     /**
-     * Search the DB the fpr up to maxResults objects.
+     * Search the DB the for up to maxResults objects.
+     * 
      * @param clazz is the class type to search for.
      * @param maxResults is the maximum results to retrieve.
      * @return a list of up to maxResults objects from the DB, null on error.
@@ -233,32 +264,42 @@ public class DbHandler
     {
         return find(clazz, null, null, null, maxResults);
     }
-    
+
     /**
      * 
      * @param clazz is the class type to search.
      * @param maxResults must be > 0. The larger this number, the longer the fetch will take.
      * @param centerLat latitude of the center Point around which to search for matching entities.
      * @param centerLng longitude of the center Point around which to search for matching entities.
-     * @param radiusMeters (optional) A number indicating the maximum distance to search, in meters. Set to 0 if no max distance is expected
+     * @param radiusMeters (optional) A number indicating the maximum distance to search, in meters.
+     *            Set to 0 if no max distance is expected
      * @return a list of up to maxResults of matching DB objects, null on error.
      * 
      * @see {@link AbstractDbGeoObject}
      * @see {@link GeocellManager#proximitySearch(com.beoui.geocell.model.Point, int, double, Class, com.beoui.geocell.model.GeocellQuery, javax.jdo.PersistenceManager)}
      */
-    public static <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz, Integer maxResults, Double centerLat, Double centerLng, Double radiusMeters)
+    public static <T extends AbstractDbGeoObject> List<T> proximitySearch(Class<T> clazz,
+                                                                          Integer maxResults,
+                                                                          Double centerLat,
+                                                                          Double centerLng,
+                                                                          Double radiusMeters)
     {
         PersistenceManager pm = PMF.get();
-    	pm.getFetchPlan().setMaxFetchDepth(-1);
+        pm.getFetchPlan().setMaxFetchDepth(-1);
         try
         {
             Point center = new Point(centerLat, centerLng);
             GeocellQuery baseQuery = new GeocellQuery();
-            List<T> attached = GeocellManager.proximitySearch(center, maxResults, radiusMeters, clazz, baseQuery, pm);
+            List<T> attached = GeocellManager.proximitySearch(center,
+                                                              maxResults,
+                                                              radiusMeters,
+                                                              clazz,
+                                                              baseQuery,
+                                                              pm);
             if (null != attached)
             {
-	            //detach the objects
-//	            return (List<T>) pm.detachCopyAll(attached);
+                // detach the objects
+                // return (List<T>) pm.detachCopyAll(attached);
             }
             return attached;
         }
@@ -268,96 +309,84 @@ public class DbHandler
         }
         finally
         {
-//            pm.close();
+            // pm.close();
         }
         return null;
     }
-    
-    
-    
-//    @Deprecated
-//    public static DbRestaurant searchRestaurantByName(String name)
-//    {
-//        return find(DbRestaurant.class, "name == value", "String value", new Object[]{name});        
-//    }
-//
-//    
-//    @Deprecated
-//    public static void saveMsg(String email, String msg)
-//    {
-//        PersistenceManager pm = PMF.get();
-//
-//        DbMsg m = new DbMsg(email, msg);
-//
-//        try
-//        {
-//            pm.makePersistent(m);
-//        }
-//        finally
-//        {
-////            pm.close();
-//        }
-//    }
-//
-//    
-//    @Deprecated
-//    public static long deleteMsg(String msg)
-//    {
-//        PersistenceManager pm = PMF.get();
-//        try
-//        {
-//            Query q = pm.newQuery(DbMsg.class);
-//            q.setFilter("msg == value");
-//            q.declareParameters("String value");
-//            return q.deletePersistentAll(msg);
-//        }
-//        finally
-//        {
-////            pm.close();
-//        }
-//    }
-//
-//    
-//    @Deprecated
-//    public static List<DbMsg> getMsgs()
-//    {
-//        PersistenceManager pm = PMF.get();
-//        try
-//        {
-//            List<DbMsg> res = new LinkedList<DbMsg>();
-//            Extent<DbMsg> extent = pm.getExtent(DbMsg.class, false);
-//            for (DbMsg m : extent)
-//            {
-//                res.add(m);
-//            }
-//            return res;
-//        }
-//        finally
-//        {
-////            pm.close();
-//        }
-//    }
-//
-//
-//    @Deprecated
-//    public static List<String> getGcmRegistered()
-//    {
-//        PersistenceManager pm = PMF.get();
-//        try
-//        {
-//            List<String> res = new LinkedList<String>();
-//            Extent<DbUserGcm> extent = pm.getExtent(DbUserGcm.class, false);
-//
-//            for (DbUserGcm m : extent)
-//            {
-//                res.add(m.getGcmKey());
-//            }
-//
-//            return res;
-//        }
-//        finally
-//        {
-////            pm.close();
-//        }
-//    }
+
+    private static StringBuilder getDeclaredParamsStr(List<DeclaredParameter> params)
+    {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        int n = params.size();
+        for (i = 0; i < n - 1; ++i)
+        {
+            builder.append(params.get(i).declaredName);
+            builder.append(", ");
+        }
+        builder.append(params.get(i).declaredName);
+        return builder;
+    }
+
+    private static Object[] getDeclaredParamsValues(List<DeclaredParameter> params)
+    {
+        int n = params.size();
+        Object[] res = new Object[n];
+        for (int i = 0; i < n; ++i)
+        {
+            res[i] = params.get(i).value;
+        }
+        return res;
+    }
+
+    private static StringBuilder getSortOrder(List<SortOrder> orders)
+    {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        int n = orders.size();
+        for (i = 0; i < n - 1; ++i)
+        {
+            builder.append(orders.get(i).sort);
+            builder.append(", ");
+        }
+        builder.append(orders.get(i).sort);
+        return builder;
+    }
+
+    public static class DeclaredParameter
+    {
+        public final String declaredName;
+        public final Object value;
+
+        public DeclaredParameter(String declaredName, Object value)
+        {
+            if (null == declaredName || null == value)
+            {
+                throw new IllegalArgumentException("Null pointer");
+            }
+
+            this.declaredName = value.getClass().getSimpleName() + " " + declaredName;
+            this.value = value;
+        }
+    }
+
+    public static enum SortOrderDirection
+    {
+        ASC, DESC;
+    }
+
+    public static class SortOrder
+    {
+        public final String sort;
+
+        public SortOrder(String paramName, SortOrderDirection direction)
+        {
+            if (null == paramName || null == direction)
+            {
+                throw new IllegalArgumentException("Null pointer");
+            }
+            this.sort = paramName + " " + direction.toString().toLowerCase();
+        }
+    }
+
 }

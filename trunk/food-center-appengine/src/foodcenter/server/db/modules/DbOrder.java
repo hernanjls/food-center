@@ -7,8 +7,6 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import com.google.appengine.datanucleus.annotations.Unowned;
-
 @PersistenceCapable(detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
@@ -18,8 +16,7 @@ public class DbOrder extends AbstractDbObject
 	private static final long serialVersionUID = -4888609583270819317L;
 
 	@Persistent
-	@Unowned
-	private DbUser user; // user which made this order
+	private String userId; // user which made this order
 
 	@Persistent
     private String compId;
@@ -53,14 +50,14 @@ public class DbOrder extends AbstractDbObject
 		this.date = new Date();
 	};
 
-	public DbUser getUser()
+	public String getUserId()
 	{
-		return user;
+		return userId;
 	}
 
-	public void setUser(DbUser user)
+	public void setUserId(String userId)
 	{
-		this.user = user;
+		this.userId = userId;
 	}
 
 	public String getCompId()

@@ -1,6 +1,6 @@
 package foodcenter.server.service;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -12,6 +12,9 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.DbHandler.DeclaredParameter;
+import foodcenter.server.db.DbHandler.SortOrder;
+import foodcenter.server.db.DbHandler.SortOrderDirection;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
@@ -102,26 +105,29 @@ public class ClientService
             return null;
         }
 
-        order.setUser(user);
-        user.getOrders().add(order);
+        order.setUserId(user.getId());
 
         // Save the order
-        if (null == DbHandler.save(user))
-        {
-            return null;
-        }
-        return order;
+        return DbHandler.save(order);
     }
 
-    public static List<DbOrder> getOrders()
+    public static List<DbOrder> getOrders(int startIdx, int endIdx)
     {
         DbUser user = PrivilegeManager.getCurrentUser();
-        return user.getOrders();
+
+        String query = "userId == userIdP";
+
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("userIdP", user.getId()));
+
+        ArrayList<SortOrder> sort = new ArrayList<SortOrder>();
+        sort.add(new SortOrder("date", SortOrderDirection.DESC));
+
+        return DbHandler.find(DbOrder.class, query, params, sort, startIdx, endIdx);
     }
 
-    
     /* ************************* Restaurant APIs *************************** */
-    
+
     public static List<DbRestaurant> getDefaultRestaurants()
     {
         logger.info("getDefaultRestaurants is called");
@@ -138,15 +144,14 @@ public class ClientService
     public static List<DbRestaurant> findRestaurant(String pattern, List<ServiceType> services)
     {
         StringBuilder query = new StringBuilder();
-        StringBuilder pat = new StringBuilder();
-        List<Object> objsList = new LinkedList<Object>();
+
+        ArrayList<DeclaredParameter> declaredParams = new ArrayList<DeclaredParameter>();
         if (null != pattern && pattern.length() > 0)
         {
-            query.append("name.startsWith(patternP)");            
-            pat.append("String patternP");
-            objsList.add(pattern);
+            query.append("name.startsWith(patternP)");
+            declaredParams.add(new DeclaredParameter("patternP", pattern));
         }
-        
+
         if (null != services && !services.isEmpty())
         {
             if (null != pattern && pattern.length() > 0)
@@ -163,24 +168,21 @@ public class ClientService
                 {
                     query.append(" || ");
                 }
-                
-                pat.append(", String serviceP" + i);
-                objsList.add(services.get(i));
+
+                declaredParams.add(new DeclaredParameter("serviceP" + i, services.get(i).toString()));
             }
             query.append(" )");
         }
 
         return DbHandler.find(DbRestaurant.class, //
                               query.toString(),
-                              pat.toString(),
-                              objsList.toArray(),
+                              declaredParams,
+                              null, // sort order
                               20); // limit num of results...
     }
 
-
-
     /* ************************* Companies APIs *************************** */
-    
+
     public static List<DbCompany> getDefaultCompanies()
     {
         logger.info("getDefaultRestaurants is called");
@@ -196,15 +198,13 @@ public class ClientService
     public static List<DbCompany> findCompany(String pattern, List<ServiceType> services)
     {
         StringBuilder query = new StringBuilder();
-        StringBuilder pat = new StringBuilder();
-        List<Object> objsList = new LinkedList<Object>();
+        ArrayList<DeclaredParameter> declaredParams = new ArrayList<DeclaredParameter>();
         if (null != pattern && pattern.length() > 0)
         {
-            query.append("name.startsWith(patternP)");            
-            pat.append("String patternP");
-            objsList.add(pattern);
+            query.append("name.startsWith(patternP)");
+            declaredParams.add(new DeclaredParameter("patternP", pattern));
         }
-        
+
         if (null != services && !services.isEmpty())
         {
             if (null != pattern && pattern.length() > 0)
@@ -221,17 +221,16 @@ public class ClientService
                 {
                     query.append(" || ");
                 }
-                
-                pat.append(", String serviceP" + i);
-                objsList.add(services.get(i));
+
+                declaredParams.add(new DeclaredParameter("serviceP" + i, services.get(i).toString()));
             }
             query.append(" )");
         }
 
         return DbHandler.find(DbCompany.class, //
                               query.toString(),
-                              pat.toString(),
-                              objsList.toArray(),
+                              declaredParams,
+                              null,
                               20); // limit num of results...
     }
 
