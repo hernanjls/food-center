@@ -117,7 +117,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox nameBox = new TextBox();
         WebClientUtils.setNotNullText(nameBox, rest.getName());
         nameBox.addKeyUpHandler(new NameKeyUpHandler(nameBox));
-        nameBox.setReadOnly(isEditMode);
+        nameBox.setReadOnly(!isEditMode);
         res.add(nameBox);
 
         return res;
@@ -132,7 +132,7 @@ public class RestaurantProfilePannel extends HorizontalPanel
         TextBox phoneBox = new TextBox();
         WebClientUtils.setNotNullText(phoneBox, rest.getPhone());
         phoneBox.addKeyUpHandler(new PhoneKeyUpHandler(phoneBox));
-        phoneBox.setReadOnly(isEditMode);
+        phoneBox.setReadOnly(!isEditMode);
         res.add(phoneBox);
 
         return res;
