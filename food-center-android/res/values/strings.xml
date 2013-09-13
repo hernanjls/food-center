@@ -28,7 +28,13 @@
     <string name="title_activity_restaurant">Restaurant Info</string>
     <string name="title_activity_branch">Branch Info</string>
     <string name="title_activity_branch_map">Map</string>
+    <string name="title_order_confirmation">Total Price:</string>
 
+    <!-- Order Confirm Activity -->
+    <string name="order_confirm_menu_ok">Confirm!</string>
+    <string name="order_success">Order Succes!</string>
+    <string name="makeing_order">Making Order ...</string>
+    <string name="subtitle_order_confirmation">Service:</string>
     <!-- LoginActivity -->
     <string name="title_activity_login">Login Options</string>
     <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
@@ -88,13 +94,15 @@
     <string name="swipe_down_to_refresh">Swipe down to refresh</string>
     <string name="load_restaurants">Loading restaurants ...</string>
     <string name="load_restaurant">Loading restaurant info ...</string>
-    <string name="course_name">Course</string>
-    <string name="course_price">0</string>
-    <string name="course_cnt">0</string>
-    <string name="course_info">this is a 2 lines course info \n is this a new line ?</string>
+    <string name="course_name">Course Name</string>
+    <string name="course_price">Price</string>
+    <string name="course_cnt">#</string>
+    <string name="course_info">No info was enterd for this course</string>
     <string name="category_name">Category</string>
+    <string name="total_price">Total Price:</string>
     <string name="press_to_select">To select - swipe items to the right</string>
     <string name="branch_menu_table">Table</string>
     <string name="branch_menu_takeaway">Take-Away</string>
     <string name="branch_menu_delivery">Delivery</string>
+
 </resources>

@@ -11,8 +11,8 @@
     <!-- Because version 2 of the Google Maps Android API requires OpenGL ES version 2 -->
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
-    
+        android:required="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Permission to request authtokens from the AccountManager -->
@@ -24,7 +24,7 @@
 
     <!--
     Gcm premissions (This permission is not required if you are targeting 
-    your application to 4.1 or above minSdkVersion=16)
+    your application to 4.1 or above minSdkVersion=16)
     -->
     <permission
         android:name="foodcenter.android.permission.C2D_MESSAGE"
@@ -43,25 +43,45 @@
 
     <!-- GMAPS: Allows the API to check the connection status in order to determine whether data can be downloaded -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
+
     <!-- GMAPS: Allows the API to access Google web-based services -->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    
+
     <!-- GMAPS:  Allows the API to use WiFi or mobile cell data (or both) to determine the device's location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    
+
     <!-- GMAPS:  Allows the API to use the Global Positioning System (GPS) to determine the device's location -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_food_center"
         android:label="@string/app_name"
         android:theme="@style/FoodCenterTheme.App" >
+        
+        <!--  Maps V2 API -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBLW3G58cVOAJguGIUNNlBm_EKQwmX7UTk" />
+
+        <!-- GCM -->
+        <service android:name="foodcenter.android.GCMIntentService" />
+
+        <!-- Handle GCM Notifications -->
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="foodcenter.android" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="foodcenter.android" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name="foodcenter.android.activities.main.MainActivity"
@@ -79,24 +99,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name="foodcenter.android.GCMIntentService" />
-
-        <receiver
-            android:name="com.google.android.gcm.GCMBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="foodcenter.android" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="foodcenter.android" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name="foodcenter.android.activities.main.LoginActivity"
             android:label="@string/title_activity_login"
@@ -107,7 +109,7 @@
             android:label="@string/title_activity_restaurant"
             android:theme="@style/FoodCenterTheme.Restaurant" >
 
-            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />
@@ -117,7 +119,18 @@
             android:label="@string/title_activity_branch"
             android:theme="@style/FoodCenterTheme.Branch" >
 
-            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="foodcenter.android.activities.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="foodcenter.android.activities.rest.OrderConfActivity"
+            android:label="@string/title_order_confirmation"
+            android:theme="@style/FoodCenterTheme.Branch" 
+            android:logo="@drawable/content_undo">
+            
+			<!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="foodcenter.android.activities.main.MainActivity" />

@@ -36,18 +36,9 @@ public class PersistenceFilter implements Filter
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException
     {
     	PMF.initThreadLocal();    	
-        Transaction tx = null;
         try
         {
-        	tx = PMF.get().currentTransaction();
-        	tx.begin();
-            chain.doFilter(req, res);
-            
-            tx = PMF.get().currentTransaction();
-            if (tx.isActive())
-            {
-            	tx.commit();
-            }
+            chain.doFilter(req, res);            
         }
         catch (Exception e)
         {
@@ -55,11 +46,6 @@ public class PersistenceFilter implements Filter
         }
         finally
         {
-        	if (null != tx && tx.isActive())
-        	{
-        		tx.rollback();
-        	}
-            
             PMF.closeThreadLocal();
         }
 

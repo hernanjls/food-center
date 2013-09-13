@@ -45,6 +45,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
         this.backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
     }
 
+    /** it actually retrieves the RF on the UI thread, but fire is on other thread */
     public void execute()
     {
         FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);

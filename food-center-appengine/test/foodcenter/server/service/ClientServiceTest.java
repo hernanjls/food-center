@@ -10,9 +10,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import foodcenter.server.AbstractGAETest;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.modules.DbCompany;
+import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbCourseOrder;
 import foodcenter.server.db.modules.DbMenu;
@@ -137,7 +139,48 @@ public class ClientServiceTest extends AbstractServiceTest
                                        numBranchMenuCats,
                                        numBranchMenuCourses);
         RestaurantAdminService.saveRestaurant(rest);
+        tearDownPMF();
+        setUpPMF();
 
+        DbCompany comp = createComp("comp", numBranches);
+        comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
+        
+        DbMenu branchMenu = rest.getBranches().get(0).getMenu();
+
+        // Create an order and fill it with all the courses from branch menu to the order
+        DbOrder order = new DbOrder();
+        for (int i = 0; i < numBranchMenuCourses; ++i)
+        {
+            DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
+            DbCourseOrder courseOrder = createOrder(course, 1);
+            order.getCourses().add(courseOrder);
+        }
+
+        // save the order
+        DbOrder result = ClientService.makeOrder(order);
+        assertNull(result);
+    }
+
+    @Test
+    public void makeOrderWithoutCompanyTest()
+    {
+        ClientService.login(null);
+        tearDownPMF();
+        setUpPMF();
+
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+
+        DbRestaurant rest = createRest("rest",
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
         setUpPMF();
 
@@ -175,19 +218,21 @@ public class ClientServiceTest extends AbstractServiceTest
                                        numBranches,
                                        numBranchMenuCats,
                                        numBranchMenuCourses);
-        RestaurantAdminService.saveRestaurant(rest);
+        rest = RestaurantAdminService.saveRestaurant(rest);
 
         tearDownPMF();
         setUpPMF();
 
-        String gcmKey = "hila";
-        // login with GCM key
-        DbUser user = ClientService.login(gcmKey);
-        assertNotNull(user);
-
+        ClientService.login(null);
         tearDownPMF();
         setUpPMF();
 
+        DbCompany comp = createComp("comp", numBranches);
+        comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
+        comp = CompanyAdminService.saveCompany(comp);
+        tearDownPMF();
+        setUpPMF();
+        
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
 
         // Create an order and fill it with all the courses from branch menu to the order
@@ -205,56 +250,19 @@ public class ClientServiceTest extends AbstractServiceTest
         assertNotNull(result);
     }
 
+    
     @Test
     public void getOrdersTest()
     {
-        int numMenuCats = 1;
-        int numMenuCourses = 2;
-        int numBranches = 1;
-        int numBranchMenuCats = numMenuCats;
-        int numBranchMenuCourses = numMenuCourses;
-
-        DbRestaurant rest = createRest("rest",
-                                       numMenuCats,
-                                       numMenuCourses,
-                                       numBranches,
-                                       numBranchMenuCats,
-                                       numBranchMenuCourses);
-        rest = RestaurantAdminService.saveRestaurant(rest);
-
+        makeOrderTest();
         tearDownPMF();
         setUpPMF();
-
-        String gcmKey = "hila";
-        // login with GCM key
-        ClientService.login(gcmKey);
-
-        tearDownPMF();
-        setUpPMF();
-
-        DbMenu branchMenu = rest.getBranches().get(0).getMenu();
-
-        // Create an order and fill it with all the courses from branch menu to the order
-        DbOrder order = new DbOrder();
-        for (int i = 0; i < numBranchMenuCourses; ++i)
-        {
-            DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
-            DbCourseOrder courseOrder = createOrder(course, 1);
-
-            order.getCourses().add(courseOrder);
-        }
-
-        // save the order
-        ClientService.makeOrder(order);
-
-        tearDownPMF();
-        setUpPMF();
-
+        
         List<DbOrder> orders = ClientService.getOrders(0, 100);
         assertNotNull(orders);
         assertEquals(1, orders.size());
     }
-
+    
     /**
      * tests that after saving 2 restaurants we can retrieve them both
      */
@@ -486,6 +494,61 @@ public class ClientServiceTest extends AbstractServiceTest
         comps = ClientService.findCompany("FDASDASDA", services);
         assertNotNull(comps);
         assertEquals(0, comps.size());
+    }
+
+
+    @Test
+    public void findUserCompanyFailTest()
+    {    
+        // get login info
+        DbUser user = ClientService.login(null);
+        tearDownPMF();
+        setUpPMF();
+        
+        DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
+        assertNull(b);
+        
+        tearDownPMF();
+        setUpPMF();
+
+        DbCompany c = ClientService.findCompanyOfBranch(b);
+        assertNull(c);
+    }
+
+    @Test
+    public void findUserCompanyAndBranchTest()
+    {    
+        // get login info
+        DbUser user = ClientService.login(null);
+        tearDownPMF();
+        setUpPMF();
+
+        
+        int numBranches = 1;
+
+        String name = "comp";
+
+        DbCompany comp = createComp(name + 1, numBranches);
+        comp.getServices().add(ServiceType.DELIVERY);
+        comp.getServices().add(ServiceType.TAKE_AWAY);
+        
+        comp.getBranches().get(0).getWorkers().add(user.getEmail()); // add the user
+        
+        CompanyAdminService.saveCompany(comp);
+
+        tearDownPMF();
+        setUpPMF();
+        
+        DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
+        assertNotNull(b);
+        assertEquals(comp.getBranches().get(0).getId(), b.getId());
+
+        tearDownPMF();
+        setUpPMF();
+
+        DbCompany c = ClientService.findCompanyOfBranch(b);
+        assertNotNull(c);
+        assertEquals(comp.getId(), c.getId());
     }
 
 }

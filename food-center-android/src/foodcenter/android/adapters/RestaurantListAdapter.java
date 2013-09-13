@@ -1,4 +1,4 @@
-package foodcenter.android.service.restaurant;
+package foodcenter.android.adapters;
 
 import android.app.Activity;
 import android.content.Intent;

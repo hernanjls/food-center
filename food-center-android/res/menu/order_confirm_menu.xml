@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/order_confirm_menu_ok"
+        android:icon="@drawable/order_now"
+        android:showAsAction="always"
+        android:title="@string/order_confirm_menu_ok"/>
+
+</menu>

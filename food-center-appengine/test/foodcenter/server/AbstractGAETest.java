@@ -17,8 +17,8 @@ import foodcenter.server.db.PMF;
 public abstract class AbstractGAETest
 {
 	
-	protected final String email = "email@email.com";
-	protected final String authDomain = "email.com";
+	protected static final String email = "email@email.com";
+	protected static final String authDomain = "email.com";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -63,34 +63,12 @@ public abstract class AbstractGAETest
 		
 	protected final void setUpPMF()
 	{
-		PMF.initThreadLocal().currentTransaction().begin();
+		PMF.initThreadLocal();
 	}
 
 	protected final void tearDownPMF()
 	{
-	    PersistenceManager pmf = PMF.get();
-        if (null == pmf)
-        {
-            return;
-        }
-		try
-		{
-			Transaction tx = pmf.currentTransaction();
-			if (tx.isActive())
-			{
-				tx.rollback();
-			}
-		}
-		catch (Exception e)
-		{
-			logger.warn(e.getMessage(), e);
-		}
-		finally
-		{
-		    
-			PMF.closeThreadLocal();
-			
-		}
+	    PMF.closeThreadLocal();
 	}
 
 }

@@ -10,9 +10,10 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
-import foodcenter.android.ObjectCashe;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.main.MainActivity;
+import foodcenter.android.adapters.RestaurantListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -48,7 +49,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
             {
                 query = "";
                 @SuppressWarnings("unchecked")
-                List<RestaurantProxy> rests =  ObjectCashe.get(List.class, query);
+                List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
                 if (null != rests)
                 {
                     publishProgress(rests.toArray(new RestaurantProxy[0]));
@@ -60,7 +61,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
             {
                 query = arg0[0];
                 @SuppressWarnings("unchecked")
-                List<RestaurantProxy> rests =  ObjectCashe.get(List.class, query);
+                List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
                 if (null != rests)
                 {
                     publishProgress(rests.toArray(new RestaurantProxy[0]));
@@ -107,7 +108,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
             if (null != response)
             {
                 // Save the response in cache!
-                ObjectCashe.put(List.class, query, response);
+                ObjectStore.put(List.class, query, response);
                 publishProgress(response.toArray(new RestaurantProxy[0]));
             }
             else

@@ -22,25 +22,16 @@ package foodcenter.android.service;
 public class Setup
 {
 
-	/**
-	 * The AppEngine app name, used to construct the production service URL
-	 * below.
-	 */
-	private static final String APP_NAME = "food-center";
+    /** The AppEngine app name, used to construct the production service URL below. */
+    private static final String APP_NAME = "food-center";
 
-	/**
-	 * The URL of the production service.
-	 */
-	public static final String PROD_URL = "https://" + APP_NAME + ".appspot.com";
-	
-	 /**
-     * Intent used to display a message in the screen.
-     */
-	public static final String DISPLAY_POPUP_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
-	
-     /**
-     * Intent's extra that contains the message to be displayed.
-     */
+    /** The URL of the production service. */
+    public static final String PROD_URL = "https://" + APP_NAME + ".appspot.com";
+
+    /** Intent used to display a message in the screen. */
+    public static final String DISPLAY_POPUP_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
+
+    /** Intent's extra that contains the message to be displayed. */
     public static final String EXTRA_MESSAGE = "message";
-    
+
 }

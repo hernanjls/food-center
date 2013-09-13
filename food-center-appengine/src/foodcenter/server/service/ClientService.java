@@ -15,7 +15,9 @@ import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
+import foodcenter.server.db.PMF;
 import foodcenter.server.db.modules.DbCompany;
+import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbUser;
@@ -106,6 +108,25 @@ public class ClientService
         }
 
         order.setUserId(user.getId());
+        
+        DbCompanyBranch branch = findUserCompanyBranch(user.getEmail());
+        if (null == branch)
+        {
+            return null;
+        }
+        
+        order.setCompBranchId(branch.getId());
+        
+        DbCompany comp = findCompanyOfBranch(branch);
+        if (null == comp)
+        {
+            return null;
+        }
+        
+        // This is needed because we are using cross transactions with the company
+        PMF.closeThreadLocal();
+        PMF.initThreadLocal();
+        order.setCompId(comp.getId());
 
         // Save the order
         return DbHandler.save(order);
@@ -232,6 +253,31 @@ public class ClientService
                               declaredParams,
                               null,
                               20); // limit num of results...
+    }
+
+    /* ******************************************************************************* */
+    /* **************************** private functions ******************************** */
+    /* ******************************************************************************* */
+    
+    protected static DbCompany findCompanyOfBranch(DbCompanyBranch branch)
+    {
+        if (null == branch)
+        {
+            return null;
+        }
+        
+        String query = "branches == branchP";
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("emailP", branch));
+        return DbHandler.find(DbCompany.class, query, params);
+    }
+    
+    protected static DbCompanyBranch findUserCompanyBranch(String email)
+    {
+        String query = "workers == emailP";
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("emailP", email));
+        return DbHandler.find(DbCompanyBranch.class, query, params);
     }
 
 }
