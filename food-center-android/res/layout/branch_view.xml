@@ -25,30 +25,36 @@
         android:layout_width="300sp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:clickable="false"
+        android:focusable="false"
         android:background="@android:color/background_light"
         android:orientation="vertical" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60sp">
+            android:layout_height="40sp"
+            android:background="@android:color/background_light">
 			<TextView 
 			    android:id="@+id/branch_drawer_phone"
 				android:layout_height="match_parent"
-				android:layout_width="240sp"
+				android:layout_width="260sp"
 				android:layout_alignParentLeft="true"
 			    android:text="@string/branch_drawer_call"
-			    android:paddingLeft="2sp"
+			    android:textSize="20sp"
+			    android:gravity="center"
+		        android:clickable="true"
+                android:focusable="true"
 			    android:textColor="@color/black">
 			</TextView>
             <Button
                 android:id="@+id/branch_drawer_call"
-                android:layout_width="60sp"
-                android:layout_height="60sp"
+                android:layout_width="40sp"
+                android:layout_height="40sp"
                 android:paddingRight="2sp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/device_access_call"
                 android:clickable="true"
-                android:paddingTop="10sp" />
+                android:focusable="true"/>
         </RelativeLayout>
 
         <fragment
