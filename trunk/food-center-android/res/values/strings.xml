@@ -104,5 +104,6 @@
     <string name="branch_menu_table">Table</string>
     <string name="branch_menu_takeaway">Take-Away</string>
     <string name="branch_menu_delivery">Delivery</string>
+    <string name="branch_drawer_call">Call Now!</string>
 
 </resources>

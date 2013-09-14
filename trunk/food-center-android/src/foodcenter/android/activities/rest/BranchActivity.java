@@ -4,9 +4,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -15,7 +15,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.helpers.OrderConfData;
@@ -25,7 +38,8 @@ import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class BranchActivity extends Activity implements SwipeListViewTouchListener.OnSwipeCallback, OnItemClickListener
+public class BranchActivity extends FragmentActivity implements SwipeListViewTouchListener.OnSwipeCallback,
+                                            OnItemClickListener
 {
 
     public final static int REQ_CODE_ORDER = 1;
@@ -38,8 +52,12 @@ public class BranchActivity extends Activity implements SwipeListViewTouchListen
     private List<ServiceType> services = null; // TODO resolve branch service workaround :)
 
     private ListView lv;
-
+    private LinearLayout drawer;
+    
     private MenuListAdapter adapter;
+
+    /** Note that this may be null if the Google Play services APK is not available. */
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +69,8 @@ public class BranchActivity extends Activity implements SwipeListViewTouchListen
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
 
+        drawer = (LinearLayout)findViewById(R.id.bracnh_drawer);
+        
         SwipeListViewTouchListener touchListener = new SwipeListViewTouchListener(lv,
                                                                                   this,
                                                                                   false,
@@ -59,6 +79,13 @@ public class BranchActivity extends Activity implements SwipeListViewTouchListen
         lv.setOnItemClickListener(this);
 
         initActionBar();
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
         handleIntent(getIntent());
     }
 
@@ -134,16 +161,9 @@ public class BranchActivity extends Activity implements SwipeListViewTouchListen
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
     {
-         onSwipeRight(lv, new int[] { position });
-        
-    }
+        onSwipeRight(lv, new int[] { position });
 
-//    @Override
-//    protected void onListItemClick(ListView l, View v, int position, long id)
-//    {
-//        onSwipeRight(l, new int[] { position });
-//
-//    }
+    }
 
     private void OpenOrderVerification(ServiceType service)
     {
@@ -190,7 +210,70 @@ public class BranchActivity extends Activity implements SwipeListViewTouchListen
             ObjectStore.put(MenuListAdapter.class, branch.getId(), adapter);
         }
         lv.setAdapter(adapter);
+
+        TextView phone = (TextView)findViewById(R.id.branch_drawer_phone);
+        phone.setText(branch.getPhone());
+        
+        setUpMapIfNeeded();
+
     }
+
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * <p>
+     * If it isn't installed {@link SupportMapFragment} (and
+     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * install/update the Google Play services APK on their device.
+     * <p>
+     * A user can return to this FragmentActivity after following the prompt and correctly
+     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+     * have been completely destroyed during this process (it is likely that it would only be
+     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
+     * method in {@link #onResume()} to guarantee that it will be called.
+     */
+    private void setUpMapIfNeeded()
+    {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null)
+        {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            
+            // Check if we were successful in obtaining the map.
+            if (mMap != null)
+            {
+                setUpMap();
+            }
+        }
+    }
+
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p>
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     */
+    private void setUpMap()
+    {
+        UiSettings mUiSettings = mMap.getUiSettings();
+        mUiSettings.setAllGesturesEnabled(false);
+        
+        LatLng l = new LatLng(branch.getLat(), branch.getLng());
+        Marker marker = mMap.addMarker(new MarkerOptions().position(l).title(branch.getAddress()));
+        marker.showInfoWindow();
+        
+        CameraUpdate center = CameraUpdateFactory.newLatLng(l);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+        mMap.moveCamera(center);
+        mMap.moveCamera(zoom);
+
+    }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
 
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {

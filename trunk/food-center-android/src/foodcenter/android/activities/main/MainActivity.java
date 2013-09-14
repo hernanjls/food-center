@@ -78,9 +78,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         {
             handleIntent(getIntent());
         }
-
-        // startActivity(new Intent(this, BranchMap.class));
-
     }
 
     private void initGCMService()
