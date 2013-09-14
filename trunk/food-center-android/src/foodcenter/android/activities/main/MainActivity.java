@@ -36,7 +36,8 @@ import foodcenter.android.service.AuthCookieImageDownloader;
 import foodcenter.android.service.Setup;
 import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 
-public class MainActivity extends Activity implements PullToRefreshAttacher.OnRefreshListener, ListView.OnItemClickListener
+public class MainActivity extends Activity implements PullToRefreshAttacher.OnRefreshListener,
+                                          ListView.OnItemClickListener
 
 {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -68,17 +69,17 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         initImageLoader();
         initActionBar();
         actionBarDrawer = new ActionBarDrawer(this, this);
-        
+
         setTitle(actionBarDrawer.getTitle());
-        
+
         initPullToRefresh();
 
         if (!gotoLoginActivity())
         {
             handleIntent(getIntent());
         }
-        
-//        startActivity(new Intent(this, BranchMap.class));
+
+        // startActivity(new Intent(this, BranchMap.class));
 
     }
 
@@ -230,7 +231,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         actionBarDrawer.closeDrawer();
     }
 
-    
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {

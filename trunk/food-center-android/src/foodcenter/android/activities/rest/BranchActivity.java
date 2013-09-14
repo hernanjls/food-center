@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
@@ -23,8 +25,7 @@ import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class BranchActivity extends ListActivity implements
-                                                SwipeListViewTouchListener.OnSwipeCallback
+public class BranchActivity extends Activity implements SwipeListViewTouchListener.OnSwipeCallback, OnItemClickListener
 {
 
     public final static int REQ_CODE_ORDER = 1;
@@ -36,14 +37,17 @@ public class BranchActivity extends ListActivity implements
     private String restId = null;
     private List<ServiceType> services = null; // TODO resolve branch service workaround :)
 
+    private ListView lv;
+
     private MenuListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.branch_view);
 
-        ListView lv = getListView();
+        lv = (ListView) findViewById(R.id.branch_menu_list);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
 
@@ -52,6 +56,7 @@ public class BranchActivity extends ListActivity implements
                                                                                   false,
                                                                                   false);
         lv.setOnTouchListener(touchListener);
+        lv.setOnItemClickListener(this);
 
         initActionBar();
         handleIntent(getIntent());
@@ -127,10 +132,18 @@ public class BranchActivity extends ListActivity implements
     }
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id)
+    public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
     {
-        onSwipeRight(l, new int[] { position });
+         onSwipeRight(lv, new int[] { position });
+        
     }
+
+//    @Override
+//    protected void onListItemClick(ListView l, View v, int position, long id)
+//    {
+//        onSwipeRight(l, new int[] { position });
+//
+//    }
 
     private void OpenOrderVerification(ServiceType service)
     {
@@ -170,14 +183,13 @@ public class BranchActivity extends ListActivity implements
         RestaurantProxy rest = ObjectStore.get(RestaurantProxy.class, restId);
         services = (null != rest) ? rest.getServices() : new ArrayList<ServiceType>();
 
-        ListView branchView = getListView();
         adapter = ObjectStore.get(MenuListAdapter.class, branch.getId());
         if (null == adapter)
         {
             adapter = new MenuListAdapter(this, branch.getMenu());
             ObjectStore.put(MenuListAdapter.class, branch.getId(), adapter);
         }
-        branchView.setAdapter(adapter);
+        lv.setAdapter(adapter);
     }
 
     private class ModeCallback implements ListView.MultiChoiceModeListener
@@ -190,6 +202,7 @@ public class BranchActivity extends ListActivity implements
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.branch_course_list_select_menu, menu);
 
+            menu.findItem(android.R.id.home);
             boolean isTakeAway = services.contains(ServiceType.TAKE_AWAY);
             menu.findItem(R.id.branch_menu_takeaway).setVisible(isTakeAway);
 
@@ -245,7 +258,7 @@ public class BranchActivity extends ListActivity implements
             // Select & add 1 to counter
             if (checked && 0 == adapter.getCounter(position))
             {
-                onSwipeRight(getListView(), new int[] { position });
+                onSwipeRight(lv, new int[] { position });
             }
             else if (!checked)
             {
@@ -263,5 +276,4 @@ public class BranchActivity extends ListActivity implements
             mode.setSubtitle(s);
         }
     }
-
 }
