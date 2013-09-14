@@ -111,14 +111,20 @@ public class ClentServiceRequestTest extends AbstractRequestTest
         tearDownPMF();
         setUpPMF();
 
-        service = rf.getClientService();
-        order = createOrder(service, restResponse.response.getBranches().get(0), numBranchMenuCatCourses);
-        order.setRestBranchId(restResponse.response.getBranches().get(0).getId());
-        order.setRestId(restResponse.response.getId());
-        service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
-        assertNotNull(orderResponse.response);
-        assertNotNull(orderResponse.response.getCourses());
-        assertEquals(numBranchMenuCatCourses, orderResponse.response.getCourses().size());
+        for (int i = 0; i< 30; ++i)
+        {
+            service = rf.getClientService();
+            order = createOrder(service, restResponse.response.getBranches().get(0), numBranchMenuCatCourses);
+            order.setRestBranchId(restResponse.response.getBranches().get(0).getId());
+            order.setRestId(restResponse.response.getId());
+            service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+            assertNotNull(orderResponse.response);
+            assertNotNull(orderResponse.response.getCourses());
+            assertEquals(numBranchMenuCatCourses, orderResponse.response.getCourses().size());
+            tearDownPMF();
+            setUpPMF();
+        }
+        
     }
 
     /**

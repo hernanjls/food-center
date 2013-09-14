@@ -17,7 +17,8 @@ public interface RestaurantProxy extends EntityProxy, AbstractEntityInterface
                                               "branches",
                                               "branches.menu",
                                               "branches.menu.categories",
-                                              "branches.menu.categories.courses"};
+                                              "branches.menu.categories.courses",
+                                              "branches.services"};
 
     public String getId();
 

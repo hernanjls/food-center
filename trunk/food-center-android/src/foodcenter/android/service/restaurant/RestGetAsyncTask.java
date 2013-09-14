@@ -16,10 +16,13 @@ import foodcenter.service.proxies.RestaurantProxy;
 public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 {
 
+    private final static String TAG = RestGetAsyncTask.class.getSimpleName();
+
     private final RestaurantActivity owner;
 
     public RestGetAsyncTask(RestaurantActivity owner)
     {
+        super();
         this.owner = owner;
     }
 
@@ -37,7 +40,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         if (null == restId || restId.length == 0 || null == restId[0])
         {
             return null;
-        }
+        }        
         try
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
@@ -49,7 +52,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         }
         catch (Exception e)
         {
-            Log.e("unknown", e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }

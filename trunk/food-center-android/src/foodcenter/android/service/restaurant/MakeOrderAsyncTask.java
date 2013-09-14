@@ -22,14 +22,16 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
 {
 
     private final static String TAG = MakeOrderAsyncTask.class.getSimpleName();
-    
+
     private OrderConfActivity activity;
-    
+
     public MakeOrderAsyncTask(OrderConfActivity activity)
     {
+        super();
+
         this.activity = activity;
     }
-    
+
     @Override
     protected void onPreExecute()
     {
@@ -41,23 +43,32 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
     @Override
     protected Void doInBackground(OrderConfData... data)
     {
-        FoodCenterRequestFactory rf = AndroidRequestUtils.getFoodCenterRF(activity);
-        ClientServiceRequest service = rf.getClientService();
-        OrderProxy order = createOrder(service, data[0]);
-        
-        service.makeOrder(order).fire(new OrderGetReciever());
-        
+        try
+        {
+            FoodCenterRequestFactory rf = AndroidRequestUtils.getFoodCenterRF(activity.getApplicationContext());
+            ClientServiceRequest service = rf.getClientService();
+            OrderProxy order = createOrder(service, data[0]);
+
+            service.makeOrder(order).fire(new OrderGetReciever());
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, e.getMessage());
+            activity.hideSpinner();
+            AndroidUtils.displayMessage(activity, e.getMessage());
+        }
+
         return null;
     }
-    
+
     private OrderProxy createOrder(ClientServiceRequest service, OrderConfData data)
     {
-        
+
         OrderProxy res = service.create(OrderProxy.class);
         res.setCourses(new ArrayList<CourseOrderProxy>());
-        
+
         int n = data.getCourses().size();
-        for (int i=0; i< n; ++i)
+        for (int i = 0; i < n; ++i)
         {
             CourseProxy c = data.getCourses().get(i);
             CourseOrderProxy co = service.create(CourseOrderProxy.class);
@@ -68,13 +79,13 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
             co.setName(c.getName());
             res.getCourses().add(co);
         }
-        
+
         res.setRestBranchId(data.getRestBranchId());
         res.setRestId(data.getRestId());
-        
+
         return res;
     }
-    
+
     private class OrderGetReciever extends Receiver<OrderProxy>
     {
         @Override
@@ -91,6 +102,5 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
             AndroidUtils.displayMessage(activity, error.getMessage());
         }
     }
-
 
 }

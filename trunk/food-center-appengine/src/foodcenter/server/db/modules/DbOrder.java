@@ -7,6 +7,8 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.service.enums.ServiceType;
+
 @PersistenceCapable(detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
@@ -34,8 +36,17 @@ public class DbOrder extends AbstractDbObject
 	private List<DbCourseOrder> courses = new ArrayList<DbCourseOrder>(); // Courses IDs
 
 	@Persistent
-	private Date date;
+	private Date date = null;
 
+	@Persistent
+	private boolean delivered = false;
+	
+	@Persistent
+    private Date deliveryDate = null;
+
+	@Persistent
+	private ServiceType service;
+	
 	public DbOrder()
 	{
 		super();
@@ -47,7 +58,14 @@ public class DbOrder extends AbstractDbObject
 		super.jdoPreStore();
 
 		// Make sure the date is correct
-		this.date = new Date();
+		if (null == this.date)
+		{
+		    this.date = new Date();
+		}
+		if (this.delivered && null == this.deliveryDate)
+		{
+		    this.deliveryDate = new Date();
+		}
 	};
 
 	public String getUserId()
@@ -114,5 +132,30 @@ public class DbOrder extends AbstractDbObject
 	{
 		return date;
 	}
+
+    public Boolean getDelivered()
+    {
+        return delivered;
+    }
+
+    public void setDelivered(boolean delivered)
+    {
+        this.delivered = delivered;
+    }
+
+    public Date getDeliveryeDate()
+    {
+        return deliveryDate;
+    }
+
+    public ServiceType getService()
+    {
+        return service;
+    }
+
+    public void setService(ServiceType service)
+    {
+        this.service = service;
+    }
 
 }

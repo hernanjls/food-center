@@ -1,5 +1,7 @@
 package foodcenter.service.request;
 
+import java.util.Random;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -14,6 +16,7 @@ import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 import foodcenter.client.service.WebRequestUtils;
 import foodcenter.server.AbstractGAETest;
 import foodcenter.service.FoodCenterRequestFactory;
+import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CompanyBranchProxy;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -80,6 +83,8 @@ public abstract class AbstractRequestTest extends AbstractGAETest
                 category.getCourses().add(course);
             }
         }
+        branch.getServices().add(ServiceType.DELIVERY);
+        branch.getServices().add(ServiceType.TAKE_AWAY);
         return branch;
     }
 
@@ -149,6 +154,8 @@ public abstract class AbstractRequestTest extends AbstractGAETest
                 }
             }
         }
+        int i = new Random().nextInt() % ServiceType.values().length;
+        order.setService(ServiceType.values()[i]);
         return order;
     }
 

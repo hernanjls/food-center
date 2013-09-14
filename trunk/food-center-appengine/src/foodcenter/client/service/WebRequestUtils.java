@@ -82,6 +82,7 @@ public class WebRequestUtils
         res.setAdmins(new ArrayList<String>());
         res.setWaiters(new ArrayList<String>());
         res.setChefs(new ArrayList<String>());
+        res.setServices(new ArrayList<ServiceType>());
         
     	res.setLat(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LAT);
     	res.setLng(AbstractDbGeoObject.GOOGLE_API_DEFAULT_LNG);

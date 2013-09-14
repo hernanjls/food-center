@@ -38,8 +38,9 @@ import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class BranchActivity extends FragmentActivity implements SwipeListViewTouchListener.OnSwipeCallback,
-                                            OnItemClickListener
+public class BranchActivity extends FragmentActivity implements
+                                                    SwipeListViewTouchListener.OnSwipeCallback,
+                                                    OnItemClickListener
 {
 
     public final static int REQ_CODE_ORDER = 1;
@@ -53,7 +54,7 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
 
     private ListView lv;
     private LinearLayout drawer;
-    
+
     private MenuListAdapter adapter;
 
     /** Note that this may be null if the Google Play services APK is not available. */
@@ -69,8 +70,8 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
 
-        drawer = (LinearLayout)findViewById(R.id.bracnh_drawer);
-        
+        drawer = (LinearLayout) findViewById(R.id.bracnh_drawer);
+
         SwipeListViewTouchListener touchListener = new SwipeListViewTouchListener(lv,
                                                                                   this,
                                                                                   false,
@@ -200,8 +201,11 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
             return;
         }
 
-        RestaurantProxy rest = ObjectStore.get(RestaurantProxy.class, restId);
-        services = (null != rest) ? rest.getServices() : new ArrayList<ServiceType>();
+        services = branch.getServices();
+        if (null == services)
+        {
+            services = new ArrayList<ServiceType>();
+        }
 
         adapter = ObjectStore.get(MenuListAdapter.class, branch.getId());
         if (null == adapter)
@@ -211,9 +215,9 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
         }
         lv.setAdapter(adapter);
 
-        TextView phone = (TextView)findViewById(R.id.branch_drawer_phone);
+        TextView phone = (TextView) findViewById(R.id.branch_drawer_phone);
         phone.setText(branch.getPhone());
-        
+
         setUpMapIfNeeded();
 
     }
@@ -240,7 +244,7 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
         {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            
+
             // Check if we were successful in obtaining the map.
             if (mMap != null)
             {
@@ -259,11 +263,11 @@ public class BranchActivity extends FragmentActivity implements SwipeListViewTou
     {
         UiSettings mUiSettings = mMap.getUiSettings();
         mUiSettings.setAllGesturesEnabled(false);
-        
+
         LatLng l = new LatLng(branch.getLat(), branch.getLng());
         Marker marker = mMap.addMarker(new MarkerOptions().position(l).title(branch.getAddress()));
         marker.showInfoWindow();
-        
+
         CameraUpdate center = CameraUpdateFactory.newLatLng(l);
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
         mMap.moveCamera(center);
