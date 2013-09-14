@@ -16,9 +16,9 @@ import android.widget.TextView;
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
-import foodcenter.android.activities.helpers.OrderConfData;
 import foodcenter.android.adapters.MenuListAdapter;
 import foodcenter.android.adapters.OrderConfAdapter;
+import foodcenter.android.data.OrderConfData;
 import foodcenter.android.service.restaurant.MakeOrderAsyncTask;
 
 public class OrderConfActivity extends ListActivity

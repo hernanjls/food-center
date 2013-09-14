@@ -79,7 +79,7 @@
         </receiver>
 
         <activity
-            android:name="foodcenter.android.activities.main.MainActivity"
+            android:name=".activities.main.MainActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="android.app.searchable"
@@ -95,32 +95,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="foodcenter.android.activities.main.LoginActivity"
+            android:name=".activities.main.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/FoodCenterTheme.Login" >
         </activity>
         <activity
-            android:name="foodcenter.android.activities.rest.RestaurantActivity"
+            android:name=".activities.rest.RestaurantActivity"
             android:label="@string/title_activity_restaurant"
             android:theme="@style/FoodCenterTheme.Restaurant" >
 
             <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="foodcenter.android.activities.main.MainActivity" />
+                android:value=".activities.main.MainActivity" />
         </activity>
         <activity
-            android:name="foodcenter.android.activities.rest.BranchActivity"
+            android:name=".activities.rest.BranchActivity"
             android:label="@string/title_activity_branch"
             android:theme="@style/FoodCenterTheme.Branch" >
 
             <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="foodcenter.android.activities.main.MainActivity" />
+                android:value=".activities.main.MainActivity" />
         </activity>
         <activity
-            android:name="foodcenter.android.activities.rest.OrderConfActivity"
+            android:name=".activities.rest.OrderConfActivity"
             android:label="@string/title_order_confirmation"
             android:theme="@style/FoodCenterTheme.Branch" 
             android:logo="@drawable/content_undo">
@@ -128,14 +128,13 @@
 			<!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="foodcenter.android.activities.main.MainActivity" />
+                android:value=".activities.main.MainActivity" />
         </activity>
         <activity
-            android:name="foodcenter.android.service.restaurant.BranchMap"
-            android:label="@string/title_activity_branch_map"
-            android:theme="@style/FoodCenterTheme.Branch" >
+            android:name=".activities.user.OrderHistoryActivity"
+            android:label="@string/title_activity_history"
+            android:theme="@style/FoodCenterTheme.OrderHistory" >
         </activity>
-        
         <!--  Maps V2 API -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

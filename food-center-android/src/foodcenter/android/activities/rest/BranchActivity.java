@@ -29,9 +29,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
-import foodcenter.android.activities.helpers.OrderConfData;
 import foodcenter.android.adapters.MenuListAdapter;
 import foodcenter.android.adapters.SwipeListViewTouchListener;
+import foodcenter.android.data.OrderConfData;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 

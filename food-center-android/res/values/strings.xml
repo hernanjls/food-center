@@ -36,8 +36,14 @@
     <string name="makeing_order">Making Order ...</string>
     <string name="makeing_order_retry">Making Order ... (Retry %1$d)</string>
     <string name="subtitle_order_confirmation">Service:</string>
+    
     <!-- LoginActivity -->
     <string name="title_activity_login">Login Options</string>
+    
+    <!-- HistoryActivity -->
+    <string name="title_activity_history">History Activity</string>
+    <string name="history_loading">Loading Orders</string>
+    
     <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
     <string name="connect_text">This application requests permission to connect your mobile device to the server.</string>
 

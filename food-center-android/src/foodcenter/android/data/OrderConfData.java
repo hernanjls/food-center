@@ -1,4 +1,4 @@
-package foodcenter.android.activities.helpers;
+package foodcenter.android.data;
 
 import java.util.LinkedList;
 import java.util.List;
