@@ -2,6 +2,7 @@ package foodcenter.service.request;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -56,8 +57,6 @@ public class ClentServiceRequestTest extends AbstractRequestTest
     @Test
     public void makeOrderRequestTest()
     {
-        OrderProxy response;
-
         menuCats = 3;
         menuCatCourses = 4;
         numBranches = 2;
@@ -93,18 +92,33 @@ public class ClentServiceRequestTest extends AbstractRequestTest
         tearDownPMF();
         setUpPMF();
 
+        MockTestResponse<OrderProxy> orderResponse = new MockTestResponse<OrderProxy>();
+
         RestaurantBranchProxy branch = restResponse.response.getBranches().get(0);        
         service = rf.getClientService();
         OrderProxy order = createOrder(service, branch, numBranchMenuCatCourses);
-        MockTestResponse<OrderProxy> orderResponse = new MockTestResponse<OrderProxy>();
         service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+        assertNull(orderResponse.response);   // fail - no restId, branchId
         tearDownPMF();
         setUpPMF();
 
-        response = orderResponse.response;
-        assertNotNull(response);
-        assertNotNull(response.getCourses());
-        assertEquals(numBranchMenuCatCourses, response.getCourses().size());
+        
+        service = rf.getClientService();
+        order = createOrder(service, restResponse.response.getBranches().get(0), numBranchMenuCatCourses);
+        order.setRestBranchId(restResponse.response.getBranches().get(0).getId());
+        service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+        assertNull(orderResponse.response);   // fail - no restId
+        tearDownPMF();
+        setUpPMF();
+
+        service = rf.getClientService();
+        order = createOrder(service, restResponse.response.getBranches().get(0), numBranchMenuCatCourses);
+        order.setRestBranchId(restResponse.response.getBranches().get(0).getId());
+        order.setRestId(restResponse.response.getId());
+        service.makeOrder(order).with(OrderProxy.ORDER_WITH).fire(orderResponse);
+        assertNotNull(orderResponse.response);
+        assertNotNull(orderResponse.response.getCourses());
+        assertEquals(numBranchMenuCatCourses, orderResponse.response.getCourses().size());
     }
 
     /**

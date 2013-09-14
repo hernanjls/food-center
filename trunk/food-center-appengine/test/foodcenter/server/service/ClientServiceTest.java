@@ -118,7 +118,7 @@ public class ClientServiceTest extends AbstractServiceTest
 
         // make sure the GCM key was removed
         user = DbHandler.find(DbUser.class, query, params);
-        
+
         assertNotNull(user);
         assertEquals("", user.getGcmKey());
     }
@@ -144,7 +144,7 @@ public class ClientServiceTest extends AbstractServiceTest
 
         DbCompany comp = createComp("comp", numBranches);
         comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
-        
+
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
 
         // Create an order and fill it with all the courses from branch menu to the order
@@ -232,7 +232,7 @@ public class ClientServiceTest extends AbstractServiceTest
         comp = CompanyAdminService.saveCompany(comp);
         tearDownPMF();
         setUpPMF();
-        
+
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
 
         // Create an order and fill it with all the courses from branch menu to the order
@@ -245,24 +245,36 @@ public class ClientServiceTest extends AbstractServiceTest
             order.getCourses().add(courseOrder);
         }
 
-        // save the order
+        // fail because there is no rest id
         DbOrder result = ClientService.makeOrder(order);
+        assertNull(result);
+        tearDownPMF();
+        setUpPMF();
+
+        // fail because there is no rest branch id
+        order.setRestId(rest.getId());
+        result = ClientService.makeOrder(order);
+        assertNull(result);
+
+        // Success
+        order.setRestBranchId(rest.getBranches().get(0).getId());
+        result = ClientService.makeOrder(order);
         assertNotNull(result);
+
     }
 
-    
     @Test
     public void getOrdersTest()
     {
         makeOrderTest();
         tearDownPMF();
         setUpPMF();
-        
+
         List<DbOrder> orders = ClientService.getOrders(0, 100);
         assertNotNull(orders);
         assertEquals(1, orders.size());
     }
-    
+
     /**
      * tests that after saving 2 restaurants we can retrieve them both
      */
@@ -496,18 +508,17 @@ public class ClientServiceTest extends AbstractServiceTest
         assertEquals(0, comps.size());
     }
 
-
     @Test
     public void findUserCompanyFailTest()
-    {    
+    {
         // get login info
         DbUser user = ClientService.login(null);
         tearDownPMF();
         setUpPMF();
-        
+
         DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
         assertNull(b);
-        
+
         tearDownPMF();
         setUpPMF();
 
@@ -517,13 +528,12 @@ public class ClientServiceTest extends AbstractServiceTest
 
     @Test
     public void findUserCompanyAndBranchTest()
-    {    
+    {
         // get login info
         DbUser user = ClientService.login(null);
         tearDownPMF();
         setUpPMF();
 
-        
         int numBranches = 1;
 
         String name = "comp";
@@ -531,14 +541,14 @@ public class ClientServiceTest extends AbstractServiceTest
         DbCompany comp = createComp(name + 1, numBranches);
         comp.getServices().add(ServiceType.DELIVERY);
         comp.getServices().add(ServiceType.TAKE_AWAY);
-        
+
         comp.getBranches().get(0).getWorkers().add(user.getEmail()); // add the user
-        
+
         CompanyAdminService.saveCompany(comp);
 
         tearDownPMF();
         setUpPMF();
-        
+
         DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
         assertNotNull(b);
         assertEquals(comp.getBranches().get(0).getId(), b.getId());
