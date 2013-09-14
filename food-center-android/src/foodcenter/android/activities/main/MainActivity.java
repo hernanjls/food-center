@@ -97,14 +97,17 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     private void initImageLoader()
     {
 
-        // Create global configuration and initialize ImageLoader with this configuration
-        Builder builder = new ImageLoaderConfiguration.Builder(getApplicationContext());
+        if (!ImageLoader.getInstance().isInited())
+        {
+            // Create global configuration and initialize ImageLoader with this configuration
+            Builder builder = new ImageLoaderConfiguration.Builder(getApplicationContext());
 
-        // Use downloader with cookies from extra
-        ImageDownloader downloader = new AuthCookieImageDownloader(this);
-        ImageLoaderConfiguration config = builder.imageDownloader(downloader).build();
+            // Use downloader with cookies from extra
+            ImageDownloader downloader = new AuthCookieImageDownloader(this);
+            ImageLoaderConfiguration config = builder.imageDownloader(downloader).build();
 
-        ImageLoader.getInstance().init(config);
+            ImageLoader.getInstance().init(config);
+        }
     }
 
     private void initActionBar()

@@ -15,23 +15,22 @@
  */
 package foodcenter.android.service;
 
-import android.util.Log;
-
-import com.google.web.bindery.requestfactory.shared.RequestTransport;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
+import android.util.Log;
+
+import com.google.web.bindery.requestfactory.shared.RequestTransport;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 /**
  * An implementation of RequestTransport for use between an Android client and a
@@ -43,6 +42,8 @@ public class AndroidRequestTransport implements RequestTransport
 	private final URI uri;
 
 	private final String TAG = AndroidRequestTransport.class.getSimpleName();
+
+	private final HttpClient client;
 	
 	private final String cookie;
 
@@ -52,16 +53,16 @@ public class AndroidRequestTransport implements RequestTransport
 	 * @param uri the URI for the RequestFactory service
 	 * @param cookie the ACSID or SACSID cookie used for authentication
 	 */
-	public AndroidRequestTransport(URI uri, String cookie)
+	public AndroidRequestTransport(URI uri, String cookie, HttpClient client)
 	{
 		this.uri = uri;
 		this.cookie = cookie;
+		this.client = client;
 	}
 
 	@Override
 	public void send(String payload, TransportReceiver receiver)
 	{
-		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost();
 		post.setHeader("Content-Type", "application/json;charset=UTF-8");
 		if (null != cookie)

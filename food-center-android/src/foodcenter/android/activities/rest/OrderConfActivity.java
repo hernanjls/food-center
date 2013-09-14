@@ -17,6 +17,7 @@ import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.helpers.OrderConfData;
+import foodcenter.android.adapters.MenuListAdapter;
 import foodcenter.android.adapters.OrderConfAdapter;
 import foodcenter.android.service.restaurant.MakeOrderAsyncTask;
 
@@ -25,12 +26,12 @@ public class OrderConfActivity extends ListActivity
     private OrderConfData data;
     private final DecimalFormat df = new DecimalFormat("#.0");
     private ProgressDialog spiner;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
+        
         ListView lv = getListView();
         lv.setChoiceMode(ListView.CHOICE_MODE_NONE);
 
@@ -116,7 +117,8 @@ public class OrderConfActivity extends ListActivity
                 onBackPressed();
                 return true;
             case R.id.order_confirm_menu_ok:
-                new MakeOrderAsyncTask(this).execute(data);
+                showSpinner(getString(R.string.makeing_order));
+                new MakeOrderAsyncTask(this, 1).execute(data);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -130,16 +132,28 @@ public class OrderConfActivity extends ListActivity
         super.onDestroy();
     }
 
-    public void showSpinner()
+    private void showSpinner(String msg)
     {
+        spiner.setMessage(msg);
         if (!spiner.isShowing())
         {
-            String msg = getString(R.string.makeing_order);
-            spiner.setMessage(msg);
             spiner.show();
         }
     }
 
+    public void orderFail(String msg, boolean retry, int attempt)
+    {   
+        if (retry && ( attempt < MakeOrderAsyncTask.MAX_ATTEMPS))
+        {
+            
+            showSpinner(getString(R.string.makeing_order_retry, attempt) + ": " + msg);
+            new MakeOrderAsyncTask(this, attempt + 1 ).execute(data);
+            return;
+        }
+        hideSpinner();
+        AndroidUtils.displayMessage(this, msg);
+    }
+    
     public void orderSuccess()
     {
         hideSpinner();
@@ -147,11 +161,15 @@ public class OrderConfActivity extends ListActivity
         String msg = getString(R.string.order_success);
         AndroidUtils.displayMessage(this, msg);
         
+        // remove the Order and the Adapter from cache
+        ObjectStore.put(OrderConfData.class, OrderConfData.CACHE_KEY, null);
+        ObjectStore.put(MenuListAdapter.class, data.getRestBranchId(), null);
+        
         // Navigate back to main view
         NavUtils.navigateUpFromSameTask(this);
     }
 
-    public void hideSpinner()
+    private void hideSpinner()
     {
         if (spiner.isShowing())
         {
