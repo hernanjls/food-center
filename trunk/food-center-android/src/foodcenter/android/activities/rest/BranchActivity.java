@@ -15,8 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,7 +34,6 @@ import foodcenter.android.adapters.MenuListAdapter;
 import foodcenter.android.adapters.SwipeListViewTouchListener;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
-import foodcenter.service.proxies.RestaurantProxy;
 
 public class BranchActivity extends FragmentActivity implements
                                                     SwipeListViewTouchListener.OnSwipeCallback,
@@ -50,10 +47,9 @@ public class BranchActivity extends FragmentActivity implements
 
     private RestaurantBranchProxy branch = null;
     private String restId = null;
-    private List<ServiceType> services = null; // TODO resolve branch service workaround :)
+    private List<ServiceType> services = null;
 
     private ListView lv;
-    private LinearLayout drawer;
 
     private MenuListAdapter adapter;
 
@@ -69,8 +65,6 @@ public class BranchActivity extends FragmentActivity implements
         lv = (ListView) findViewById(R.id.branch_menu_list);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
-
-        drawer = (LinearLayout) findViewById(R.id.bracnh_drawer);
 
         SwipeListViewTouchListener touchListener = new SwipeListViewTouchListener(lv,
                                                                                   this,

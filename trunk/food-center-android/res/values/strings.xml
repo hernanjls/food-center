@@ -34,6 +34,7 @@
     <string name="order_confirm_menu_ok">Confirm!</string>
     <string name="order_success">Order Succes!</string>
     <string name="makeing_order">Making Order ...</string>
+    <string name="makeing_order_retry">Making Order ... (Retry %1$d)</string>
     <string name="subtitle_order_confirmation">Service:</string>
     <!-- LoginActivity -->
     <string name="title_activity_login">Login Options</string>

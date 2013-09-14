@@ -8,7 +8,6 @@ import android.util.Log;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.activities.helpers.OrderConfData;
 import foodcenter.android.activities.rest.OrderConfActivity;
 import foodcenter.android.service.AndroidRequestUtils;
@@ -18,33 +17,34 @@ import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.requset.ClientServiceRequest;
 
-public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Void>
+public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, String, String>
 {
+    public static final int MAX_ATTEMPS = 10;
 
     private final static String TAG = MakeOrderAsyncTask.class.getSimpleName();
 
     private OrderConfActivity activity;
 
-    public MakeOrderAsyncTask(OrderConfActivity activity)
+    private final int attempt;
+
+    public MakeOrderAsyncTask(OrderConfActivity activity, int attempt)
     {
         super();
 
         this.activity = activity;
+        this.attempt = attempt;
     }
 
+    // return error msg or null on success
     @Override
-    protected void onPreExecute()
-    {
-        super.onPreExecute();
-
-        activity.showSpinner();
-    }
-
-    @Override
-    protected Void doInBackground(OrderConfData... data)
+    protected String doInBackground(OrderConfData... data)
     {
         try
         {
+            if (0 != attempt)
+            {
+                Thread.sleep(100);
+            }
             FoodCenterRequestFactory rf = AndroidRequestUtils.getFoodCenterRF(activity.getApplicationContext());
             ClientServiceRequest service = rf.getClientService();
             OrderProxy order = createOrder(service, data[0]);
@@ -53,14 +53,25 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
         }
         catch (Exception e)
         {
+            Log.e(TAG, "if this is a class loader exeption: there is a retry mechanizm");
             Log.e(TAG, e.getMessage());
-            activity.hideSpinner();
-            AndroidUtils.displayMessage(activity, e.getMessage());
+            return e.getMessage();
         }
 
         return null;
     }
 
+    @Override
+    protected void onPostExecute(String result)
+    {
+        if (null != result)
+        {
+            activity.orderFail(result, true, attempt);
+        }
+        super.onPostExecute(result);
+    }
+    
+    
     private OrderProxy createOrder(ClientServiceRequest service, OrderConfData data)
     {
 
@@ -82,7 +93,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
 
         res.setRestBranchId(data.getRestBranchId());
         res.setRestId(data.getRestId());
-
+        res.setService(data.getService());
         return res;
     }
 
@@ -98,8 +109,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, OrderProxy, Voi
         public void onFailure(ServerFailure error)
         {
             Log.e(TAG, error.getMessage());
-            activity.hideSpinner();
-            AndroidUtils.displayMessage(activity, error.getMessage());
+            activity.orderFail(error.getMessage(), false, attempt);
         }
     }
 
