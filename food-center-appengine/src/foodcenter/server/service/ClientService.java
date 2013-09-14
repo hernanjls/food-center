@@ -20,6 +20,7 @@ import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
+import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;
 import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.service.enums.ServiceType;
@@ -108,24 +109,45 @@ public class ClientService
         }
 
         order.setUserId(user.getId());
-        
-        DbCompanyBranch branch = findUserCompanyBranch(user.getEmail());
-        if (null == branch)
+        String restId = order.getRestId();
+        if (null == restId)
+        {
+            return null;
+        }
+        DbRestaurant rest = DbHandler.find(DbRestaurant.class, order.getRestId());
+        if (null == rest)
         {
             return null;
         }
         
-        order.setCompBranchId(branch.getId());
+        String rBranchId = order.getRestBranchId();
+        if (null == rBranchId)
+        {
+            return null;
+        }
+        DbRestaurantBranch rBranch = DbHandler.find(DbRestaurantBranch.class, order.getRestBranchId());
+        if (null == rBranch)
+        {
+            return null;
+        }
+            
+        DbCompanyBranch cBranch = findUserCompanyBranch(user.getEmail());
+        if (null == cBranch)
+        {
+            return null;
+        }
         
-        DbCompany comp = findCompanyOfBranch(branch);
+        order.setCompBranchId(cBranch.getId());
+        
+        DbCompany comp = findCompanyOfBranch(cBranch);
         if (null == comp)
         {
             return null;
         }
         
         // This is needed because we are using cross transactions with the company
-        PMF.closeThreadLocal();
-        PMF.initThreadLocal();
+        PMF.get().currentTransaction().rollback();
+        PMF.get().currentTransaction().begin();
         order.setCompId(comp.getId());
 
         // Save the order

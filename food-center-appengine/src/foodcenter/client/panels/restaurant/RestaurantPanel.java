@@ -42,8 +42,8 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
     private final VerticalPanel main;
     private final List<RestaurantBranchProxy> addedBranches;
 
-    private final Label infoPopupText;      // for setting the popup text
-    private final PopupPanel infoPopup;     // info popup which can be shown whenever needed
+    private final Label infoPopupText; // for setting the popup text
+    private final PopupPanel infoPopup; // info popup which can be shown whenever needed
 
     public RestaurantPanel(RestaurantProxy rest,
                            PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
@@ -56,15 +56,15 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
                            RestaurantAdminServiceRequest service)
     {
         super(false);
-        
+
         this.rest = rest;
         this.callback = callback;
         this.service = service;
-      
+
         setStyleName("popup-common");
-        
+
         infoPopup = new PopupPanel(false);
-        infoPopupText = new Label();        
+        infoPopupText = new Label();
 
         this.branchListCallback = new RestaurantBranchCallback();
         this.isEditMode = (null != service);
@@ -82,7 +82,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         // Draw the main Panel's data
         redraw();
     }
-    
+
     @Override
     public void redraw()
     {
@@ -90,7 +90,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
 
         main.add(createButtonsPanel());
         main.add(createRestaurantDetailsPanel());
-        
+
         center();
         setPopupPosition(getAbsoluteLeft(), 60);
     }
@@ -132,7 +132,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         Panel menuPanel = new MenuPanel(rest.getMenu(), service);
         detailsPanel.add(menuPanel, "Menu");
         detailsPanel.selectTab(detailsPanel.getTabBar().getTabCount() - 1);
-        
+
         if (rest.isEditable())
         {
             Panel adminsPanel = new UsersPanel(rest.getAdmins(), isEditMode);
@@ -148,7 +148,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
 
         return detailsPanel;
     }
-    
+
     private void showPopup(String msg)
     {
         infoPopupText.setText(msg);
@@ -156,13 +156,12 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         infoPopup.center();
         infoPopup.show();
     }
-    
+
     private void hidePopup()
     {
         infoPopup.clear();
         infoPopup.hide();
     }
-
 
     /* ********************************************************************* */
     /* *************************** private classes ************************* */
@@ -173,7 +172,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
                                           PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest>
     {
         private final BlockingPopupPanel blockingPopup = new BlockingPopupPanel();
-        
+
         @Override
         public void close(RedrawablePanel listPanel, RestaurantBranchProxy branch)
         {
@@ -199,13 +198,13 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
                 error(listPanel, branch, "New branch can be add only from edit mode!!");
                 return;
             }
-            
+
             if (isEditMode) // this also means rest.isEditable()!
             {
 
                 // In edit mode always service = Panel.this.service!
                 // (only edit and createNew pass the service.)
-                RestaurantAdminServiceRequest admin = (RestaurantAdminServiceRequest)service;
+                RestaurantAdminServiceRequest admin = (RestaurantAdminServiceRequest) service;
                 if (!rest.getBranches().contains(branch) && !addedBranches.contains(branch))
                 {
                     addedBranches.add(branch);
@@ -216,9 +215,11 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
             }
 
             blockingPopup.show();
-            showPopup("Saveing restaurant ...");
+            showPopup("Saveing branch ...");
             // Since not in edit mode, branch should save itself!
-            service.saveRestaurantBranch(branch).fire(new SaveRestReciever(callback));
+            service.saveRestaurantBranch(branch)
+                .with(RestaurantBranchProxy.BRANCH_WITH)
+                .fire(new SaveRestReciever(callback));
         }
 
         @Override
@@ -319,7 +320,8 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
             else
             {
                 admin = WebRequestUtils.getRequestFactory().getRestaurantAdminService(); // RestaurantAdmin
-                                                                                      // on purpose!
+                                                                                         // on
+                                                                                         // purpose!
             }
 
             blockingPopup.show();
@@ -372,6 +374,9 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
             hidePopup();
             // When in edit mode branch can't fire save itself
             // This occurs only from view mode -> reload the restaurant in view mode
+
+            // TODO known issue, after saving the branch need to update the restaurant branches
+            // because reopen the branch opens its old version
             RestaurantPanel.this.redraw();
             new RestaurantBranchPanel(response, callback);
         }
