@@ -24,7 +24,7 @@
 
     <!--
     Gcm premissions (This permission is not required if you are targeting 
-    your application to 4.1 or above minSdkVersion=16)
+    your application to 4.1 or above minSdkVersion=16)
     -->
     <permission
         android:name="foodcenter.android.permission.C2D_MESSAGE"
@@ -59,11 +59,6 @@
         android:label="@string/app_name"
         android:theme="@style/FoodCenterTheme.App" >
         
-        <!--  Maps V2 API -->
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBLW3G58cVOAJguGIUNNlBm_EKQwmX7UTk" />
-
         <!-- GCM -->
         <service android:name="foodcenter.android.GCMIntentService" />
 
@@ -140,6 +135,11 @@
             android:label="@string/title_activity_branch_map"
             android:theme="@style/FoodCenterTheme.Branch" >
         </activity>
+        
+        <!--  Maps V2 API -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw" />
     </application>
 
 </manifest>
