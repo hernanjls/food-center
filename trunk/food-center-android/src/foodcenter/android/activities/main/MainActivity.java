@@ -31,6 +31,7 @@ import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.Popup;
 import foodcenter.android.R;
+import foodcenter.android.activities.user.OrderHistoryActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.AuthCookieImageDownloader;
 import foodcenter.android.service.Setup;
@@ -119,6 +120,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
     private void initPullToRefresh()
     {
+
         // Create new PullToRefreshAttacher
         mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
 
@@ -222,12 +224,22 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         getActionBar().setTitle(title);
     }
 
-    /* The click listner for ListView in the navigation drawer */
+    /** The click listner for ListView in the navigation drawer */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        String s = (String) actionBarDrawer.getItemAtPosition(position);
-        AndroidUtils.displayMessage(this, s + "not supported yet...");
+        switch (position)
+        {
+            case 1:
+                Intent i = new Intent(this, OrderHistoryActivity.class);
+                startActivity(i);
+                break;
+            default:
+                String s = (String) actionBarDrawer.getItemAtPosition(position);
+                AndroidUtils.displayMessage(this, s + " not supported yet...");
+                break;
+        }
+        
         actionBarDrawer.closeDrawer();
     }
 

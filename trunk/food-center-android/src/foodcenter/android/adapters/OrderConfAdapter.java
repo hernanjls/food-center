@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import foodcenter.android.R;
-import foodcenter.android.activities.helpers.OrderConfData;
+import foodcenter.android.data.OrderConfData;
 
 public class OrderConfAdapter extends AbstractCourseAdapter
 {

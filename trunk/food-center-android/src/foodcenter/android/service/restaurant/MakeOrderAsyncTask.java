@@ -8,8 +8,8 @@ import android.util.Log;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.activities.helpers.OrderConfData;
 import foodcenter.android.activities.rest.OrderConfActivity;
+import foodcenter.android.data.OrderConfData;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.CourseOrderProxy;

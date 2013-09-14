@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import foodcenter.android.R;
-import foodcenter.android.activities.helpers.OrderConfData;
+import foodcenter.android.data.OrderConfData;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
