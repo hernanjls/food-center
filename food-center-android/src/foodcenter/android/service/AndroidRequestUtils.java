@@ -121,6 +121,9 @@ public class AndroidRequestUtils
     private static <T extends RequestFactory> T getRequestFactory(Context context,
                                                                   Class<T> factoryClass)
     {
+        // request factory uses Thread.currentThread().getContextClassLoader() to load factory
+        Thread.currentThread().setContextClassLoader(AndroidRequestUtils.class.getClassLoader());        
+
         T requestFactory = RequestFactorySource.create(factoryClass);
 
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(context);

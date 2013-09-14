@@ -21,12 +21,15 @@ import foodcenter.service.proxies.RestaurantProxy;
 public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
 {
 
+    private final static String TAG = RestsGetAsyncTask.class.getSimpleName();
+
     private final MainActivity owner;
 
     private String query = null;
     
     public RestsGetAsyncTask(MainActivity owner)
     {
+        super();
         this.owner = owner;
     }
 
@@ -45,34 +48,21 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
 
-            if (null == arg0 || arg0.length == 0 || null == arg0[0])
+            query = (null == arg0 || arg0.length == 0 || null == arg0[0]) ? "" : arg0[0];
+            
+            @SuppressWarnings("unchecked")
+            List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
+            if (null != rests)
             {
-                query = "";
-                @SuppressWarnings("unchecked")
-                List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
-                if (null != rests)
-                {
-                    publishProgress(rests.toArray(new RestaurantProxy[0]));
-                    return null;
-                }
-                factory.getClientService().getDefaultRestaurants().fire(new RestsGetReciever());
+                publishProgress(rests.toArray(new RestaurantProxy[0]));
+                return null;
             }
-            else
-            {
-                query = arg0[0];
-                @SuppressWarnings("unchecked")
-                List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
-                if (null != rests)
-                {
-                    publishProgress(rests.toArray(new RestaurantProxy[0]));
-                    return null;
-                }
-                factory.getClientService().findRestaurant(query, null).fire(new RestsGetReciever());
-            }
+            
+            factory.getClientService().findRestaurant(query, null).fire(new RestsGetReciever());
         }
         catch (Exception e)
         {
-            Log.e("unknown", e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }

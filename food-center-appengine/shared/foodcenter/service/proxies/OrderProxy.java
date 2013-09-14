@@ -6,11 +6,13 @@ import java.util.List;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyForName;
 
+import foodcenter.service.enums.ServiceType;
+
 @ProxyForName(value = "foodcenter.server.db.modules.DbOrder", locator = "foodcenter.server.db.DbObjectLocator")
 public interface OrderProxy extends EntityProxy
 {
 
-    public final static String[] ORDER_WITH = { "courses", "date" };
+    public final static String[] ORDER_WITH = { "courses", "date", "deliveryDate" };
 
     public String getUserId();
 
@@ -38,4 +40,13 @@ public interface OrderProxy extends EntityProxy
 
     public Date getDate();
 
+    public Boolean getDelivered();
+    
+    public void setDelivered(boolean delivered);
+    
+    public Date getDeliveryeDate();
+
+    public ServiceType getService();
+    
+    public void setService(ServiceType service);
 }
