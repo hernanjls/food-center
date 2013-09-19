@@ -25,6 +25,11 @@ import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.request.mock.MockTestResponse;
+import foodcenter.service.requset.ClientServiceRequest;
+import foodcenter.service.requset.CompanyAdminServiceRequest;
+import foodcenter.service.requset.RestaurantAdminServiceRequest;
+import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 
 public abstract class AbstractRequestTest extends AbstractGAETest
 {
@@ -88,6 +93,29 @@ public abstract class AbstractRequestTest extends AbstractGAETest
         return branch;
     }
 
+    protected CourseProxy createCourse(RequestContext service)
+    {
+        CourseProxy course = service.create(CourseProxy.class);
+        course.setName("course" + Math.random());
+        course.setPrice(12.2 + 10 * Math.random());
+        return course;
+    }
+    
+    protected MenuCategoryProxy createMenuCat(RequestContext service, int menuCatCourses)
+    {
+        MenuCategoryProxy category = WebRequestUtils.createMenuCategoryProxy(service);
+        category.setCategoryTitle("rest" + Math.random());
+
+        for (int j = 0; j < menuCatCourses; ++j)
+        {
+            CourseProxy course = createCourse(service);
+            
+            category.getCourses().add(course);
+        }
+
+        return category;
+    }
+    
     protected RestaurantProxy createRest(RequestContext service,
                                          String name,
                                          int menuCats,
@@ -103,18 +131,10 @@ public abstract class AbstractRequestTest extends AbstractGAETest
 
         for (int i = 0; i < menuCats; ++i)
         {
-            MenuCategoryProxy category = WebRequestUtils.createMenuCategoryProxy(service);
-            category.setCategoryTitle("rest" + Math.random());
+            MenuCategoryProxy category = createMenuCat(service, menuCatCourses);
 
             r.getMenu().getCategories().add(category);
 
-            for (int j = 0; j < menuCatCourses; ++j)
-            {
-                CourseProxy course = service.create(CourseProxy.class);
-                course.setName("course" + Math.random());
-                course.setPrice(12.2 + 10 * Math.random());
-                category.getCourses().add(course);
-            }
         }
 
         for (int i = 0; i < numBranches; ++i)
@@ -145,7 +165,9 @@ public abstract class AbstractRequestTest extends AbstractGAETest
             for (int j = 0; j < numCourses; ++j)
             {
                 CourseProxy course = cat.getCourses().get(j);
-                CourseOrderProxy courseOrder = WebRequestUtils.createCourseOrderProxy(rContext, course, 1);
+                CourseOrderProxy courseOrder = WebRequestUtils.createCourseOrderProxy(rContext,
+                                                                                      course,
+                                                                                      1);
                 order.getCourses().add(courseOrder);
                 cnt++;
                 if (cnt >= maxCourses)
@@ -179,6 +201,114 @@ public abstract class AbstractRequestTest extends AbstractGAETest
         }
 
         return r;
+    }
+
+    /* *********************** blocking RF methods ************************************* */
+    /* *********************** blocking RF methods ************************************* */
+    /* *********************** blocking RF methods ************************************* */
+
+    protected RestaurantProxy saveRest(RestaurantAdminServiceRequest service,
+                                       RestaurantProxy rest,
+                                       boolean isWith)
+    {
+        setUpPMF();
+
+        MockTestResponse<RestaurantProxy> restResp = new MockTestResponse<RestaurantProxy>();
+        if (isWith)
+        {
+            service.saveRestaurant(rest).with(RestaurantProxy.REST_WITH).fire(restResp);
+        }
+        else
+        {
+            service.saveRestaurant(rest).fire(restResp);
+        }
+
+        tearDownPMF();
+
+        return restResp.response;
+    }
+
+    protected RestaurantProxy getRestById(String id, boolean isWith)
+    {
+        setUpPMF();
+
+        ClientServiceRequest client = rf.getClientService();
+        MockTestResponse<RestaurantProxy> restResp = new MockTestResponse<RestaurantProxy>();
+        if (isWith)
+        {
+            client.getRestaurantById(id).with(RestaurantProxy.REST_WITH).fire(restResp);
+        }
+        else
+        {
+            client.getRestaurantById(id).fire(restResp);
+        }
+
+        tearDownPMF();
+
+        return restResp.response;
+    }
+
+    protected RestaurantBranchProxy saveRestBranch(RestaurantBranchAdminServiceRequest service,
+                                                   RestaurantBranchProxy branch,
+                                                   boolean isWith)
+    {
+        setUpPMF();
+
+        MockTestResponse<RestaurantBranchProxy> branchResp = new MockTestResponse<RestaurantBranchProxy>();
+        if (isWith)
+        {
+            service.saveRestaurantBranch(branch)
+                .with(RestaurantBranchProxy.BRANCH_WITH)
+                .fire(branchResp);
+        }
+        else
+        {
+            service.saveRestaurantBranch(branch).fire(branchResp);
+        }
+
+        tearDownPMF();
+
+        return branchResp.response;
+
+    }
+    
+    protected CompanyProxy saveComp(CompanyAdminServiceRequest service, CompanyProxy comp, boolean isWith)
+    {
+        setUpPMF();
+        
+        MockTestResponse<CompanyProxy> compResp = new MockTestResponse<CompanyProxy>();
+        if (isWith)
+        {
+            service.saveCompany(comp).with(CompanyProxy.COMP_WITH).fire(compResp);
+        }
+        else
+        {
+            service.saveCompany(comp).fire(compResp);
+        }
+        tearDownPMF();
+        
+        return  compResp.response;
+
+    }
+    
+    protected CompanyProxy getCompById(String id, boolean isWith)
+    {
+        setUpPMF();
+
+        ClientServiceRequest client = rf.getClientService();
+        MockTestResponse<CompanyProxy> resp = new MockTestResponse<CompanyProxy>();
+        if (isWith)
+        {
+            client.getCompanyById(id).with(CompanyProxy.COMP_WITH).fire(resp);
+        }
+        else
+        {
+            client.getCompanyById(id).fire(resp);
+        }
+
+        tearDownPMF();
+
+        return resp.response;
     }
 
 }

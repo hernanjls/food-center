@@ -31,7 +31,7 @@ import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.Popup;
 import foodcenter.android.R;
-import foodcenter.android.activities.user.OrderHistoryActivity;
+import foodcenter.android.activities.history.HistoryActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.AuthCookieImageDownloader;
 import foodcenter.android.service.Setup;
@@ -50,6 +50,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
     private PullToRefreshAttacher mPullToRefreshAttacher;
 
+    /** used by {@link AndroidUtils#displayMessage(Context, String)} */
     private final BroadcastReceiver handlePopupReceiver = new BroadcastReceiver()
     {
         @Override
@@ -231,7 +232,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         switch (position)
         {
             case 1:
-                Intent i = new Intent(this, OrderHistoryActivity.class);
+                Intent i = new Intent(this, HistoryActivity.class);
                 startActivity(i);
                 break;
             default:

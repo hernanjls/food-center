@@ -19,12 +19,12 @@ public class AdminService
     /******************** company apis ********************/
 
     public static Boolean deleteCompany(String id)
-    {
+    {        
         if (!userService.isUserAdmin())
         {
             return false;
         }
-
+        
         DbCompany d = DbHandler.find(DbCompany.class, id);
         if (null == d)
         {

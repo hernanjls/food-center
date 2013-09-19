@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.PMF;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
@@ -19,11 +20,15 @@ public class RestaurantBranchAdminService extends MenuAdminService
 {
     public static void addBranchTable(DbRestaurantBranch branch, DbTable table)
     {
+        PMF.makeTransactional();
+        
         branch.getTables().add(table);
     }
 
     public static void removeBranchTable(DbRestaurantBranch branch, DbTable table)
     {
+        PMF.makeTransactional();
+        
         branch.getTables().remove(table);
     }
 

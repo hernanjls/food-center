@@ -38,22 +38,22 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
     private final MenuAdminServiceRequest service;
 
     private final Boolean isEditMode;
-
+    
     // new courses for existing category
     private final Map<MenuCategoryProxy, List<CourseProxy>> addedCourses;
 
+    // deleted courses for existing category
+    private final Map<MenuCategoryProxy, List<CourseProxy>> deletedCourses;
+
     // new categories for menu
     private final List<MenuCategoryProxy> addedCats;
+    // deleted categories for menu
+    private final List<MenuCategoryProxy> deletedCats;
 
-    // mapping from panel to category
+    // mapping from courses table to category
     private final Map<RedrawablePanel, MenuCategoryProxy> panelCategory;
 
     private final CourseCallback coursesListCallback;
-
-    public MenuPanel(MenuProxy menu)
-    {
-        this(menu, null);
-    }
 
     public MenuPanel(MenuProxy menu, MenuAdminServiceRequest service)
     {
@@ -61,15 +61,18 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
 
         this.menu = menu;
         this.service = service;
-
+        
         this.isEditMode = (null != service);
 
         addedCats = new LinkedList<MenuCategoryProxy>();
+        deletedCats = new LinkedList<MenuCategoryProxy>();
         addedCourses = new HashMap<MenuCategoryProxy, List<CourseProxy>>();
+        deletedCourses = new HashMap<MenuCategoryProxy, List<CourseProxy>>();
 
         for (MenuCategoryProxy mcp : menu.getCategories())
         {
             addedCourses.put(mcp, new LinkedList<CourseProxy>());
+            deletedCourses.put(mcp, new LinkedList<CourseProxy>());
         }
 
         panelCategory = new HashMap<RedrawablePanel, MenuCategoryProxy>();
@@ -92,14 +95,20 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
 
         for (MenuCategoryProxy mcp : menu.getCategories())
         {
-            printCategoryTableRow(mcp, row);
-            ++row;
+            if (!deletedCats.contains(mcp))
+            {
+                printCategoryTableRow(mcp, row);
+                ++row;
+            }
         }
 
         for (MenuCategoryProxy mcp : addedCats)
         {
-            printCategoryTableRow(mcp, row);
-            ++row;
+            if (!deletedCats.contains(mcp))
+            {
+                printCategoryTableRow(mcp, row);
+                ++row;
+            }
         }
     }
 
@@ -110,6 +119,35 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         coursesListCallback.error(this, null, "MenuPanel close was called!!");
     }
 
+    public void setToService()
+    {
+        for (MenuCategoryProxy cat : addedCats)
+        {
+            service.addMenuCategory(menu, cat);
+        }
+        for (MenuCategoryProxy cat: deletedCats)
+        {
+            service.removeMenuCategory(menu, cat);
+        }
+        
+        for (MenuCategoryProxy cat : addedCourses.keySet())
+        {
+            List<CourseProxy> courses = addedCourses.get(cat);
+            for (CourseProxy course : courses)
+            {
+                service.addCategoryCourse(cat, course);
+            }
+        }
+        for (MenuCategoryProxy cat : deletedCourses.keySet())
+        {
+            List<CourseProxy> courses = deletedCourses.get(cat);
+            for (CourseProxy course : courses)
+            {
+                service.removeCategoryCourse(cat, course);
+            }
+        }
+    }
+    
     /**
      * Prints (or overrides) the 1st row of the table
      */
@@ -146,8 +184,9 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, delButton);
         }
 
-        MenuCoursesListPanel coursesTable = new MenuCoursesListPanel(cat.getCourses(), //
+        MenuCoursesListPanel coursesTable = new MenuCoursesListPanel(cat.getCourses(),
                                                                      addedCourses.get(cat),
+                                                                     deletedCourses.get(cat),
                                                                      coursesListCallback,
                                                                      isEditMode);
 
@@ -199,47 +238,50 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         {
             CourseProxy course = WebRequestUtils.createCourseProxy(service);
             MenuCategoryProxy cat = panelCategory.get(coursesPanel);
+
+            if (addedCats.contains(cat))
+            {
+                // for new cat there is no need to add it to the added courses list
+                cat.getCourses().add(course);
+            }
+            else
+            {
+                addedCourses.get(cat).add(course);
+            }
             
-            addedCourses.get(cat).add(course);
-            service.addCategoryCourse(cat, course);
-
             coursesPanel.redraw();
-        }
-
-        private boolean removeCategoryCourse(MenuCategoryProxy cat, CourseProxy course)
-        {
-            if (cat.getCourses().contains(course))
-            {
-                cat.getCourses().remove(course);
-                service.removeCategoryCourse(cat, course);
-                return true;
-            }
-            else if (addedCourses.get(cat).contains(course))
-            {
-                addedCourses.get(cat).remove(course);
-                service.removeCategoryCourse(cat, course);
-                return true;
-            }
-            return false;
         }
 
         @Override
         public void del(RedrawablePanel coursesPanel, CourseProxy course)
         {
-            for (MenuCategoryProxy mcp : menu.getCategories())
+            // for each of the existing categories
+            for (MenuCategoryProxy cat : menu.getCategories())
             {
-                if (removeCategoryCourse(mcp, course))
+                
+                if (cat.getCourses().contains(course))
                 {
-                    panelCategory.put(coursesPanel, null);
+                    // if the course is already exists in the category
+                    deletedCourses.get(cat).add(course);
+                    coursesPanel.redraw();
+                    return;
+                }
+                else if (addedCourses.get(cat).contains(course))
+                {
+                    //if the course is a new one added to an existing category
+                    addedCourses.get(cat).remove(course);
+                    coursesPanel.redraw();
                     return;
                 }
             }
 
-            for (MenuCategoryProxy mcp : addedCats)
+            // do for every added category
+            for (MenuCategoryProxy cat : addedCats)
             {
-                if (removeCategoryCourse(mcp, course))
+                if (cat.getCourses().contains(course))
                 {
-                    panelCategory.put(coursesPanel, null);
+                    cat.getCourses().remove(course);
+                    coursesPanel.redraw();
                     return;
                 }
             }
@@ -260,11 +302,14 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
-            MenuCategoryProxy cat = WebRequestUtils.createMenuCategoryProxy(service); 
+            MenuCategoryProxy cat = WebRequestUtils.createMenuCategoryProxy(service);
+
             addedCats.add(cat);
-            addedCourses.put(cat, new LinkedList<CourseProxy>());
-            service.addMenuCategory(menu, cat);
             
+            addedCourses.put(cat, new LinkedList<CourseProxy>());
+            deletedCourses.put(cat, new LinkedList<CourseProxy>());
+
+            // service.addMenuCategory(menu, cat);
             redraw();
         }
     }
@@ -284,16 +329,21 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
+            
             if (menu.getCategories().contains(cat))
             {
-                menu.getCategories().remove(cat);
-//                service.removeMenuCategory(menu, cat);
+                deletedCats.add(cat);
+                // // menu.getCategories().remove(cat); // this is illegal
+                // service.removeMenuCategory(menu, cat);
                 redraw();
             }
             else if (addedCats.contains(cat))
             {
                 addedCats.remove(cat);
-//                service.removeMenuCategory(menu, cat);
+
+                // deletedCats.add(cat);
+                // // menu.getCategories().remove(cat); // this is illegal
+                // service.removeMenuCategory(menu, cat);
                 redraw();
             }
         }

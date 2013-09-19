@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import foodcenter.android.R;
-import foodcenter.android.adapters.ActionBarListAdapter;
 
 public class ActionBarDrawer
 {
@@ -27,7 +26,7 @@ public class ActionBarDrawer
         mDrawerList = (ListView) activity.findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ActionBarListAdapter(activity, null));
+        mDrawerList.setAdapter(new ActionBarDrawerAdapter(activity, null));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(onItemClick);
         mDrawerToggle = new FoodCenterActionBarDrawerToggle();

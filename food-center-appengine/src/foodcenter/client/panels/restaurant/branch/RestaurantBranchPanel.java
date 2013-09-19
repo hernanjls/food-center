@@ -28,6 +28,8 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
     private final boolean isEditMode;
     private final VerticalPanel main;
 
+    private MenuPanel menuPanel = null;
+    
     public RestaurantBranchPanel(RestaurantBranchProxy branch,
                                  PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
     {
@@ -110,7 +112,7 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         res.add(locationPanel, "Location");
         res.selectTab(res.getTabBar().getTabCount() - 1);
         
-        Panel menuPanel = new MenuPanel(branch.getMenu(), service);
+        menuPanel = new MenuPanel(branch.getMenu(), service);
         res.add(menuPanel, "Menu");
 
         if (branch.isEditable())
@@ -157,6 +159,8 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
+            menuPanel.setToService();
+            
             callback.save(RestaurantBranchPanel.this,
                           branch,
                           callback,

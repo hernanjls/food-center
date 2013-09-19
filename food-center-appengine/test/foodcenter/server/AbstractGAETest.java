@@ -13,14 +13,21 @@ import foodcenter.server.db.PMF;
 
 public abstract class AbstractGAETest
 {
-
     protected static final String email = "email@email.com";
     protected static final String authDomain = "email.com";
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig(),
-                                                                             new LocalUserServiceTestConfig()).setEnvIsAdmin(true)
+    /**
+     * Make the datastore a high-replication datastore, but with all jobs applying
+     * immediately (simplifies tests that use eventually-consistent queries).
+     */
+    private LocalDatastoreServiceTestConfig dataConfig = new LocalDatastoreServiceTestConfig()
+    // TODO if you want to set cross-group transactions //.setApplyAllHighRepJobPolicy()
+    ;
+    private LocalUserServiceTestConfig userConfig = new LocalUserServiceTestConfig();
+
+    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(dataConfig, userConfig).setEnvIsAdmin(true)
         .setEnvIsLoggedIn(true)
         .setEnvAuthDomain(authDomain)
         .setEnvEmail(email);
@@ -36,7 +43,6 @@ public abstract class AbstractGAETest
     public void setUp()
     {
         helper.setUp();
-        setUpPMF();
 
         menuCats = 0;
         menuCatCourses = 0;
@@ -48,7 +54,6 @@ public abstract class AbstractGAETest
     @After
     public void tearDown()
     {
-        tearDownPMF();
         helper.tearDown();
     }
 

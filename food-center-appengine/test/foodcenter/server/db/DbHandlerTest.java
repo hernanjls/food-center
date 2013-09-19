@@ -37,6 +37,7 @@ public class DbHandlerTest extends AbstractDbTest
     public void setUp()
     {
         super.setUp();
+        setUpPMF();
         for (int i = 0; i < NUM_RESTS; ++i)
         {
             rests[i] = createRest("test" + i, 1, 1, 1, 0, 0);
@@ -52,6 +53,7 @@ public class DbHandlerTest extends AbstractDbTest
     @Override
     public void tearDown()
     {
+        tearDownPMF();
         super.tearDown();
     }
 

@@ -29,6 +29,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
     // CTOR variables
     private final List<RestaurantBranchProxy> branches;
     private final List<RestaurantBranchProxy> addedBranches;
+    private final List<RestaurantBranchProxy> deletedBranches;
     private final PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback;
     private final boolean isEditMode;
     private final boolean isRestAdmin;
@@ -38,13 +39,15 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
 
     public RestaurantBranchesListPanel(List<RestaurantBranchProxy> branches,
                                        List<RestaurantBranchProxy> addedBranches,
+                                       List<RestaurantBranchProxy> deletedBranches,
                                        PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
     {
-        this(branches, addedBranches, callback, false, false);
+        this(branches, addedBranches, deletedBranches, callback, false, false);
     }
 
     public RestaurantBranchesListPanel(List<RestaurantBranchProxy> branches,
                                        List<RestaurantBranchProxy> addedBranches,
+                                       List<RestaurantBranchProxy> deletedBranches,
                                        PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback,
                                        boolean isEditMode,
                                        boolean isRestAdmin)
@@ -53,6 +56,7 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
 
         this.branches = branches;
         this.addedBranches = addedBranches;
+        this.deletedBranches = deletedBranches;
         this.callback = callback;
         this.isEditMode = isEditMode;
         this.isRestAdmin = isRestAdmin;
@@ -76,8 +80,11 @@ public class RestaurantBranchesListPanel extends FlexTable implements Redrawable
         {
             for (RestaurantBranchProxy rbp : branches)
             {
-                printRestaurntBranchTableRow(rbp, row);
-                row++;
+                if (!deletedBranches.contains(rbp))
+                {
+                    printRestaurntBranchTableRow(rbp, row);
+                    row++;
+                }
             }
         }
         if (null != addedBranches)

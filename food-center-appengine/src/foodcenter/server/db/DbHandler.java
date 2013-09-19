@@ -42,7 +42,8 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> T save(T object)
     {
-        logger.info("save: " + object.getClass() + "state:" + JDOHelper.getObjectState(object));
+        logger.info("save: " + object.getClass() + ", state:" + JDOHelper.getObjectState(object));
+        PMF.makeTransactional();
         PersistenceManager pm = PMF.get();
         try
         {
@@ -63,7 +64,7 @@ public class DbHandler
         }
         finally
         {
-            PMF.get().currentTransaction().begin();
+            // PMF.get().currentTransaction().begin();
         }
 
         return null;
@@ -80,17 +81,28 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> Long delete(Class<T> clazz, String id)
     {
+        PMF.makeTransactional();
         PersistenceManager pm = PMF.get();
         try
         {
             Query q = pm.newQuery(clazz);
             q.setFilter("id == value");
             q.declareParameters("String value");
-            return q.deletePersistentAll(id.toString());
+            Long res = q.deletePersistentAll(id.toString());
+
+            Transaction tx = PMF.get().currentTransaction();
+            tx.commit();
+            return res;
         }
         catch (Throwable e)
         {
             logger.error(e.getMessage(), e);
+            Transaction tx = PMF.get().currentTransaction();
+            if (tx.isActive())
+            {
+                tx.rollback();
+            }
+
             return 0L;
         }
         finally
@@ -110,6 +122,7 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
+        logger.info("find: " + clazz.getSimpleName() + ", id= " + id);
         PersistenceManager pm = PMF.get();
         T res = null;
         try
@@ -119,17 +132,10 @@ public class DbHandler
             {
                 logger.warn(clazz.toString() + " with id: " + id + " was not found");
             }
-            // ThreadLocalPM.get().currentTransaction().commit();
         }
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
-            // Transaction tx = ThreadLocalPM.get().currentTransaction();
-            // if (tx.isActive())
-            // {
-            // tx.rollback();
-            // }
-            // ThreadLocalPM.get().currentTransaction().begin();
         }
         return res;
     }
@@ -161,6 +167,7 @@ public class DbHandler
         try
         {
             Query q = pm.newQuery(clazz);
+            String decParamsStr = null;
             Object[] values = null;
             if (null != baseQuery)
             {
@@ -168,7 +175,8 @@ public class DbHandler
 
                 if (null != declaredParams && declaredParams.size() > 0)
                 {
-                    q.declareParameters(getDeclaredParamsStr(declaredParams).toString());
+                    decParamsStr = getDeclaredParamsStr(declaredParams).toString();
+                    q.declareParameters(decParamsStr);
                     values = getDeclaredParamsValues(declaredParams);
                 }
             }
@@ -182,6 +190,11 @@ public class DbHandler
             endIdx = (null == endIdx) ? startIdx + 100 : endIdx;
             q.setRange(startIdx, endIdx); // limit query for the 1st result
 
+            logger.info("find: " + clazz.getSimpleName()
+                        + ", query= "
+                        + baseQuery
+                        + ", params= "
+                        + decParamsStr);
             List<T> attached = null;
             if (null != values)
             {
@@ -198,12 +211,6 @@ public class DbHandler
         catch (Exception e)
         {
             logger.error(e.getMessage(), e);
-            Transaction tx = PMF.get().currentTransaction();
-            if (tx.isActive())
-            {
-                tx.rollback();
-            }
-            PMF.get().currentTransaction().begin();
         }
         return null;
     }
@@ -296,11 +303,6 @@ public class DbHandler
                                                               clazz,
                                                               baseQuery,
                                                               pm);
-            if (null != attached)
-            {
-                // detach the objects
-                // return (List<T>) pm.detachCopyAll(attached);
-            }
             return attached;
         }
         catch (Exception e)
@@ -309,7 +311,7 @@ public class DbHandler
         }
         finally
         {
-            // pm.close();
+            // pm.close(); // is closed by PMF and PersistanceFilter
         }
         return null;
     }
