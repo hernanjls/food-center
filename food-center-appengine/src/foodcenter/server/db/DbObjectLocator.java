@@ -35,21 +35,21 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
 	@Override
 	public AbstractDbObject find(Class<? extends AbstractDbObject> clazz, String id)
 	{
-		logger.info("Loader.find: " + clazz + " id: " + id);
+		logger.trace("Loader.find: " + clazz + " id: " + id);
 		return DbHandler.find(clazz, id);
 	}
 
 	@Override
 	public Class<AbstractDbObject> getDomainType()
 	{
-		logger.info("Loader.getDomainType()");
+		logger.trace("Loader.getDomainType()");
 		return null;
 	}
 
 	@Override
 	public String getId(AbstractDbObject domainObject)
 	{
-		logger.info("Loader.getId(AbstractDbObject domainObject)");
+		logger.trace("Loader.getId(AbstractDbObject domainObject)");
 		String id = domainObject.getId();
 		return id;
 	}
@@ -57,14 +57,14 @@ public class DbObjectLocator extends Locator<AbstractDbObject, String>
 	@Override
 	public Class<String> getIdType()
 	{
-		logger.info("Loader.getIdType()");
+		logger.trace("Loader.getIdType()");
 		return String.class;
 	}
 
 	@Override
 	public Object getVersion(AbstractDbObject domainObject)
 	{
-        logger.info("Loader.getVersion(AbstractDbObject domainObject)");
+        logger.trace("Loader.getVersion(AbstractDbObject domainObject)");
         Integer version = 0;
         try
         {

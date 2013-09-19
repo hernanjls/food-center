@@ -81,6 +81,7 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> Long delete(Class<T> clazz, String id)
     {
+        logger.info("delete:" + clazz.getSimpleName() + ", id: " + id);
         PMF.makeTransactional();
         PersistenceManager pm = PMF.get();
         try
@@ -122,7 +123,7 @@ public class DbHandler
      */
     public static <T extends AbstractDbObject> T find(Class<T> clazz, String id)
     {
-        logger.info("find: " + clazz.getSimpleName() + ", id= " + id);
+        logger.debug("find: " + clazz.getSimpleName() + ", id= " + id);
         PersistenceManager pm = PMF.get();
         T res = null;
         try
@@ -190,7 +191,7 @@ public class DbHandler
             endIdx = (null == endIdx) ? startIdx + 100 : endIdx;
             q.setRange(startIdx, endIdx); // limit query for the 1st result
 
-            logger.info("find: " + clazz.getSimpleName()
+            logger.debug("find: " + clazz.getSimpleName()
                         + ", query= "
                         + baseQuery
                         + ", params= "
