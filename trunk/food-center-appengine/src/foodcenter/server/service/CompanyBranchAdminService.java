@@ -18,7 +18,6 @@ public class CompanyBranchAdminService
 {
     public static DbCompanyBranch saveCompanyBranch(DbCompanyBranch branch)
     {
-        // TODO save branch logic ? / remove this option ?
         return DbHandler.save(branch);
     }
 

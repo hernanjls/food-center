@@ -19,5 +19,4 @@ public interface CourseProxy extends EntityProxy, AbstractEntityInterface
     public Double getPrice();
 
     public void setPrice(Double price);
-
 }

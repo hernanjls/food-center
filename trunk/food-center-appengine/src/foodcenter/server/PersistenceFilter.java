@@ -41,7 +41,7 @@ public class PersistenceFilter implements Filter
         }
         catch (Exception e)
         {
-        	log.error(e.getMessage(), e);
+        	log.error(e.getMessage(), e.getCause());
         }
         finally
         {

@@ -4,8 +4,11 @@
 <%@page import="org.slf4j.LoggerFactory" %>
 <%@page import="foodcenter.server.service.ClientService" %>
 <%@page import="foodcenter.server.db.modules.DbUser" %>
+<%@page import="foodcenter.server.db.modules.DbOrder" %>
 <%@page import="foodcenter.server.db.modules.DbRestaurant" %>
 <%@page import="foodcenter.server.db.DbHandler" %>
+<%@page import="java.util.List" %>
+<%@page import="foodcenter.service.proxies.OrderProxy" %>
 
 <!doctype html>
 <!-- The DOCTYPE declaration above will set the     -->
@@ -43,7 +46,6 @@
   <body>
     <!--  container for gwt -->
     <div id="gwtContainer"></div>
-    
     <!-- OPTIONAL: include this if you want history support -->
     <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
     

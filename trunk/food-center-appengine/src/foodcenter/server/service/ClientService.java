@@ -12,10 +12,10 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.PMF;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
-import foodcenter.server.db.PMF;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
@@ -46,8 +46,6 @@ public class ClientService
     public static DbUser login(String gcmKey)
     {
 
-        // find user by email
-
         // else save a new user to the db and return it
         DbUser user = PrivilegeManager.getCurrentUser();
         if (null == user)
@@ -64,7 +62,6 @@ public class ClientService
         else
         {
             logger.info("User already exsists");
-
         }
 
         logger.info("Login info: " + user.getEmail());
@@ -83,7 +80,6 @@ public class ClientService
     public static void logout()
     {
         DbUser user = PrivilegeManager.getCurrentUser();
-        ;
         if (null == user)
         {
             return;
@@ -102,13 +98,13 @@ public class ClientService
         }
 
         // Set the user of the current order
-        DbUser user = PrivilegeManager.getCurrentUser();
+        User user = PrivilegeManager.getUser();
         if (null == user)
         {
             return null;
         }
 
-        order.setUserId(user.getId());
+        order.setUserEmail(user.getEmail());
         String restId = order.getRestId();
         if (null == restId)
         {
@@ -119,54 +115,53 @@ public class ClientService
         {
             return null;
         }
-        
+
         String rBranchId = order.getRestBranchId();
         if (null == rBranchId)
         {
             return null;
         }
-        DbRestaurantBranch rBranch = DbHandler.find(DbRestaurantBranch.class, order.getRestBranchId());
+        DbRestaurantBranch rBranch = DbHandler.find(DbRestaurantBranch.class,
+                                                    order.getRestBranchId());
         if (null == rBranch)
         {
             return null;
         }
-            
+
         DbCompanyBranch cBranch = findUserCompanyBranch(user.getEmail());
         if (null == cBranch)
         {
             return null;
         }
-        
+
         order.setCompBranchId(cBranch.getId());
-        
+
         DbCompany comp = findCompanyOfBranch(cBranch);
         if (null == comp)
         {
             return null;
         }
-        
-        // This is needed because we are using cross transactions with the company
-        PMF.get().currentTransaction().rollback();
-        PMF.get().currentTransaction().begin();
+
         order.setCompId(comp.getId());
 
         // Save the order
         return DbHandler.save(order);
     }
 
-    public static List<DbOrder> getOrders(int startIdx, int endIdx)
+    public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
     {
-        DbUser user = PrivilegeManager.getCurrentUser();
-
-        String query = "userId == userIdP";
+        String userEmail = PrivilegeManager.getUser().getEmail();
+        
+        String query = "userEmail == userEmailP";
 
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
-        params.add(new DeclaredParameter("userIdP", user.getId()));
+        params.add(new DeclaredParameter("userEmailP", userEmail));
 
         ArrayList<SortOrder> sort = new ArrayList<SortOrder>();
         sort.add(new SortOrder("date", SortOrderDirection.DESC));
 
-        return DbHandler.find(DbOrder.class, query, params, sort, startIdx, endIdx);
+        List<DbOrder> res = DbHandler.find(DbOrder.class, query, params, sort, startIdx, endIdx);
+        return res;
     }
 
     /* ************************* Restaurant APIs *************************** */
@@ -280,20 +275,20 @@ public class ClientService
     /* ******************************************************************************* */
     /* **************************** private functions ******************************** */
     /* ******************************************************************************* */
-    
+
     protected static DbCompany findCompanyOfBranch(DbCompanyBranch branch)
     {
         if (null == branch)
         {
             return null;
         }
-        
+
         String query = "branches == branchP";
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
         params.add(new DeclaredParameter("emailP", branch));
         return DbHandler.find(DbCompany.class, query, params);
     }
-    
+
     protected static DbCompanyBranch findUserCompanyBranch(String email)
     {
         String query = "workers == emailP";

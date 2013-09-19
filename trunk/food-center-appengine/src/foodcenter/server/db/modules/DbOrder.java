@@ -9,7 +9,7 @@ import javax.jdo.annotations.Persistent;
 
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable(detachable = "true")
+@PersistenceCapable//(detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
 	/**
@@ -18,7 +18,7 @@ public class DbOrder extends AbstractDbObject
 	private static final long serialVersionUID = -4888609583270819317L;
 
 	@Persistent
-	private String userId; // user which made this order
+	private String userEmail; // user which made this order
 
 	@Persistent
     private String compId;
@@ -68,14 +68,14 @@ public class DbOrder extends AbstractDbObject
 		}
 	};
 
-	public String getUserId()
+	public String getUserEmail()
 	{
-		return userId;
+		return userEmail;
 	}
 
-	public void setUserId(String userId)
+	public void setUserEmail(String userEmail)
 	{
-		this.userId = userId;
+		this.userEmail = userEmail;
 	}
 
 	public String getCompId()
@@ -157,5 +157,4 @@ public class DbOrder extends AbstractDbObject
     {
         this.service = service;
     }
-
 }

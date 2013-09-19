@@ -8,19 +8,19 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.activities.rest.RestaurantActivity;
+import foodcenter.android.activities.rest.RestActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
+public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
 {
 
     private final static String TAG = RestGetAsyncTask.class.getSimpleName();
 
-    private final RestaurantActivity owner;
+    private final RestActivity owner;
 
-    public RestGetAsyncTask(RestaurantActivity owner)
+    public RestGetAsyncTask(RestActivity owner)
     {
         super();
         this.owner = owner;
@@ -35,7 +35,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     }
 
     @Override
-    protected Void doInBackground(String... restId)
+    protected String doInBackground(String... restId)
     {
         if (null == restId || restId.length == 0 || null == restId[0])
         {
@@ -53,21 +53,31 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         catch (Exception e)
         {
             Log.e(TAG, e.getMessage(), e);
+            return e.getMessage();
         }
         return null;
     }
 
     @Override
+    protected void onPostExecute(String msg)
+    {
+        if (null != msg)
+        {
+            owner.hideSpinner();
+            AndroidUtils.displayMessage(owner, msg);
+        }
+        super.onPostExecute(msg);
+    }
+    @Override
     protected void onProgressUpdate(RestaurantProxy... rest)
     {
-        // // find the text view to add the text to.
         owner.hideSpinner();
-        
+
         if (null == rest || rest.length < 1)
         {
             return;
         }
-
+        
         owner.showRestaurant(rest[0]);
 
     }
@@ -86,9 +96,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         {
             Log.e("req context", error.getMessage());
             AndroidUtils.displayMessage(owner, error.getMessage());
-
-            // Notify PullToRefreshAttacher that the refresh has finished
-            owner.hideSpinner();
+            publishProgress();
         }
     }
 }

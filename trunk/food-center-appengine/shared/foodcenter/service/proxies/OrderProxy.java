@@ -12,11 +12,9 @@ import foodcenter.service.enums.ServiceType;
 public interface OrderProxy extends EntityProxy
 {
 
-    public final static String[] ORDER_WITH = { "courses", "date", "deliveryDate" };
+    public final static String[] ORDER_WITH = { "courses" , "date", "deliveryDate" };
 
-    public String getUserId();
-
-    public void setUserId(String userId);
+    public String getUserEmail();
 
     public String getCompId();
 

@@ -13,12 +13,12 @@ import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.main.MainActivity;
-import foodcenter.android.adapters.RestaurantListAdapter;
+import foodcenter.android.activities.main.MainRestListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
 
-public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
+public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Exception>
 {
 
     private final static String TAG = RestsGetAsyncTask.class.getSimpleName();
@@ -26,7 +26,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     private final MainActivity owner;
 
     private String query = null;
-    
+
     public RestsGetAsyncTask(MainActivity owner)
     {
         super();
@@ -42,27 +42,28 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
     }
 
     @Override
-    protected Void doInBackground(String... arg0)
+    protected Exception doInBackground(String... arg0)
     {
         try
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
 
             query = (null == arg0 || arg0.length == 0 || null == arg0[0]) ? "" : arg0[0];
-            
+
             @SuppressWarnings("unchecked")
-            List<RestaurantProxy> rests =  ObjectStore.get(List.class, query);
+            List<RestaurantProxy> rests = ObjectStore.get(List.class, query);
             if (null != rests)
             {
                 publishProgress(rests.toArray(new RestaurantProxy[0]));
                 return null;
             }
-            
+
             factory.getClientService().findRestaurant(query, null).fire(new RestsGetReciever());
         }
         catch (Exception e)
         {
             Log.e(TAG, e.getMessage(), e);
+            return e;
         }
         return null;
     }
@@ -74,47 +75,50 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Void>
         GridView gridView = (GridView) owner.findViewById(R.id.rest_grid_view);
 
         // update the view for all the restaurants
-        RestaurantListAdapter adapter = new RestaurantListAdapter(owner,
-                                                                  AndroidRequestUtils.getDefaultDisplayImageOptions(owner),
-                                                                  rests);
+        MainRestListAdapter adapter = new MainRestListAdapter(owner,
+                                                AndroidRequestUtils.getDefaultDisplayImageOptions(owner),
+                                                rests);
 
         gridView.setAdapter(adapter);
-        
+
         // Notify PullToRefreshAttacher that the refresh has finished
         owner.hideSpinner();
     }
 
     @Override
-    protected void onPostExecute(Void result)
+    protected void onPostExecute(Exception result)
     {
+        if (null != result)
+        {
+            AndroidUtils.displayMessage(owner, result.getMessage());
+        }
+        
         super.onPostExecute(result);
     }
 
     private class RestsGetReciever extends Receiver<List<RestaurantProxy>>
     {
+        /** Doesn't run on UI thread */
         @Override
         public void onSuccess(List<RestaurantProxy> response)
         {
+            RestaurantProxy[] rests = new RestaurantProxy[0];
             if (null != response)
             {
                 // Save the response in cache!
                 ObjectStore.put(List.class, query, response);
-                publishProgress(response.toArray(new RestaurantProxy[0]));
+                rests = response.toArray(new RestaurantProxy[0]);
             }
-            else
-            {
-                publishProgress(new RestaurantProxy[] {});
-            }
+            publishProgress(rests);
         }
 
+        /** Doesn't run on UI thread */
         @Override
         public void onFailure(ServerFailure error)
         {
             Log.e("req context", error.getMessage());
             AndroidUtils.displayMessage(owner, error.getMessage());
-            
-            // Notify PullToRefreshAttacher that the refresh has finished
-            owner.hideSpinner();
+            publishProgress(new RestaurantProxy[] {});
         }
     }
 }

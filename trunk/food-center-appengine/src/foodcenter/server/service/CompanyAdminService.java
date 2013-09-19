@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.PMF;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 
@@ -11,6 +12,8 @@ public class CompanyAdminService extends CompanyBranchAdminService
 {
     public static void addCompanyBranch(DbCompany comp, DbCompanyBranch branch)
     {
+        PMF.makeTransactional();
+        
         List<DbCompanyBranch> branches = comp.getBranches();
         if (null == branches)
         {
@@ -22,6 +25,8 @@ public class CompanyAdminService extends CompanyBranchAdminService
 
     public static void removeCompanyBranch(DbCompany comp, DbCompanyBranch branch)
     {
+        PMF.makeTransactional();
+        
         List<DbCompanyBranch> branches = comp.getBranches();
         if (null == branches)
         {
@@ -34,7 +39,7 @@ public class CompanyAdminService extends CompanyBranchAdminService
     }
 
     public static DbCompany saveCompany(DbCompany comp)
-    {
+    {        
         DbCompany res = DbHandler.save(comp);
 
         return res;

@@ -8,8 +8,8 @@ import android.util.Log;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.activities.rest.OrderConfActivity;
-import foodcenter.android.data.OrderConfData;
+import foodcenter.android.activities.order.OrderActivity;
+import foodcenter.android.data.OrderData;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -17,17 +17,17 @@ import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.requset.ClientServiceRequest;
 
-public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, String, String>
+public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
 {
     public static final int MAX_ATTEMPS = 10;
 
     private final static String TAG = MakeOrderAsyncTask.class.getSimpleName();
 
-    private OrderConfActivity activity;
+    private OrderActivity activity;
 
     private final int attempt;
 
-    public MakeOrderAsyncTask(OrderConfActivity activity, int attempt)
+    public MakeOrderAsyncTask(OrderActivity activity, int attempt)
     {
         super();
 
@@ -37,7 +37,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, String, String>
 
     // return error msg or null on success
     @Override
-    protected String doInBackground(OrderConfData... data)
+    protected String doInBackground(OrderData... data)
     {
         try
         {
@@ -72,7 +72,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderConfData, String, String>
     }
     
     
-    private OrderProxy createOrder(ClientServiceRequest service, OrderConfData data)
+    private OrderProxy createOrder(ClientServiceRequest service, OrderData data)
     {
 
         OrderProxy res = service.create(OrderProxy.class);

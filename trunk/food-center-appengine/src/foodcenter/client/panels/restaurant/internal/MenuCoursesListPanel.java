@@ -26,18 +26,15 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 
     private final List<CourseProxy> courses;
     private final List<CourseProxy> addedCourses;
+    private final List<CourseProxy> deletedCourses;
+
     private final PanelCallback<CourseProxy, MenuAdminServiceRequest> callback;
     private final boolean isEditMode;
-    
-    public MenuCoursesListPanel(List<CourseProxy> courses,
-                                List<CourseProxy> addedCourses,
-                                PanelCallback<CourseProxy, MenuAdminServiceRequest> callback)
-    {
-        this(courses, addedCourses, callback, false);
-    }
+
 
     public MenuCoursesListPanel(List<CourseProxy> courses,
                                 List<CourseProxy> addedCourses,
+                                List<CourseProxy> deletedCourses,
                                 PanelCallback<CourseProxy, MenuAdminServiceRequest> callback,
                                 boolean isEditMode)
     {
@@ -45,6 +42,7 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 
         this.courses = courses;
         this.addedCourses = addedCourses;
+        this.deletedCourses = deletedCourses;
         this.callback = callback;
         this.isEditMode = isEditMode;
 
@@ -61,24 +59,30 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
         int row = getRowCount();
         for (CourseProxy cp : courses)
         {
-            printCourseRow(cp, row);
-            ++row;
-        }
-        
-        for (CourseProxy cp : addedCourses)
-        {
-            printCourseRow(cp, row);
-            ++row;
+            if (!deletedCourses.contains(cp))
+            {
+                printCourseRow(cp, row);
+                ++row;
+            }
         }
 
+        for (CourseProxy cp : addedCourses)
+        {
+            if (!deletedCourses.contains(cp))
+            {
+                printCourseRow(cp, row);
+                ++row;
+            }
+        }
     }
 
     @Override
     public void close()
     {
         callback.error(this, null, "Closing MenuCourseListPanel ??");
-        
+
     }
+
     private void createHeader()
     {
         this.setText(0, COLUMN_NAME, "name");
@@ -92,7 +96,6 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
         }
     }
 
-
     public void printCourseRow(CourseProxy courseProxy, int row)
     {
         TextBox name = new TextBox();
@@ -101,7 +104,7 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
 
         TextBox info = new TextBox();
         info.setText(courseProxy.getInfo());
-        
+
         setWidget(row, COLUMN_INFO, info);
 
         TextBox price = new TextBox();
@@ -172,7 +175,7 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
             course.setName(titleBox.getText());
         }
     }
-    
+
     class OnKeyUpCourseInfo implements KeyUpHandler
     {
         private final TextBox titleBox;
@@ -190,7 +193,6 @@ public class MenuCoursesListPanel extends FlexTable implements RedrawablePanel
             course.setInfo(titleBox.getText());
         }
     }
-
 
     class OnKeyUpCoursePrice implements KeyUpHandler
     {

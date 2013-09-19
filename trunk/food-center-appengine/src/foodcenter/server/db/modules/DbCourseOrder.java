@@ -1,6 +1,5 @@
 package foodcenter.server.db.modules;
 
-import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
@@ -8,27 +7,65 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @PersistenceCapable
-@Inheritance(customStrategy="complete-table")   //store it in new table
-public class DbCourseOrder extends DbCourse
+public class DbCourseOrder extends AbstractDbObject
 {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -5866545173812383595L;
+    private static final long serialVersionUID = 6195953622747507407L;
 
     private static final Logger logger = LoggerFactory.getLogger(DbCourseOrder.class);
+
+    @Persistent
+    private String name;
+
+    @Persistent
+    private String info;
+
+    @Persistent
+    private Double price;
 
     @Persistent
     private String courseId;
 
     @Persistent
-    private int cnt;
+    private Integer cnt;
 
     public DbCourseOrder()
     {
         super();
         logger.trace("new DbCourseOrder()");
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getInfo()
+    {
+        return info;
+    }
+
+    public void setInfo(String info)
+    {
+        this.info = info;
+    }
+
+    public Double getPrice()
+    {
+        return price;
+    }
+
+    public void setPrice(Double price)
+    {
+        this.price = price;
     }
 
     public String getCourseId()

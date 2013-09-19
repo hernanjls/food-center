@@ -9,11 +9,10 @@ import org.slf4j.LoggerFactory;
 @PersistenceCapable
 public class DbCourse extends AbstractDbObject
 {
-
-	/**
-	 * 
-	 */
-    private static final long serialVersionUID = 6823279601912582912L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1573226317863060483L;
 
     private static final Logger logger = LoggerFactory.getLogger(DbCourse.class);
     

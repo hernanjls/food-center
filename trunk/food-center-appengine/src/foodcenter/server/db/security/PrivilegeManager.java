@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -21,6 +22,11 @@ public class PrivilegeManager
     private static UserService userService = UserServiceFactory.getUserService();
     private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    public static User getUser()
+    {
+        return userService.getCurrentUser();
+    }
+    
     public static DbUser getCurrentUser()
     {
         return getDbUser(userService.getCurrentUser().getEmail());

@@ -1,6 +1,7 @@
 package foodcenter.server.service;
 
 import foodcenter.server.db.DbHandler;
+import foodcenter.server.db.PMF;
 import foodcenter.server.db.modules.DbCourse;
 import foodcenter.server.db.modules.DbMenu;
 import foodcenter.server.db.modules.DbMenuCategory;
@@ -20,6 +21,8 @@ public class MenuAdminService
 	 */
 	public static void addCategoryCourse(DbMenuCategory cat, DbCourse course)
 	{
+        PMF.makeTransactional();
+
 		cat.getCourses().add(course);
 	}
 	
@@ -30,6 +33,8 @@ public class MenuAdminService
 	 */
 	public static void removeCategoryCourse(DbMenuCategory cat, DbCourse course)
 	{
+        PMF.makeTransactional();
+
 		cat.getCourses().remove(course);
 	}
 	
@@ -40,6 +45,8 @@ public class MenuAdminService
 	 */
 	public static void addMenuCategory(DbMenu menu, DbMenuCategory category)
 	{
+        PMF.makeTransactional();
+
 		menu.getCategories().add(category);
 	}
 	
@@ -50,6 +57,11 @@ public class MenuAdminService
 	 */
 	public static void removeMenuCategory(DbMenu menu, DbMenuCategory category)
 	{
-		menu.getCategories().remove(category);
+        PMF.makeTransactional();
+
+	    if (menu.getCategories().contains(category))
+	    {
+	        menu.getCategories().remove(category);
+	    }
 	}
 }

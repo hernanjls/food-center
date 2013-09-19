@@ -1,6 +1,9 @@
 package foodcenter.service.request.mock;
 
+import org.slf4j.LoggerFactory;
+
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 /**
  * 
@@ -16,5 +19,11 @@ public class MockTestResponse<T> extends Receiver<T>
 	public void onSuccess(T response)
 	{
 		this.response = response;
+	}
+	@Override
+	public void onFailure(ServerFailure error)
+	{
+	    LoggerFactory.getLogger(getClass()).error(error.getMessage());
+	    this.response = null;
 	}
 };

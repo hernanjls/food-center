@@ -41,16 +41,13 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
     private final boolean isEditMode;
     private final VerticalPanel main;
     private final List<RestaurantBranchProxy> addedBranches;
+    private final List<RestaurantBranchProxy> deletedBranches;
 
     private final Label infoPopupText; // for setting the popup text
     private final PopupPanel infoPopup; // info popup which can be shown whenever needed
 
-    public RestaurantPanel(RestaurantProxy rest,
-                           PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback)
-    {
-        this(rest, callback, null);
-    }
-
+    private MenuPanel menuPanel = null;
+    
     public RestaurantPanel(RestaurantProxy rest,
                            PanelCallback<RestaurantProxy, RestaurantAdminServiceRequest> callback,
                            RestaurantAdminServiceRequest service)
@@ -66,9 +63,10 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         infoPopup = new PopupPanel(false);
         infoPopupText = new Label();
 
-        this.branchListCallback = new RestaurantBranchCallback();
-        this.isEditMode = (null != service);
-        this.addedBranches = new LinkedList<RestaurantBranchProxy>();
+        branchListCallback = new RestaurantBranchCallback();
+        isEditMode = (null != service);
+        addedBranches = new LinkedList<RestaurantBranchProxy>();
+        deletedBranches = new LinkedList<RestaurantBranchProxy>();
 
         // Add the holder Panel
         this.main = new VerticalPanel();
@@ -129,7 +127,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         Panel profilePanel = new RestaurantProfilePannel(rest, isEditMode);
         detailsPanel.add(profilePanel, "Profile");
 
-        Panel menuPanel = new MenuPanel(rest.getMenu(), service);
+        menuPanel = new MenuPanel(rest.getMenu(), service);
         detailsPanel.add(menuPanel, "Menu");
         detailsPanel.selectTab(detailsPanel.getTabBar().getTabCount() - 1);
 
@@ -141,6 +139,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
 
         Panel branchesPanel = new RestaurantBranchesListPanel(rest.getBranches(),
                                                               addedBranches,
+                                                              deletedBranches,
                                                               branchListCallback,
                                                               isEditMode,
                                                               rest.isEditable());
@@ -199,7 +198,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
                 return;
             }
 
-            if (isEditMode) // this also means rest.isEditable()!
+            if (isEditMode) // enter to edit branch from here this also means rest.isEditable()!
             {
 
                 // In edit mode always service = Panel.this.service!
@@ -277,14 +276,16 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
 
             if (rest.getBranches().contains(branch))
             {
-                service.removeRestaurantBranch(rest, branch); // TODO is this needed ?
-                rest.getBranches().remove(branch);
+                service.removeRestaurantBranch(rest, branch);
+                // rest.getBranches().remove(branch); // illegal - throws exception!
+                deletedBranches.add(branch);
                 panel.redraw();
             }
             else if (addedBranches.contains(branch))
             {
-                service.removeRestaurantBranch(rest, branch); // TODO is this needed ?
+                service.removeRestaurantBranch(rest, branch);
                 addedBranches.remove(branch);
+                deletedBranches.add(branch);
                 panel.redraw();
             }
             else
@@ -354,6 +355,7 @@ public class RestaurantPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
+            menuPanel.setToService();
             callback.save(RestaurantPanel.this, rest, callback, service);
         }
     }

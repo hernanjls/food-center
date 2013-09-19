@@ -57,7 +57,8 @@ public final class PMF
 		}
 		
 		pm = getPmfInstance().getPersistenceManager();
-		pm.currentTransaction().begin();
+		// by default non-transactional read and write 
+//		pm.currentTransaction().begin();
 		holder.set(pm);
 		
 		return pm;
@@ -65,9 +66,8 @@ public final class PMF
 	
 	/**
 	 * @return the local thread PM it must be initialize 1st
-	 * 
 	 * @see {@link #initThreadLocal()} for initializing the thread PM
-	 *  @see {@link #closeThreadLocal()} for closing the thread PM
+	 * @see {@link #closeThreadLocal()} for closing the thread PM
 	 */
 	public static PersistenceManager get()
 	{
@@ -90,6 +90,7 @@ public final class PMF
 			return;
 		}
 		
+		// if this is transactional - roll-back! 
 		Transaction tx = pm.currentTransaction(); 
 		if (tx.isActive())
 		{
@@ -99,6 +100,14 @@ public final class PMF
 		pm.close();
 		holder.set(null);
 	}
+
+    public static void makeTransactional()
+    {
+        if (!PMF.get().currentTransaction().isActive())
+        {
+            PMF.get().currentTransaction().begin();
+        }
+    }
 	
 	
 }

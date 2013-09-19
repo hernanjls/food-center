@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-local-runtime-shared.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gcm-server.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jdo-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json-1.5.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/hibernate-validator-4.2.0.Final.jar"/>
