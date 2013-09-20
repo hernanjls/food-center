@@ -27,6 +27,8 @@ public interface OrderProxy extends EntityProxy
     public String getRestId();
 
     public void setRestId(String restId);
+    
+    public String getRestName();
 
     public String getRestBranchId();
 

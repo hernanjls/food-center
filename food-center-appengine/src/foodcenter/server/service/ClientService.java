@@ -12,7 +12,6 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
 import foodcenter.server.db.DbHandler;
-import foodcenter.server.db.PMF;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
@@ -115,7 +114,8 @@ public class ClientService
         {
             return null;
         }
-
+        order.setRestName(rest.getName());
+        
         String rBranchId = order.getRestBranchId();
         if (null == rBranchId)
         {

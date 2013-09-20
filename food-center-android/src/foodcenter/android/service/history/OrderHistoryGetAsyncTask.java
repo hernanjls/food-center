@@ -10,23 +10,23 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.activities.history.HistoryActivity;
-import foodcenter.android.activities.history.HistoryOrderListAdapter;
+import foodcenter.android.activities.history.OrderHistoryActivity;
+import foodcenter.android.activities.history.OrderHistoryListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.OrderProxy;
 
-public class HistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, String>
+public class OrderHistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, String>
 {
 
-    private final static String TAG = HistoryGetAsyncTask.class.getSimpleName();
+    private final static String TAG = OrderHistoryGetAsyncTask.class.getSimpleName();
 
-    private final HistoryActivity activity;
-    private final HistoryOrderListAdapter adapter;
+    private final OrderHistoryActivity activity;
+    private final OrderHistoryListAdapter adapter;
 
     private String query = null;
 
-    public HistoryGetAsyncTask(HistoryActivity activity, HistoryOrderListAdapter adapter)
+    public OrderHistoryGetAsyncTask(OrderHistoryActivity activity, OrderHistoryListAdapter adapter)
     {
         super();
         this.activity = activity;

@@ -112,5 +112,7 @@
     <string name="branch_menu_takeaway">Take-Away</string>
     <string name="branch_menu_delivery">Delivery</string>
     <string name="branch_drawer_call">Call Now!</string>
+    <string name="order_order_date">2013.08.15 14:00 GMT+2</string>
+    <string name="order_order_delivery_date">Not Delivered</string>
 
 </resources>

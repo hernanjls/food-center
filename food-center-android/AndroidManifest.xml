@@ -131,7 +131,7 @@
                 android:value=".activities.main.MainActivity" />
         </activity>
         <activity
-            android:name="foodcenter.android.activities.history.HistoryActivity"
+            android:name="foodcenter.android.activities.history.OrderHistoryActivity"
             android:label="@string/title_activity_history"
             android:theme="@style/FoodCenterTheme.OrderHistory" >
             

@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="35sp"
+    android:background="?android:attr/activatedBackgroundIndicator" >
+
+    <TextView
+        android:id="@+id/order_history_course_name"
+        android:layout_width="wrap_content"
+        android:layout_height="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="30sp"
+        android:layout_marginTop="5sp"
+        android:clickable="false"
+        android:focusable="false"
+        android:paddingLeft="5sp"
+        android:text="@string/course_name"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/order_history_course_cnt"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10sp"
+        android:clickable="false"
+        android:focusable="false"
+        android:inputType="text"
+        android:text="@string/course_cnt"
+        android:textSize="14sp" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/order_history_course_price"
+        android:layout_width="wrap_content"
+        android:layout_height="20sp"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10sp"
+        android:layout_marginTop="5sp"
+        android:layout_toLeftOf="@id/order_history_course_cnt"
+        android:text="@string/course_price"
+        android:textSize="14sp" />
+
+</RelativeLayout>
