@@ -41,9 +41,10 @@
     <string name="title_activity_login">Login Options</string>
     
     <!-- HistoryActivity -->
-    <string name="title_activity_history">History Activity</string>
-    <string name="history_loading">Loading Orders</string>
-    
+    <string name="title_activity_history">Orders History</string>
+    <string name="history_loading">Loading Order History</string>
+	<string name="swipe_down_to_load_more">Swipe down to get more ...</string>    
+	
     <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
     <string name="connect_text">This application requests permission to connect your mobile device to the server.</string>
 
@@ -101,6 +102,7 @@
     <string name="swipe_down_to_refresh">Swipe down to refresh</string>
     <string name="load_restaurants">Loading restaurants ...</string>
     <string name="load_restaurant">Loading restaurant info ...</string>
+    <string name="load_order_history">Loading History...</string>
     <string name="course_name">Course Name</string>
     <string name="course_price">Price</string>
     <string name="course_cnt">#</string>
@@ -112,7 +114,8 @@
     <string name="branch_menu_takeaway">Take-Away</string>
     <string name="branch_menu_delivery">Delivery</string>
     <string name="branch_drawer_call">Call Now!</string>
-    <string name="order_order_date">2013.08.15 14:00 GMT+2</string>
+    <string name="branch_location_addr">Branch Location streed and city </string>
+    <string name="order_order_date">2013.08.15 14:00</string>
     <string name="order_order_delivery_date">Not Delivered</string>
 
 </resources>

@@ -1,5 +1,7 @@
 package foodcenter.android.activities.history;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import foodcenter.android.R;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -26,7 +29,9 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
     
     private class OrderHolder
     {
+        public ImageView serviceImage;
         public TextView restName;
+        public TextView branchAddr;
         public TextView totalPrice;
         public TextView orderDate;
         public TextView deliveryDate;
@@ -35,10 +40,12 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
     private final Activity activity;
     private final List<OrderProxy> orders;
 
+    private final DateFormat dateFormat;
     public OrderHistoryListAdapter(Activity context)
     {
         super();
         this.activity = context;
+        dateFormat  = new SimpleDateFormat("dd.MM.yyyy HH:mm", activity.getResources().getConfiguration().locale);
         
         orders = new ArrayList<OrderProxy>();
     }
@@ -77,6 +84,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
                                                         false);
             CourseHolder holder = new CourseHolder();
             view.setTag(holder);
+            
             holder.name = (TextView) view.findViewById(R.id.order_history_course_name);
             holder.price = (TextView) view.findViewById(R.id.order_history_course_price);
             holder.cnt = (EditText) view.findViewById(R.id.order_history_course_cnt);
@@ -86,6 +94,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
         holder.name.setText(c.getName());
         holder.price.setText(c.getPrice().toString());
         holder.cnt.setText("" + c.getCnt());
+        
         
         return view;
     }
@@ -135,14 +144,21 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
                                                         false);
             OrderHolder holder = new OrderHolder();
             view.setTag(holder);
+            
+            holder.serviceImage = (ImageView) view.findViewById(R.id.order_history_title_service_img);
             holder.restName = (TextView) view.findViewById(R.id.order_history_title_rest_name);
+            holder.branchAddr = (TextView) view.findViewById(R.id.order_history_title_rest_branch_addr);
             holder.totalPrice = (TextView) view.findViewById(R.id.order_history_title_price);
             holder.orderDate = (TextView) view.findViewById(R.id.order_history_title_order_date);
             holder.deliveryDate = (TextView) view.findViewById(R.id.order_history_title_delivery_date);
         }
 
         OrderHolder holder = (OrderHolder) view.getTag();
+        
+        // Set the restaurant name
         holder.restName.setText(o.getRestName());
+                        
+        // Set total price of order
         Double totalPrice = 0.0;
         for (int i=0; i< getChildrenCount(groupPosition); ++i)
         {
@@ -150,16 +166,37 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
             totalPrice += c.getCnt() * c.getPrice();
         }
         holder.totalPrice.setText(totalPrice.toString());
-        holder.orderDate.setText(o.getDate().toGMTString());
+        
+        // Set Order date
+        holder.orderDate.setText(dateFormat.format(o.getDate()));
+        
+        // Set Delivery date
         if (o.getDelivered())
         {
-            holder.deliveryDate.setText(o.getDeliveryeDate().toGMTString());
+            holder.deliveryDate.setText(dateFormat.format(o.getDeliveryeDate()));
         }
         else
         {
             holder.deliveryDate.setText(activity.getString(R.string.order_order_delivery_date));
         }
         
+        // Set restaurant branch address
+        holder.branchAddr.setText(o.getRestBranchAddr());
+
+        // Set the service image
+        switch (o.getService())
+        {
+            case DELIVERY:
+                holder.serviceImage.setBackgroundResource(R.drawable.delivery);
+                break;
+            case TABLE:
+                holder.serviceImage.setBackgroundResource(R.drawable.table);
+                break;
+            case TAKE_AWAY:
+                holder.serviceImage.setBackgroundResource(R.drawable.takeaway);
+                break;
+        }
+
         return view;
     }
 

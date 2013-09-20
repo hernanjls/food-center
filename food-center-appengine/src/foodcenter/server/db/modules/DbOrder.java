@@ -9,79 +9,89 @@ import javax.jdo.annotations.Persistent;
 
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable//(detachable = "true")
+@PersistenceCapable
+// (detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4888609583270819317L;
+    private static final long serialVersionUID = -4888609583270819317L;
 
-	@Persistent
-	private String userEmail; // user which made this order
+    @Persistent
+    private String userEmail; // user which made this order
 
-	@Persistent
+    @Persistent
     private String compId;
 
-	@Persistent
-	private String compBranchId;
+    @Persistent
+    private String compName = "";
 
-	@Persistent
+    @Persistent
+    private String compBranchId;
+    
+    @Persistent
+    private String compBranchAddr = "";
+
+    @Persistent
     private String restId;
 
-	@Persistent
-	private String restName = "";
-	
-	@Persistent
-	private String restBranchId;
+    @Persistent
+    private String restName = "";
 
-	@Persistent
-	private List<DbCourseOrder> courses = new ArrayList<DbCourseOrder>(); // Courses IDs
+    @Persistent
+    private String restBranchId;
+    
+    @Persistent
+    private String restBranchAddr = "";
 
-	@Persistent
-	private Date date = null;
+    @Persistent
+    private List<DbCourseOrder> courses = new ArrayList<DbCourseOrder>(); // Courses IDs
 
-	@Persistent
-	private boolean delivered = false;
-	
-	@Persistent
+    @Persistent
+    private Date date = null;
+
+    @Persistent
+    private boolean delivered = false;
+
+    @Persistent
     private Date deliveryDate = null;
 
-	@Persistent
-	private ServiceType service;
-	
-	public DbOrder()
-	{
-		super();
-	}
+    @Persistent
+    private ServiceType service;
 
-	@Override
-	public void jdoPreStore()
-	{
-		super.jdoPreStore();
+    public DbOrder()
+    {
+        super();
+    }
 
-		// Make sure the date is correct
-		if (null == this.date)
-		{
-		    this.date = new Date();
-		}
-		if (this.delivered && null == this.deliveryDate)
-		{
-		    this.deliveryDate = new Date();
-		}
-	};
+    @Override
+    public void jdoPreStore()
+    {
+        super.jdoPreStore();
 
-	public String getUserEmail()
-	{
-		return userEmail;
-	}
+        // Make sure the date is correct
+        if (null == this.date)
+        {
+            this.date = new Date();
+        }
+        if (this.delivered && null == this.deliveryDate)
+        {
+            this.deliveryDate = new Date();
+        }
+    };
 
-	public void setUserEmail(String userEmail)
-	{
-		this.userEmail = userEmail;
-	}
+    public String getUserEmail()
+    {
+        return userEmail;
+    }
 
-	public String getCompId()
+    public void setUserEmail(String userEmail)
+    {
+        this.userEmail = userEmail;
+    }
+
+    public String getCompId()
     {
         return compId;
     }
@@ -90,18 +100,38 @@ public class DbOrder extends AbstractDbObject
     {
         this.compId = compId;
     }
-    
-	public String getCompBranchId()
-	{
-		return compBranchId;
-	}
 
-	public void setCompBranchId(String compBranchId)
-	{
-		this.compBranchId = compBranchId;
-	}
+    public String getCompName()
+    {
+        return compName;
+    }
 
-	public String getRestId()
+    public void setCompName(String compName)
+    {
+        this.compName = compName;
+    }
+
+    public String getCompBranchId()
+    {
+        return compBranchId;
+    }
+
+    public void setCompBranchId(String compBranchId)
+    {
+        this.compBranchId = compBranchId;
+    }
+
+    public String getCompBranchAddr()
+    {
+        return compBranchAddr;
+    }
+
+    public void setCompBranchAddr(String compBranchAddr)
+    {
+        this.compBranchAddr = compBranchAddr;
+    }
+
+    public String getRestId()
     {
         return restId;
     }
@@ -110,8 +140,8 @@ public class DbOrder extends AbstractDbObject
     {
         this.restId = restId;
     }
-    
-	public String getRestName()
+
+    public String getRestName()
     {
         return restName;
     }
@@ -122,29 +152,39 @@ public class DbOrder extends AbstractDbObject
     }
 
     public String getRestBranchId()
-	{
-		return restBranchId;
-	}
+    {
+        return restBranchId;
+    }
 
-	public void setRestBranchId(String restBranchId)
-	{
-		this.restBranchId = restBranchId;
-	}
+    public void setRestBranchId(String restBranchId)
+    {
+        this.restBranchId = restBranchId;
+    }
 
-	public List<DbCourseOrder> getCourses()
-	{
-		return courses;
-	}
+    public String getRestBranchAddr()
+    {
+        return restBranchAddr;
+    }
 
-	public void setCourses(List<DbCourseOrder> courses)
-	{
-		this.courses = courses;
-	}
+    public void setRestBranchAddr(String restBranchAddr)
+    {
+        this.restBranchAddr = restBranchAddr;
+    }
 
-	public Date getDate()
-	{
-		return date;
-	}
+    public List<DbCourseOrder> getCourses()
+    {
+        return courses;
+    }
+
+    public void setCourses(List<DbCourseOrder> courses)
+    {
+        this.courses = courses;
+    }
+
+    public Date getDate()
+    {
+        return date;
+    }
 
     public Boolean getDelivered()
     {
