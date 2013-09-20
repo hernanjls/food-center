@@ -109,6 +109,7 @@ public class ClientService
         {
             return null;
         }
+        
         DbRestaurant rest = DbHandler.find(DbRestaurant.class, order.getRestId());
         if (null == rest)
         {
@@ -127,24 +128,25 @@ public class ClientService
         {
             return null;
         }
+        order.setRestBranchAddr(rBranch.getAddress());
 
         DbCompanyBranch cBranch = findUserCompanyBranch(user.getEmail());
         if (null == cBranch)
         {
             return null;
         }
-
         order.setCompBranchId(cBranch.getId());
+        order.setCompBranchAddr(cBranch.getAddress());
 
         DbCompany comp = findCompanyOfBranch(cBranch);
         if (null == comp)
         {
             return null;
         }
-
         order.setCompId(comp.getId());
+        order.setCompName(comp.getName());
 
-        // Save the order
+        // Save the order (using 1 transaction!)
         return DbHandler.save(order);
     }
 

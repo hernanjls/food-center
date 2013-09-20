@@ -24,6 +24,10 @@ public interface OrderProxy extends EntityProxy
 
     public void setCompBranchId(String compBranchId);
 
+    public String getCompName();
+
+    public String getCompBranchAddr();
+
     public String getRestId();
 
     public void setRestId(String restId);
@@ -32,6 +36,8 @@ public interface OrderProxy extends EntityProxy
 
     public String getRestBranchId();
 
+    public String getRestBranchAddr();
+    
     public void setRestBranchId(String restBranchId);
 
     public List<CourseOrderProxy> getCourses();
