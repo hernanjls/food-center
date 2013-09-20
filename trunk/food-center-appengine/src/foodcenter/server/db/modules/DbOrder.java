@@ -30,6 +30,9 @@ public class DbOrder extends AbstractDbObject
     private String restId;
 
 	@Persistent
+	private String restName = "";
+	
+	@Persistent
 	private String restBranchId;
 
 	@Persistent
@@ -108,7 +111,17 @@ public class DbOrder extends AbstractDbObject
         this.restId = restId;
     }
     
-	public String getRestBranchId()
+	public String getRestName()
+    {
+        return restName;
+    }
+
+    public void setRestName(String restName)
+    {
+        this.restName = restName;
+    }
+
+    public String getRestBranchId()
 	{
 		return restBranchId;
 	}

@@ -21,12 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
@@ -50,8 +47,6 @@ import foodcenter.service.FoodCenterRequestFactory;
  */
 public class AndroidRequestUtils
 {
-
-    private static HttpClient client = new DefaultHttpClient();
 
     /** Tag for logging. */
     private static final String TAG = AndroidRequestUtils.class.getSimpleName();

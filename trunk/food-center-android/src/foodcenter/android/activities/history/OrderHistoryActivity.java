@@ -5,20 +5,17 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.R;
-import foodcenter.android.activities.main.LoginActivity;
-import foodcenter.android.service.history.HistoryGetAsyncTask;
+import foodcenter.android.service.history.OrderHistoryGetAsyncTask;
 
-public class HistoryActivity extends Activity implements OnRefreshListener
+public class OrderHistoryActivity extends Activity implements OnRefreshListener
 {
 
-    private HistoryOrderListAdapter adapter;
+    private OrderHistoryListAdapter adapter;
     private ExpandableListView elv;
     private PullToRefreshAttacher mPullToRefreshAttacher;
     
@@ -28,9 +25,9 @@ public class HistoryActivity extends Activity implements OnRefreshListener
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.history_layot);
+        setContentView(R.layout.order_history_layot);
         
-        adapter = new HistoryOrderListAdapter(this);
+        adapter = new OrderHistoryListAdapter(this);
         
         elv = (ExpandableListView) findViewById(R.id.history_order_list);
         elv.setAdapter(adapter);
@@ -38,7 +35,7 @@ public class HistoryActivity extends Activity implements OnRefreshListener
         initActionBar();
         initPullToRefresh();
         
-        new HistoryGetAsyncTask(this, adapter).execute(toFrom);
+        new OrderHistoryGetAsyncTask(this, adapter).execute(toFrom);
     }
     
     @Override
@@ -47,7 +44,7 @@ public class HistoryActivity extends Activity implements OnRefreshListener
         int cnt = toFrom[0] - toFrom[1];
         toFrom[0]  = toFrom[1] + 1;
         toFrom[1] = toFrom[0] + cnt;
-        new HistoryGetAsyncTask(this, adapter).execute(toFrom);
+        new OrderHistoryGetAsyncTask(this, adapter).execute(toFrom);
     }
 
     private void initActionBar()
