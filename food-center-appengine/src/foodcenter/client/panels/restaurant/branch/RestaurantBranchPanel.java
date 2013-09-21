@@ -13,7 +13,8 @@ import com.google.gwt.user.client.ui.Widget;
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.panels.common.UsersPanel;
-import foodcenter.client.panels.restaurant.internal.MenuPanel;
+import foodcenter.client.panels.restaurant.branch.orders.PendingOrdersPanel;
+import foodcenter.client.panels.restaurant.menu.MenuPanel;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
 import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
@@ -29,7 +30,9 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
     private final VerticalPanel main;
 
     private MenuPanel menuPanel = null;
-    
+
+    private PendingOrdersPanel pendingOrders = null;
+
     public RestaurantBranchPanel(RestaurantBranchProxy branch,
                                  PanelCallback<RestaurantBranchProxy, RestaurantBranchAdminServiceRequest> callback)
     {
@@ -106,12 +109,12 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
     {
         TabPanel res = new TabPanel();
         res.setWidth("100%");
-//        res.setHeight("250px");
+        // res.setHeight("250px");
 
         Panel locationPanel = new RestaurantBranchLocationVerticalPanel(branch, isEditMode);
         res.add(locationPanel, "Location");
         res.selectTab(res.getTabBar().getTabCount() - 1);
-        
+
         menuPanel = new MenuPanel(branch.getMenu(), service);
         res.add(menuPanel, "Menu");
 
@@ -125,6 +128,17 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
 
             Panel chefsPanel = new UsersPanel(branch.getChefs(), isEditMode);
             res.add(chefsPanel, "Chefs");
+        }
+
+        // TODO fix this to be added also for chefs
+        if (!isEditMode && branch.isEditable())
+        {
+            if (null != pendingOrders)
+            {
+                pendingOrders.close(); // close opened sockets!
+            }
+            pendingOrders = new PendingOrdersPanel(branch.getId());
+            res.add(pendingOrders, "Pending Orders");
         }
 
         // TODO tables res.add(tablesPanel, "Tables");
@@ -141,6 +155,7 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         @Override
         public void onClick(ClickEvent event)
         {
+
             callback.close(RestaurantBranchPanel.this, branch);
         }
     }
@@ -160,7 +175,7 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
         public void onClick(ClickEvent event)
         {
             menuPanel.setToService();
-            
+
             callback.save(RestaurantBranchPanel.this,
                           branch,
                           callback,

@@ -20,7 +20,7 @@ import foodcenter.server.FileManager;
 import foodcenter.server.service.servlet.ImageServlet;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
-@PersistenceCapable(detachable = "true")
+@PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public abstract class AbstractDbObject implements StoreCallback, Serializable,
                                       AbstractEntityInterface, LoadCallback

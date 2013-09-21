@@ -36,6 +36,8 @@
     <!-- be added before this line.                -->
     <!--                                           -->
     <script type="text/javascript" src="food_center/food_center.nocache.js"></script>
+    <script type="text/javascript" src="/_ah/channel/jsapi"></script>
+
   </head>
 
   <!--                                           -->

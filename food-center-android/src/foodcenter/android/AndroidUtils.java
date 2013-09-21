@@ -17,13 +17,18 @@ package foodcenter.android;
 
 import android.content.Context;
 import android.content.Intent;
-import foodcenter.android.service.Setup;
 /**
  * Helper class providing methods and constants common to other classes in the
  * app.
  */
 public final class AndroidUtils
 {
+
+    /** Intent used to display a message in the screen. */
+    public static final String DISPLAY_POPUP_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
+
+    /** Intent's extra that contains the message to be displayed. */
+    public static final String EXTRA_MESSAGE = "message";
 
     /**
      * Notifies UI to display a message.
@@ -36,8 +41,8 @@ public final class AndroidUtils
      */
     public static void displayMessage(Context context, String message)
     {
-        Intent intent = new Intent(Setup.DISPLAY_POPUP_ACTION);
-        intent.putExtra(Setup.EXTRA_MESSAGE, message);
+        Intent intent = new Intent(DISPLAY_POPUP_ACTION);
+        intent.putExtra(EXTRA_MESSAGE, message);
         context.sendBroadcast(intent);
     }
     

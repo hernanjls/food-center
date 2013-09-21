@@ -89,7 +89,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
     {
 
         // load the maps api!
-        Maps.loadMapsApi(WebClientUtils.GOOGLE_API_MAPS_KEY,
+        Maps.loadMapsApi(WebClientUtils.BROWSER_API_KEY_MAPS,
                          WebClientUtils.GOOGLE_API_MAPS_VER,
                          false,
                          this);

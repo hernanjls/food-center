@@ -118,4 +118,7 @@
     <string name="order_order_date">2013.08.15 14:00</string>
     <string name="order_order_delivery_date">Not Delivered</string>
 
+    <!-- API Keys created by GAE Api consule and needed by the app -->
+    <string name="android_api_key"></string>
+    <string name="browser_api_key">AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw</string>
 </resources>

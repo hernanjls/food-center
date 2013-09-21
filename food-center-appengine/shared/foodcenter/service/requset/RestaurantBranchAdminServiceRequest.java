@@ -15,4 +15,5 @@ public interface RestaurantBranchAdminServiceRequest extends MenuAdminServiceReq
 	public Request<Void> addBranchTable(RestaurantBranchProxy branch, TableProxy table);
 		
 	public Request<RestaurantBranchProxy> saveRestaurantBranch(RestaurantBranchProxy branch);
+	
 }

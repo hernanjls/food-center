@@ -1,5 +1,6 @@
 package foodcenter.server.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -82,14 +83,50 @@ public class DbHandler
     public static <T extends AbstractDbObject> Long delete(Class<T> clazz, String id)
     {
         logger.info("delete:" + clazz.getSimpleName() + ", id: " + id);
+        
+        String query = "id == valueP";
+        
+        List<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("valueP", id));
+        
+        return delete(clazz, query, params);
+    }
+
+    
+    public static <T extends AbstractDbObject> Long delete(Class<T> clazz, String query, List<DeclaredParameter> declaredParams)
+    {
+        logger.info("delete: " + query);
+        if (null == query || 0 == query.length())
+        {
+            // deleting all objects is not supported, and should never be 
+            // (if developer wants this feature, implement it in a different function!)
+            return 0L;
+        }
+        
         PMF.makeTransactional();
         PersistenceManager pm = PMF.get();
         try
         {
             Query q = pm.newQuery(clazz);
-            q.setFilter("id == value");
-            q.declareParameters("String value");
-            Long res = q.deletePersistentAll(id.toString());
+            q.setFilter(query);
+            String decParamsStr = null;
+            Object[] values = null;
+            if (null != declaredParams && declaredParams.size() > 0)
+            {
+                decParamsStr = getDeclaredParamsStr(declaredParams).toString();
+                q.declareParameters(decParamsStr);
+                values = getDeclaredParamsValues(declaredParams);
+            }
+            
+            Long res = 0L;
+            if (null != values)
+            {
+                res = q.deletePersistentAll(values);
+            }
+            else
+            {
+                res = q.deletePersistentAll();
+            }
 
             Transaction tx = PMF.get().currentTransaction();
             tx.commit();

@@ -6,8 +6,8 @@ import com.google.gwt.user.client.ui.ValueBoxBase;
 
 public class WebClientUtils
 {
-    public final static String GOOGLE_API_MAPS_KEY = "AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw"; 
-    public final static String GOOGLE_API_MAPS_VER = "2";
+    public final static String BROWSER_API_KEY_MAPS = "AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw";
+    public final static String GOOGLE_API_MAPS_VER = "2";    
     
     public static void setNotNullText(ValueBoxBase<String> w, String s)
     {

@@ -13,6 +13,7 @@ import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
+import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;

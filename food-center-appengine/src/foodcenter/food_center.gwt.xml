@@ -15,6 +15,11 @@
 	<inherits name='com.google.gwt.user.theme.chrome.Chrome'/>  
 	<!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
 
+	<inherits name="com.google.gwt.logging.Logging"/>
+	
+	<!-- GAE GWT Channel API -->
+   	<inherits name='com.google.gwt.appengine.channel.Channel'/> 
+	
 	<!--  Google maps styles and api-->
 	<inherits name='com.google.gwt.maps.GoogleMaps' />
 	

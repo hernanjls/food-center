@@ -4,14 +4,19 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
@@ -34,9 +39,6 @@ import foodcenter.android.service.AndroidRequestUtils;
 
 public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boolean>
 {
-
-    /** Cookie name for authorization. */
-    public static final String AUTH_COOKIE_NAME = "SACSID";
 
     /** for logs */
     private static final String TAG = AuthenticateAndLoginAsyncTask.class.getSimpleName();
@@ -223,12 +225,27 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
                           + URLEncoder.encode(continueURL, "UTF-8")
                           + "&auth="
                           + authToken);
-        HttpGet method = new HttpGet(uri);
-        final HttpParams getParams = new BasicHttpParams();
-        HttpClientParams.setRedirecting(getParams, false);
-        method.setParams(getParams);
+        
+        HttpPost httpPost = new HttpPost(uri);
+        if (AndroidRequestUtils.IS_DEV)
+        {
+            final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
+            String accName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, "myemail@gmail.com");
 
-        HttpResponse res = client.execute(method);
+            // attach 
+            List<BasicNameValuePair> devParams = new ArrayList<BasicNameValuePair>();
+            devParams.add(new BasicNameValuePair("email", accName));
+            devParams.add(new BasicNameValuePair("admin", "False"));
+            devParams.add(new BasicNameValuePair("action", "Login"));
+            HttpEntity entity = new UrlEncodedFormEntity(devParams);
+            httpPost.setEntity(entity);
+        }
+
+        final HttpParams params = new BasicHttpParams();
+        httpPost.setParams(params);
+        HttpClientParams.setRedirecting(params, false);
+        
+        HttpResponse res = client.execute(httpPost);
         Header[] headers = res.getHeaders("Set-Cookie");
         if (res.getStatusLine().getStatusCode() != 302 || headers.length == 0)
         {
@@ -237,11 +254,12 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
                                   + headers.length);
         }
 
+        final String authCookieName = AndroidRequestUtils.getAuthCookieName();
         for (Cookie cookie : client.getCookieStore().getCookies())
         {
-            if (AUTH_COOKIE_NAME.equals(cookie.getName()))
+            if (authCookieName.equals(cookie.getName()))
             {
-                return AUTH_COOKIE_NAME + "=" + cookie.getValue();
+                return authCookieName + "=" + cookie.getValue();
             }
         }
         throw new IOException("AUTH_COOKIE_NAME is missing from the response");

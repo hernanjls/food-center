@@ -7,10 +7,10 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable
-// (detachable = "true")
 public class DbOrder extends AbstractDbObject
 {
     /**
@@ -29,7 +29,7 @@ public class DbOrder extends AbstractDbObject
 
     @Persistent
     private String compBranchId;
-    
+
     @Persistent
     private String compBranchAddr = "";
 
@@ -41,7 +41,7 @@ public class DbOrder extends AbstractDbObject
 
     @Persistent
     private String restBranchId;
-    
+
     @Persistent
     private String restBranchAddr = "";
 
@@ -52,7 +52,7 @@ public class DbOrder extends AbstractDbObject
     private Date date = null;
 
     @Persistent
-    private boolean delivered = false;
+    private OrderStatus status = null;
 
     @Persistent
     private Date deliveryDate = null;
@@ -75,7 +75,13 @@ public class DbOrder extends AbstractDbObject
         {
             this.date = new Date();
         }
-        if (this.delivered && null == this.deliveryDate)
+        
+        if (null == status)
+        {
+            status = OrderStatus.CREATED;
+        }
+        
+        if ((OrderStatus.CREATED != this.status) && (null == this.deliveryDate))
         {
             this.deliveryDate = new Date();
         }
@@ -186,14 +192,14 @@ public class DbOrder extends AbstractDbObject
         return date;
     }
 
-    public Boolean getDelivered()
+    public OrderStatus getStatus()
     {
-        return delivered;
+        return status;
     }
 
-    public void setDelivered(boolean delivered)
+    public void setStatus(OrderStatus status)
     {
-        this.delivered = delivered;
+        this.status = status;
     }
 
     public Date getDeliveryeDate()

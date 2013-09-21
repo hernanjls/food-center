@@ -6,6 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.channel.ChannelMessage;
+import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -15,6 +18,7 @@ import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
+import foodcenter.server.db.modules.DbChannelToken;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
@@ -33,7 +37,7 @@ public class ClientService
 
     public static String getLogoutUrl()
     {
-        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
+        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";        
         return userService.createLogoutURL("/") + logoutRedirectionUrl;
     }
 
@@ -147,7 +151,11 @@ public class ClientService
         order.setCompName(comp.getName());
 
         // Save the order (using 1 transaction!)
-        return DbHandler.save(order);
+        order = DbHandler.save(order);
+        
+        broadcastOrder(order);
+        
+        return order;
     }
 
     public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
@@ -278,6 +286,30 @@ public class ClientService
     /* **************************** private functions ******************************** */
     /* ******************************************************************************* */
 
+    protected static void broadcastOrder(DbOrder order)
+    {
+        if (null == order)
+        {
+            return;
+        }
+        String query = "branchId == branchIdP";
+        
+        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
+        params.add(new DeclaredParameter("branchIdP", order.getRestBranchId()));
+            
+        List<DbChannelToken> tokens = DbHandler.find(DbChannelToken.class, query, params,null, Integer.MAX_VALUE);
+        if ((null == tokens) || tokens.isEmpty())
+        {
+            return;
+        }
+        
+        ChannelService channelService = ChannelServiceFactory.getChannelService();
+        for (DbChannelToken t : tokens)
+        {
+            channelService.sendMessage(new ChannelMessage(t.getKey(), order.getId()));
+        }
+        
+    }
     protected static DbCompany findCompanyOfBranch(DbCompanyBranch branch)
     {
         if (null == branch)

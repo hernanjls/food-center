@@ -34,7 +34,6 @@ import foodcenter.android.R;
 import foodcenter.android.activities.history.OrderHistoryActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.AuthCookieImageDownloader;
-import foodcenter.android.service.Setup;
 import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 
 public class MainActivity extends Activity implements PullToRefreshAttacher.OnRefreshListener,
@@ -56,7 +55,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            String newMessage = intent.getExtras().getString(Setup.EXTRA_MESSAGE);
+            String newMessage = intent.getExtras().getString(AndroidUtils.EXTRA_MESSAGE);
             Popup.show(MainActivity.this, newMessage);
         }
     };
@@ -92,7 +91,7 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         // TODO GCMRegistrar.checkManifest(context);
 
         // register msg reciever handler (to show on ui thread)
-        registerReceiver(handlePopupReceiver, new IntentFilter(Setup.DISPLAY_POPUP_ACTION));
+        registerReceiver(handlePopupReceiver, new IntentFilter(AndroidUtils.DISPLAY_POPUP_ACTION));
 
     }
 

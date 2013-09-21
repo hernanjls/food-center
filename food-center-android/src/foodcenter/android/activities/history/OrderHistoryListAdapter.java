@@ -26,7 +26,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
         public EditText cnt;
         public TextView price;
     }
-    
+
     private class OrderHolder
     {
         public ImageView serviceImage;
@@ -36,20 +36,22 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
         public TextView orderDate;
         public TextView deliveryDate;
     }
-    
+
     private final Activity activity;
     private final List<OrderProxy> orders;
 
     private final DateFormat dateFormat;
+
     public OrderHistoryListAdapter(Activity context)
     {
         super();
         this.activity = context;
-        dateFormat  = new SimpleDateFormat("dd.MM.yyyy HH:mm", activity.getResources().getConfiguration().locale);
-        
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", activity.getResources()
+            .getConfiguration().locale);
+
         orders = new ArrayList<OrderProxy>();
     }
-    
+
     @Override
     public CourseOrderProxy getChild(int groupPosition, int childPosition)
     {
@@ -69,7 +71,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
                              View view,
                              ViewGroup parent)
     {
-        
+
         CourseOrderProxy c = getChild(groupPosition, childPosition);
         if (null == c)
         {
@@ -84,7 +86,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
                                                         false);
             CourseHolder holder = new CourseHolder();
             view.setTag(holder);
-            
+
             holder.name = (TextView) view.findViewById(R.id.order_history_course_name);
             holder.price = (TextView) view.findViewById(R.id.order_history_course_price);
             holder.cnt = (EditText) view.findViewById(R.id.order_history_course_cnt);
@@ -94,8 +96,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
         holder.name.setText(c.getName());
         holder.price.setText(c.getPrice().toString());
         holder.cnt.setText("" + c.getCnt());
-        
-        
+
         return view;
     }
 
@@ -108,7 +109,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
     @Override
     public OrderProxy getGroup(int groupPosition)
     {
-        
+
         return orders.get(groupPosition);
     }
 
@@ -125,10 +126,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
     }
 
     @Override
-    public View getGroupView(int groupPosition,
-                             boolean isExpanded,
-                             View view,
-                             ViewGroup parent)
+    public View getGroupView(int groupPosition, boolean isExpanded, View view, ViewGroup parent)
     {
         OrderProxy o = getGroup(groupPosition);
         if (null == o)
@@ -144,7 +142,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
                                                         false);
             OrderHolder holder = new OrderHolder();
             view.setTag(holder);
-            
+
             holder.serviceImage = (ImageView) view.findViewById(R.id.order_history_title_service_img);
             holder.restName = (TextView) view.findViewById(R.id.order_history_title_rest_name);
             holder.branchAddr = (TextView) view.findViewById(R.id.order_history_title_rest_branch_addr);
@@ -154,32 +152,40 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
         }
 
         OrderHolder holder = (OrderHolder) view.getTag();
-        
+
         // Set the restaurant name
         holder.restName.setText(o.getRestName());
-                        
+
         // Set total price of order
         Double totalPrice = 0.0;
-        for (int i=0; i< getChildrenCount(groupPosition); ++i)
+        for (int i = 0; i < getChildrenCount(groupPosition); ++i)
         {
             CourseOrderProxy c = getChild(groupPosition, i);
             totalPrice += c.getCnt() * c.getPrice();
         }
         holder.totalPrice.setText(totalPrice.toString());
-        
+
         // Set Order date
         holder.orderDate.setText(dateFormat.format(o.getDate()));
-        
+
         // Set Delivery date
-        if (o.getDelivered())
+        int colorId = activity.getResources().getColor(android.R.color.secondary_text_light);
+        switch (o.getStatus())
         {
-            holder.deliveryDate.setText(dateFormat.format(o.getDeliveryeDate()));
+            case CANCELD:
+                holder.deliveryDate.setText("Canceled: " + dateFormat.format(o.getDeliveryeDate()));
+                colorId = activity.getResources().getColor(android.R.color.holo_red_dark);
+                break;
+            case CREATED:
+                holder.deliveryDate.setText(activity.getString(R.string.order_order_delivery_date));
+                break;
+            case DELIVERED:
+                holder.deliveryDate.setText(dateFormat.format(o.getDeliveryeDate()));
+                break;
         }
-        else
-        {
-            holder.deliveryDate.setText(activity.getString(R.string.order_order_delivery_date));
-        }
+        holder.deliveryDate.setTextColor(colorId);
         
+
         // Set restaurant branch address
         holder.branchAddr.setText(o.getRestBranchAddr());
 
@@ -211,7 +217,7 @@ public class OrderHistoryListAdapter extends BaseExpandableListAdapter
     {
         return false;
     }
-    
+
     public void addOrders(OrderProxy[] orders)
     {
         Collections.addAll(this.orders, orders);
