@@ -78,7 +78,8 @@ public class OrderHistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, Str
         {
             AndroidUtils.displayMessage(activity, msg);
         }
-        
+        // Notify PullToRefreshAttacher that the refresh has finished
+        activity.hideSpinner();
         super.onPostExecute(msg);
     }
 
@@ -101,9 +102,9 @@ public class OrderHistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, Str
             {
                 // Save the response in cache!
                 ObjectStore.put(List.class, query, response);
-                orders = response.toArray(orders); 
+                orders = response.toArray(orders);
             }
-            
+
             publishProgress(orders);
         }
 

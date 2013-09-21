@@ -1,8 +1,12 @@
 package foodcenter.service.requset;
 
+import java.util.Date;
+import java.util.List;
+
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
+import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.TableProxy;
 
@@ -15,5 +19,7 @@ public interface RestaurantBranchAdminServiceRequest extends MenuAdminServiceReq
 	public Request<Void> addBranchTable(RestaurantBranchProxy branch, TableProxy table);
 		
 	public Request<RestaurantBranchProxy> saveRestaurantBranch(RestaurantBranchProxy branch);
-	
+
+	public Request<List<OrderProxy>> getOrders(String branchId, Date from, Date to);
+
 }
