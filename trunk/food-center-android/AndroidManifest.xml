@@ -144,7 +144,7 @@
         <!--  Maps V2 API -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw" />
+            android:value="@string/browser_api_key" />
     </application>
 
 </manifest>

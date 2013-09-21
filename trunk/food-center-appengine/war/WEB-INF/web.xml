@@ -16,7 +16,8 @@
 
 	<filter-mapping>
 		<filter-name>PersistenceFilter</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/gwtRequest</url-pattern>
+		<url-pattern>/blobservlet</url-pattern>
 	</filter-mapping>
 
 	<!-- GWT RequestFactory Servlet -->
@@ -34,6 +35,7 @@
 	<servlet-mapping>
 		<servlet-name>requestFactoryServlet</servlet-name>
 		<url-pattern>/gwtRequest</url-pattern>
+		<url-pattern>/_ah/channel</url-pattern>
 	</servlet-mapping>
 
 
@@ -62,12 +64,30 @@
 		<servlet-name>ImageServlet</servlet-name>
 		<servlet-class>foodcenter.server.service.servlet.ImageServlet</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>ImageServlet</servlet-name>
 		<url-pattern>/blobservlet</url-pattern>
 	</servlet-mapping>
 
+	<!-- called when client connects to a channel (placeholder) -->
+	<servlet>
+		<servlet-name>ClientConnectServlet</servlet-name>
+		<servlet-class>foodcenter.server.service.servlet.ChannelConnectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ClientConnectServlet</servlet-name>
+		<url-pattern>/_ah/channel/connected</url-pattern>
+	</servlet-mapping>
+
+	<!-- called when client disconnects from a channel -->
+	<servlet>
+		<servlet-name>ClientDisconnectServlet</servlet-name>
+		<servlet-class>foodcenter.server.service.servlet.ChannelDisconnectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ClientDisconnectServlet</servlet-name>
+		<url-pattern>/_ah/channel/disconnected</url-pattern>
+	</servlet-mapping>
 
 	<security-constraint>
 		<web-resource-collection>

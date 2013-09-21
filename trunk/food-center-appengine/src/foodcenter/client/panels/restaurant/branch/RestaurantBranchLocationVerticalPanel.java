@@ -81,7 +81,7 @@ public class RestaurantBranchLocationVerticalPanel extends VerticalPanel
         // add the map and the pannels
         if (!Maps.isLoaded())
         {
-            Maps.loadMapsApi(WebClientUtils.GOOGLE_API_MAPS_KEY, WebClientUtils.GOOGLE_API_MAPS_VER, false, new OnApiLoadRunnable());
+            Maps.loadMapsApi(WebClientUtils.BROWSER_API_KEY_MAPS, WebClientUtils.GOOGLE_API_MAPS_VER, false, new OnApiLoadRunnable());
         }
         else
         {

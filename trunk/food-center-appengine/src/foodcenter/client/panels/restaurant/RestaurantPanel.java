@@ -22,7 +22,7 @@ import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.panels.common.BlockingPopupPanel;
 import foodcenter.client.panels.common.UsersPanel;
 import foodcenter.client.panels.restaurant.branch.RestaurantBranchPanel;
-import foodcenter.client.panels.restaurant.internal.MenuPanel;
+import foodcenter.client.panels.restaurant.menu.MenuPanel;
 import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;

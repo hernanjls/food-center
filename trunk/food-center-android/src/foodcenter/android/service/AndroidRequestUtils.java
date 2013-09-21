@@ -15,10 +15,6 @@
  */
 package foodcenter.android.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -28,9 +24,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.os.Debug;
 import android.util.Log;
 
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -47,6 +41,16 @@ import foodcenter.service.FoodCenterRequestFactory;
  */
 public class AndroidRequestUtils
 {
+
+    /** The URL of the production service. */
+    public static final Boolean IS_DEV = false; // by default run on prod
+    private static final String PROD_URL = "https://food-center.appspot.com";
+    private static final String DEV_URL = "http://10.0.0.32:8888";
+
+    /** Cookie name for authorization. */
+    private static final String PROD_AUTH_COOKIE_NAME = "SACSID";
+    private static final String DEV_AUTH_COOKIE_NAME = "dev_appserver_login";
+    
 
     /** Tag for logging. */
     private static final String TAG = AndroidRequestUtils.class.getSimpleName();
@@ -70,9 +74,7 @@ public class AndroidRequestUtils
     /** Key for shared preferences. */
     private static final String SHARED_PREFS = "FOODCENTER_PREFS";
 
-    /** Cache containing the base URL for a given context. */
-    private static final Map<Context, String> URL_MAP = new HashMap<Context, String>();
-
+    
     /** Container for the request factory. */
     private static FoodCenterRequestFactory foodCenterRF = null;
 
@@ -82,25 +84,14 @@ public class AndroidRequestUtils
      */
     public static String getBaseUrl(Context context)
     {
-        String url = URL_MAP.get(context);
-        if (null != url)
-        {
-            return url;
-        }
-
-        if (Debug.isDebuggerConnected())
-        {
-            // if a debug_url raw resource exists, use its contents as the url
-            url = getDebugUrl(context);
-            URL_MAP.put(context, url);
-            return url;
-        }
-
-        url = Setup.PROD_URL;
-        URL_MAP.put(context, url);
-        return url;
+        return IS_DEV ? DEV_URL : PROD_URL;
     }
 
+    public static String getAuthCookieName()
+    {
+        return IS_DEV ? DEV_AUTH_COOKIE_NAME : PROD_AUTH_COOKIE_NAME;
+    }
+    
     /**
      * Creates and returns an initialized {@link FoodCenterRequestFactory} of the given
      * type, with authCookie added to the request. <br>
@@ -155,15 +146,6 @@ public class AndroidRequestUtils
         return context.getApplicationContext().getSharedPreferences(SHARED_PREFS, 0);
     }
 
-    /**
-     * Returns true if we are running against a dev mode appengine instance.
-     */
-    public static boolean isDebug(Context context)
-    {
-        // Although this is a bit roundabout, it has the nice side effect
-        // of caching the result.
-        return !Setup.PROD_URL.equals(getBaseUrl(context));
-    }
 
     /**
      * 
@@ -191,60 +173,6 @@ public class AndroidRequestUtils
 
     }
 
-    /**
-     * Returns a debug url, or null. To set the url, create a file
-     * {@code assets/debugging_prefs.properties} with a line of the form
-     * 'url=http:/<ip address>:<port>'. A numeric IP address may be required in
-     * situations where the device or emulator will not be able to resolve the
-     * hostname for the dev mode server.
-     */
-    private static String getDebugUrl(Context context)
-    {
-        BufferedReader reader = null;
-        String url = Setup.PROD_URL;
-        try
-        {
-            AssetManager assetManager = context.getAssets();
-            InputStream is = assetManager.open("debugging_prefs.properties");
-            reader = new BufferedReader(new InputStreamReader(is));
-            while (true)
-            {
-                String s = reader.readLine();
-                if (s == null)
-                {
-                    break;
-                }
-                if (s.startsWith("url="))
-                {
-                    url = s.substring(4).trim();
-                    break;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Log.w(TAG, "Got exception " + e);
-            Log.w(TAG, Log.getStackTraceString(e));
-
-            // O.K., we will use the production server
-        }
-        finally
-        {
-            if (reader != null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (IOException e)
-                {
-                    Log.w(TAG, "Got exception " + e);
-                    Log.w(TAG, Log.getStackTraceString(e));
-                }
-            }
-        }
-        return url;
-    }
 
     /**
      * Returns the package name of this class.
