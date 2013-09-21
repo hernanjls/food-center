@@ -9,7 +9,7 @@ import javax.jdo.annotations.Persistent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@PersistenceCapable //(detachable="true")
+@PersistenceCapable
 public class DbMenuCategory extends AbstractDbObject
 {
 
@@ -23,10 +23,7 @@ public class DbMenuCategory extends AbstractDbObject
 	@Persistent
 	private String title;
 
-//	@Persistent
-//	private DbMenu menu;
-	
-	@Persistent //(mappedBy="category")
+	@Persistent
 	private List<DbCourse> courses = new ArrayList<DbCourse>();
 
 	public DbMenuCategory()

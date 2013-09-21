@@ -54,7 +54,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
         catch (Exception e)
         {
             Log.e(TAG, "if this is a class loader exeption: there is a retry mechanizm");
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage(), e);
             return e.getMessage();
         }
 

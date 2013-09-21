@@ -405,7 +405,7 @@ public class DbHandler
                 throw new IllegalArgumentException("Null pointer");
             }
 
-            this.declaredName = value.getClass().getSimpleName() + " " + declaredName;
+            this.declaredName = value.getClass().getName() + " " + declaredName;
             this.value = value;
         }
     }

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -178,7 +178,7 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
 
         if (isEditMode)
         {
-            catTitle.addKeyPressHandler(new CategoryTitleKeyPressHandler(cat));
+            catTitle.addKeyUpHandler(new CategoryTitleKeyUpHandler(cat));
 
             Button delButton = new Button("-", new OnClickDeleteCategory(cat));
             setWidget(row, COLUMN_CATEGORIES_DEL_BUTTON, delButton);
@@ -352,20 +352,20 @@ public class MenuPanel extends FlexTable implements RedrawablePanel
     /**
      * This class will set the title of the category when key is pressed
      */
-    private class CategoryTitleKeyPressHandler implements KeyPressHandler
+    private class CategoryTitleKeyUpHandler implements KeyUpHandler
     {
         private final MenuCategoryProxy cat;
 
         /**
          * @param cat is the category to set its title.
          */
-        public CategoryTitleKeyPressHandler(MenuCategoryProxy cat)
+        public CategoryTitleKeyUpHandler(MenuCategoryProxy cat)
         {
             this.cat = cat;
         }
 
         @Override
-        public void onKeyPress(KeyPressEvent event)
+        public void onKeyUp(KeyUpEvent event)
         {
             String s = ((TextBox) event.getSource()).getText();
             cat.setCategoryTitle(s);

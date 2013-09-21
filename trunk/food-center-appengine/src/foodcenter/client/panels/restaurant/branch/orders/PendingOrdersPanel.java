@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.client.WebClientUtils;
 import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.panels.common.EditableImage;
 import foodcenter.client.service.WebRequestUtils;
@@ -37,6 +38,7 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
 
     private ArrayList<OrderProxy> orders;
     private Socket socket = null;
+    private int socketErrors = 0;
 
     private final static Integer SERVICE_TYPE_IMG_WIDTH_PX = 50;
     private final static Integer SERVICE_TYPE_IMG_HEIGHT_PX = 50;
@@ -48,7 +50,7 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
         this.branchId = branchId;
         orders = new ArrayList<OrderProxy>();
 
-        setWidth("100%");
+        this.setWidth("100%");
 
         RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
             .getRestaurantChefService();
@@ -109,7 +111,10 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
         public void onMessage(String orderId)
         {
             logger.fine("got orderId in msg: " + orderId);
-
+            
+            // message is received - can reset counter for socket errors (num open retries)
+            socketErrors = 0;
+            
             RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
                 .getRestaurantChefService();
             service.getOrderById(orderId).with(OrderProxy.ORDER_WITH).fire(new NewOrderReciever());
@@ -118,10 +123,20 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
         @Override
         public void onError(SocketError error)
         {
-            logger.severe(error.getDescription());
+            logger.info("socket error, code "+ error.getCode() + ", desc=" + error.getDescription());
             // Renew token - socket is open for more than 2 hrs
             close();
-            Window.alert("error: " + error.getDescription());
+            if (socketErrors >= WebClientUtils.SOCKET_ERROR_NUM_RETRIES)
+            {
+                // dev server was disconnected from the browser plugin
+                Window.alert("socket error: " + error.getDescription()
+                             + ", reached max retries - please refresh to re-open socket. ");
+                return;
+            }
+         
+            // try to re-open the channel
+            //TODO reopen channel only on specific error code
+            ++socketErrors;
             RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
                 .getRestaurantChefService();
             service.createChannel(branchId).fire(new ChannelTokenReciever());
@@ -230,6 +245,8 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
             super();
 
             this.order = order;
+
+            this.setWidth("90%");
 
             draw();
         }

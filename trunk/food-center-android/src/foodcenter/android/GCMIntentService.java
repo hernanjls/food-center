@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
@@ -71,8 +72,7 @@ public class GCMIntentService extends GCMBaseIntentService
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
             Log.i(TAG, "unregistering device (regId = " + regId + ")");
-            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
-            factory.getClientService().logout().fire(new GCMUnRegisterReciever(context));
+            new GCMUnRegisterAsyncTask(context).execute();
         }
         else
         {
@@ -154,47 +154,76 @@ public class GCMIntentService extends GCMBaseIntentService
     }
 }
 
-class GCMUnRegisterReciever extends Receiver<Void>
+class GCMUnRegisterAsyncTask extends AsyncTask<Void, String, Void>
 {
 
     private final Context context;
 
-    public GCMUnRegisterReciever(final Context context)
+    public GCMUnRegisterAsyncTask(final Context context)
     {
         this.context = context.getApplicationContext();
     }
 
     @Override
-    public void onSuccess(Void arg0)
+    protected Void doInBackground(Void... params)
     {
-        GCMRegistrar.setRegisteredOnServer(context, false);
-
-        // Delete the current auth cookie from shared preferences
-        Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
-        editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
-        editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
-        editor.commit();
-        LoginActivity.closeLoginActivity(false);
+        try
+        {
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
+            factory.getClientService().logout().fire(new GCMUnregisterReciever());
+        }
+        catch (Exception e)
+        {
+            Log.e(getClass().getSimpleName(), e.getMessage(), e);
+            publishProgress(e.getMessage());
+        }
+        return null;
     }
 
     @Override
-    public void onFailure(ServerFailure error)
+    protected void onProgressUpdate(String... values)
     {
-        GCMRegistrar.setRegisteredOnServer(context, false);
-
-        // Delete the current auth cookie from shared preferences
-        Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
-        editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
-        editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
-        editor.commit();
-
-        // At this point the device is unregistered from GCM, but still
-        // registered in the server.
-        // We could try to unregister again, but it is not necessary:
-        // if the server tries to send a message to the device, it will get
-        // a "NotRegistered" error message and should unregister the device.
-        String msg = context.getString(R.string.server_unregister_error, error.getMessage());
-        LoginActivity.showSpinner(msg);
+        if (null != values && values.length > 0)
+        {
+            LoginActivity.showSpinner(values[0]);
+        }
         LoginActivity.closeLoginActivity(false);
+
+    }
+
+    class GCMUnregisterReciever extends Receiver<Void>
+    {
+        @Override
+        public void onSuccess(Void arg0)
+        {
+            GCMRegistrar.setRegisteredOnServer(context, false);
+
+            // Delete the current auth cookie from shared preferences
+            Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
+            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
+            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
+            editor.commit();
+            publishProgress();
+        }
+
+        @Override
+        public void onFailure(ServerFailure error)
+        {
+            GCMRegistrar.setRegisteredOnServer(context, false);
+
+            // Delete the current auth cookie from shared preferences
+            Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
+            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
+            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
+            editor.commit();
+
+            // At this point the device is unregistered from GCM, but still
+            // registered in the server.
+            // We could try to unregister again, but it is not necessary:
+            // if the server tries to send a message to the device, it will get
+            // a "NotRegistered" error message and should unregister the device.
+            String msg = context.getString(R.string.server_unregister_error, error.getMessage());
+            publishProgress(msg);
+        }
     }
 }
