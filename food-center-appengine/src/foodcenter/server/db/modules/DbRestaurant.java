@@ -8,8 +8,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
-import foodcenter.server.db.security.PrivilegeManager;
-import foodcenter.server.db.security.UserPrivilege;
+import com.google.appengine.api.users.User;
+
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable (detachable="true")
@@ -27,7 +28,7 @@ public class DbRestaurant extends AbstractDbObject
     @NotNull
     private String name = "";
 
-    @Persistent(defaultFetchGroup="true")
+    @Persistent
     private DbMenu menu = new DbMenu();
 
     @Persistent
@@ -62,12 +63,10 @@ public class DbRestaurant extends AbstractDbObject
     {
         super.jdoPostLoad();
         
-        // Set permissions
-        UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p)
-        {
-            setEditable(true);
-        }
+        User user = UsersManager.getUser();
+     
+        // Set edit permission (this happens in post load before any changes to admins)
+        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail()));
         
         // Make sure image can be shown!
         if (0 == getImageUrl().length())

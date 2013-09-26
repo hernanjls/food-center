@@ -2,7 +2,6 @@ package foodcenter.client.panels.common;
 
 import java.util.Date;
 
-import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -22,6 +21,8 @@ public class LabeledDatePicker extends HorizontalPanel
     private final DatePicker datePicker;
     private final PopupPanel popup;
 
+    private static DateTimeFormat dateFormater = DateTimeFormat.getFormat("dd MMM yyyy");
+    
     public LabeledDatePicker(String txt)
     {
         this.date = new Date();
@@ -46,14 +47,14 @@ public class LabeledDatePicker extends HorizontalPanel
     private void init()
     {
         datePicker.setValue(date, true); // Set the default value
-        dateTxt.setText(DateTimeFormat.getMediumDateFormat().format(date));
+        dateTxt.setText(dateFormater.format(date));
 
         datePicker.addValueChangeHandler(new ValueChangeHandler<Date>()
         {
             public void onValueChange(ValueChangeEvent<Date> event)
             {
                 date = event.getValue();
-                String dateString = DateTimeFormat.getMediumDateFormat().format(date);
+                String dateString = dateFormater.format(date);
                 dateTxt.setText(dateString);
             }
         });

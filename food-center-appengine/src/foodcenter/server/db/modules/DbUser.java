@@ -4,6 +4,7 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.server.service.ClientService;
 
 @PersistenceCapable//(detachable="true")
@@ -53,6 +54,8 @@ public class DbUser extends AbstractDbObject
             setImageUrl(DEFAULT_ICON_PATH);
         }
         setEditable(ClientService.getCurrentUser().getEmail().equals(email));
+        
+        setAdmin(UsersManager.isAdmin());
 	}
 
     public String getLogoutUrl()

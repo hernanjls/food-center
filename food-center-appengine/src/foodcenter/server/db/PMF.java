@@ -48,7 +48,7 @@ public final class PMF
 	 */
 	public static PersistenceManager initThreadLocal()
 	{
-		logger.info("starting PersistenceManager");
+		logger.trace("starting PersistenceManager");
 		
 		PersistenceManager pm = holder.get();
 		if (null != pm)
@@ -83,7 +83,7 @@ public final class PMF
 	 */
 	public static void closeThreadLocal()
 	{
-		logger.info("closing PersistenceManager");
+		logger.trace("closing PersistenceManager");
 		PersistenceManager pm = get();
 		if (null == pm)
 		{
