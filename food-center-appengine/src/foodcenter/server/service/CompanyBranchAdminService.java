@@ -14,6 +14,7 @@ import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
+import foodcenter.server.db.security.UsersManager;
 
 public class CompanyBranchAdminService
 {
@@ -22,12 +23,25 @@ public class CompanyBranchAdminService
     
     public static DbCompanyBranch saveCompanyBranch(DbCompanyBranch branch)
     {
-        return DbHandler.save(branch);
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
+        DbCompanyBranch res = DbHandler.save(branch);
+        if (null == res)
+        {
+            logger.warn(ServiceError.DATABASE_ISSUE + " save comp branch");
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
+        }
+        return res;
     }
     
     
     public static List<DbOrder> getOrders(String branchId, Date from, Date to)
     {
+        checkBranchAdmin(branchId);
+        
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(from);
         calendar.set(Calendar.HOUR, 0);
@@ -46,10 +60,7 @@ public class CompanyBranchAdminService
                     + from.toString()
                     + ", to: "
                     + to.toString());
-        if (!isBranchAdmin(branchId))
-        {
-            return null;
-        }
+        
 
         String query = "compBranchId == branchIdP && date >= fromP && date <= toP";
 
@@ -64,16 +75,24 @@ public class CompanyBranchAdminService
         return DbHandler.find(DbOrder.class, query, params, sort, Integer.MAX_VALUE);
     }
     
-    private static boolean isBranchAdmin(String branchId)
+    private static void checkBranchAdmin(String branchId)
     {
         if (null == branchId)
         {
-            return false;
+            logger.warn(ServiceError.INVALID_COMP_BRANCH_ID + branchId);
+            throw new ServiceError(ServiceError.INVALID_COMP_BRANCH_ID + branchId);
         }
 
         DbCompanyBranch branch = DbHandler.find(DbCompanyBranch.class, branchId);
-        return ((null != branch) && branch.isEditable());
+        if (null == branch)
+        {
+            logger.warn(ServiceError.INVALID_COMP_BRANCH_ID + branchId);
+            throw new ServiceError(ServiceError.INVALID_COMP_BRANCH_ID + branchId);
+        }
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
     }
-
-
 }

@@ -16,6 +16,7 @@ import foodcenter.server.db.PMF;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbTable;
+import foodcenter.server.db.security.UsersManager;
 
 public class RestaurantBranchAdminService extends MenuAdminService
 {
@@ -23,6 +24,12 @@ public class RestaurantBranchAdminService extends MenuAdminService
 
     public static void addBranchTable(DbRestaurantBranch branch, DbTable table)
     {
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
+
         PMF.makeTransactional();
 
         branch.getTables().add(table);
@@ -30,6 +37,12 @@ public class RestaurantBranchAdminService extends MenuAdminService
 
     public static void removeBranchTable(DbRestaurantBranch branch, DbTable table)
     {
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
+        
         PMF.makeTransactional();
 
         branch.getTables().remove(table);
@@ -37,11 +50,25 @@ public class RestaurantBranchAdminService extends MenuAdminService
 
     public static DbRestaurantBranch saveRestaurantBranch(DbRestaurantBranch branch)
     {
-        return DbHandler.save(branch);
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
+        
+        DbRestaurantBranch res = DbHandler.save(branch);
+        if (null == res)
+        {
+            logger.error(ServiceError.DATABASE_ISSUE + " save rest branch");
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
+        }
+        return res;
     }
 
     public static List<DbOrder> getOrders(String branchId, Date from, Date to)
     {
+        checkBranchAdmin(branchId);
+        
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(from);
         calendar.set(Calendar.HOUR, 0);
@@ -60,10 +87,7 @@ public class RestaurantBranchAdminService extends MenuAdminService
                     + from.toString()
                     + ", to: "
                     + to.toString());
-        if (!isBranchAdmin(branchId))
-        {
-            return null;
-        }
+        
 
         String query = "restBranchId == branchIdP && date >= fromP && date <= toP";
 
@@ -78,14 +102,25 @@ public class RestaurantBranchAdminService extends MenuAdminService
         return DbHandler.find(DbOrder.class, query, params, sort, Integer.MAX_VALUE);
     }
     
-    private static boolean isBranchAdmin(String branchId)
+    private static void checkBranchAdmin(String branchId)
     {
         if (null == branchId)
         {
-            return false;
+            logger.warn(ServiceError.INVALID_REST_BRANCH_ID + branchId);
+            throw new ServiceError(ServiceError.INVALID_REST_BRANCH_ID + branchId);
         }
 
         DbRestaurantBranch branch = DbHandler.find(DbRestaurantBranch.class, branchId);
-        return ((null != branch) && branch.isEditable());
+        if (null == branch)
+        {
+            logger.warn(ServiceError.INVALID_REST_BRANCH_ID + branchId);
+            throw new ServiceError(ServiceError.INVALID_REST_BRANCH_ID + branchId);
+        }
+        
+        if (!branch.isEditable())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
     }
 }

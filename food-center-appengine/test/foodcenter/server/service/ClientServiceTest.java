@@ -2,7 +2,6 @@ package foodcenter.server.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +115,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         user = DbHandler.find(DbUser.class, query, params);
         tearDownPMF();
-        
+
         assertEquals(gcmKey2, user.getGcmKey());
     }
 
@@ -131,7 +130,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         DbUser user = ClientService.login(gcmKey);
         tearDownPMF();
-        
+
         // logout
         setUpPMF();
         ClientService.logout();
@@ -151,7 +150,7 @@ public class ClientServiceTest extends AbstractServiceTest
         assertEquals("", user.getGcmKey());
     }
 
-    @Test
+    @Test(expected = ServiceError.class)
     public void makeOrderWithoutLoginTest()
     {
         int numMenuCats = 1;
@@ -177,7 +176,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         comp = CompanyAdminService.saveCompany(comp);
         tearDownPMF();
-        
+
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
 
         // Create an order and fill it with all the courses from branch menu to the order
@@ -190,13 +189,18 @@ public class ClientServiceTest extends AbstractServiceTest
         }
 
         // save the order
-        setUpPMF();
-        DbOrder result = ClientService.makeOrder(order);
-        tearDownPMF();
-        assertNull(result);
+        try
+        {
+            setUpPMF();
+            ClientService.makeOrder(order);
+        }
+        finally
+        {
+            tearDownPMF();
+        }
     }
 
-    @Test
+    @Test(expected = ServiceError.class)
     public void makeOrderWithoutCompanyTest()
     {
         setUpPMF();
@@ -218,7 +222,6 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
-        
 
         DbMenu branchMenu = rest.getBranches().get(0).getMenu();
 
@@ -233,10 +236,132 @@ public class ClientServiceTest extends AbstractServiceTest
 
         // save the order
         setUpPMF();
-        DbOrder result = ClientService.makeOrder(order);
+        try
+        {
+            ClientService.makeOrder(order);
+        }
+        finally
+        {
+            tearDownPMF();
+        }
+    }
+
+    /**
+     * test if the user can make an order without rest id
+     */
+    @Test(expected = ServiceError.class)
+    public void makeOrderNoRestIdTest()
+    {
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+
+        DbRestaurant rest = createRest("rest",
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        setUpPMF();
+        rest = RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
-        
-        assertNull(result);
+
+        setUpPMF();
+        ClientService.login(null);
+        tearDownPMF();
+
+        DbCompany comp = createComp("comp", numBranches);
+        comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
+
+        setUpPMF();
+        comp = CompanyAdminService.saveCompany(comp);
+        tearDownPMF();
+        setUpPMF();
+
+        DbMenu branchMenu = rest.getBranches().get(0).getMenu();
+
+        // Create an order and fill it with all the courses from branch menu to the order
+        DbOrder order = new DbOrder();
+        for (int i = 0; i < numBranchMenuCourses; ++i)
+        {
+            DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
+            DbCourseOrder courseOrder = createOrder(course, 1);
+
+            order.getCourses().add(courseOrder);
+        }
+
+        // fail because there is no rest id
+        setUpPMF();
+        try
+        {
+            ClientService.makeOrder(order);
+        }
+        finally
+        {
+            tearDownPMF();
+        }
+    }
+
+    /**
+     * test if the user can make an order
+     */
+    @Test(expected = ServiceError.class)
+    public void makeOrderFailRestBranchIdTest()
+    {
+        int numMenuCats = 1;
+        int numMenuCourses = 2;
+        int numBranches = 1;
+        int numBranchMenuCats = numMenuCats;
+        int numBranchMenuCourses = numMenuCourses;
+
+        DbRestaurant rest = createRest("rest",
+                                       numMenuCats,
+                                       numMenuCourses,
+                                       numBranches,
+                                       numBranchMenuCats,
+                                       numBranchMenuCourses);
+        setUpPMF();
+        rest = RestaurantAdminService.saveRestaurant(rest);
+        tearDownPMF();
+
+        setUpPMF();
+        ClientService.login(null);
+        tearDownPMF();
+
+        DbCompany comp = createComp("comp", numBranches);
+        comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
+
+        setUpPMF();
+        comp = CompanyAdminService.saveCompany(comp);
+        tearDownPMF();
+        setUpPMF();
+
+        DbMenu branchMenu = rest.getBranches().get(0).getMenu();
+
+        // Create an order and fill it with all the courses from branch menu to the order
+        DbOrder order = new DbOrder();
+        for (int i = 0; i < numBranchMenuCourses; ++i)
+        {
+            DbCourse course = branchMenu.getCategories().get(0).getCourses().get(i);
+            DbCourseOrder courseOrder = createOrder(course, 1);
+
+            order.getCourses().add(courseOrder);
+        }
+
+        order.setRestId(rest.getId());
+
+        setUpPMF();
+        try
+        {
+            // fail because there is no rest branch id
+            ClientService.makeOrder(order);
+        }
+        finally
+        {
+            tearDownPMF();
+        }
     }
 
     /**
@@ -260,14 +385,14 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         rest = RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
-        
+
         setUpPMF();
         ClientService.login(null);
         tearDownPMF();
 
         DbCompany comp = createComp("comp", numBranches);
         comp.getBranches().get(0).getWorkers().add(AbstractGAETest.email);
-        
+
         setUpPMF();
         comp = CompanyAdminService.saveCompany(comp);
         tearDownPMF();
@@ -285,35 +410,21 @@ public class ClientServiceTest extends AbstractServiceTest
             order.getCourses().add(courseOrder);
         }
 
-        // fail because there is no rest id
+        order.setRestId(rest.getId());
+        order.setRestBranchId(rest.getBranches().get(0).getId());
+        
         setUpPMF();
         DbOrder result = ClientService.makeOrder(order);
         tearDownPMF();
-        assertNull(result);
-        
-        // fail because there is no rest branch id
-        order.setRestId(rest.getId());
-        setUpPMF();
-        result = ClientService.makeOrder(order);
-        tearDownPMF();
-        
-        assertNull(result);
 
-        // Success
-        order.setRestBranchId(rest.getBranches().get(0).getId());
-        setUpPMF();
-        result = ClientService.makeOrder(order);
-        tearDownPMF();
-        
         assertNotNull(result);
-
     }
 
     @Test
     public void getOrdersTest()
     {
         makeOrderTest();
-        
+
         setUpPMF();
         List<DbOrder> orders = ClientService.getOrders(0, 100);
         tearDownPMF();
@@ -343,7 +454,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
-        
+
         DbRestaurant rest2 = createRest("rest2",
                                         numMenuCats,
                                         numMenuCourses,
@@ -353,11 +464,11 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest2);
         tearDownPMF();
-        
+
         setUpPMF();
         List<DbRestaurant> rests = ClientService.getDefaultRestaurants();
         tearDownPMF();
-        
+
         assertNotNull(rests);
         assertEquals(2, rests.size());
 
@@ -384,8 +495,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         CompanyAdminService.saveCompany(c1);
         tearDownPMF();
-        
-        
+
         DbCompany c2 = createComp("c2", numBranches);
         setUpPMF();
         CompanyAdminService.saveCompany(c2);
@@ -394,7 +504,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         List<DbCompany> comps = ClientService.getDefaultCompanies();
         tearDownPMF();
-        
+
         assertNotNull(comps);
         assertEquals(2, comps.size());
 
@@ -435,18 +545,18 @@ public class ClientServiceTest extends AbstractServiceTest
 
         rest2.getServices().add(ServiceType.DELIVERY);
         rest2.getServices().add(ServiceType.TAKE_AWAY);
-        
+
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest2);
         tearDownPMF();
 
         List<ServiceType> services = new ArrayList<ServiceType>();
         services.add(ServiceType.DELIVERY);
-        
+
         setUpPMF();
         List<DbRestaurant> rests = ClientService.findRestaurant(rest2.getName(), services);
         tearDownPMF();
-        
+
         assertNotNull(rests);
         assertEquals(1, rests.size());
     }
@@ -457,28 +567,26 @@ public class ClientServiceTest extends AbstractServiceTest
         int numBranches = 1;
 
         DbCompany comp = createComp("c1", numBranches);
-        
+
         setUpPMF();
         CompanyAdminService.saveCompany(comp);
         tearDownPMF();
-        
 
         DbCompany comp2 = createComp("dror", numBranches);
         comp2.getServices().add(ServiceType.DELIVERY);
         comp2.getServices().add(ServiceType.TAKE_AWAY);
-        
+
         setUpPMF();
         CompanyAdminService.saveCompany(comp2);
         tearDownPMF();
-        
-        
+
         List<ServiceType> services = new ArrayList<ServiceType>();
         services.add(ServiceType.DELIVERY);
 
         setUpPMF();
         List<DbCompany> comps = ClientService.findCompany(comp2.getName(), services);
         tearDownPMF();
-        
+
         assertNotNull(comps);
         assertEquals(1, comps.size());
     }
@@ -505,8 +613,7 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest);
         tearDownPMF();
-        
-        
+
         DbRestaurant rest2 = createRest(name + 2,
                                         numMenuCats,
                                         numMenuCourses,
@@ -519,22 +626,21 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         RestaurantAdminService.saveRestaurant(rest2);
         tearDownPMF();
-        
 
         List<ServiceType> services = new ArrayList<ServiceType>();
         services.add(ServiceType.DELIVERY);
-        
+
         setUpPMF();
         List<DbRestaurant> rests = ClientService.findRestaurant("rest", services);
         tearDownPMF();
-        
+
         assertNotNull(rests);
         assertEquals(2, rests.size());
 
         setUpPMF();
         rests = ClientService.findRestaurant("FDASDASDA", services);
         tearDownPMF();
-        
+
         assertNotNull(rests);
         assertEquals(0, rests.size());
     }
@@ -552,46 +658,50 @@ public class ClientServiceTest extends AbstractServiceTest
         setUpPMF();
         CompanyAdminService.saveCompany(comp);
         tearDownPMF();
-        
 
         DbCompany rest2 = createComp(name + 2, numBranches);
         rest2.getServices().add(ServiceType.DELIVERY);
         rest2.getServices().add(ServiceType.TAKE_AWAY);
-        
+
         setUpPMF();
         CompanyAdminService.saveCompany(rest2);
         tearDownPMF();
-        
+
         List<ServiceType> services = new ArrayList<ServiceType>();
         services.add(ServiceType.DELIVERY);
         setUpPMF();
         List<DbCompany> comps = ClientService.findCompany(name, services);
         tearDownPMF();
-        
+
         assertNotNull(comps);
         assertEquals(2, comps.size());
 
         setUpPMF();
         comps = ClientService.findCompany("FDASDASDA", services);
         tearDownPMF();
-        
+
         assertNotNull(comps);
         assertEquals(0, comps.size());
     }
 
-    @Test
+    @Test(expected=ServiceError.class)
     public void findUserCompanyFailTest()
     {
         // get login info
         setUpPMF();
         DbUser user = ClientService.login(null);
         tearDownPMF();
-        
-        setUpPMF();
-        DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
-        tearDownPMF();
-        
-        assertNull(b);
+
+        try
+        {
+            setUpPMF();
+            ClientService.findUserCompanyBranch(user.getEmail());
+        }
+        finally
+        {
+            tearDownPMF();
+        }
+
     }
 
     @Test
@@ -616,22 +726,21 @@ public class ClientServiceTest extends AbstractServiceTest
 
         comp.getBranches().get(0).getWorkers().add(user.getEmail()); // add the user
 
-        
         setUpPMF();
         CompanyAdminService.saveCompany(comp);
         CompanyAdminService.saveCompany(comp2);
         tearDownPMF();
-        
+
         setUpPMF();
         DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
         DbCompany c = b.getCompany();
         tearDownPMF();
-        
+
         assertNotNull(b);
-        assertEquals(comp.getBranches().get(0).getId(), b.getId());        
+        assertEquals(comp.getBranches().get(0).getId(), b.getId());
         assertNotNull(c);
         assertEquals(comp.getId(), c.getId());
-        
+
     }
 
 }

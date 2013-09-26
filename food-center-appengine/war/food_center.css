@@ -76,9 +76,9 @@ html,body {
     width: 100%;
     background-color: black;
     min-height: 100%;
+    position: fixed;
     height: auto !important;
     overflow: hidden;
-    height: 100%;
     margin: 50px auto; /* -44px being the size of the footer */
     opacity: 0.8;
     filter: Alpha(opacity =       80); /* IE8 and earlier */

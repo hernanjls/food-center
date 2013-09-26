@@ -129,9 +129,12 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
 
             Panel chefsPanel = new UsersPanel(branch.getChefs(), isEditMode);
             res.add(chefsPanel, "Chefs");
-            
-            Panel orders = new BranchOrdersHistoryPanel(branch.getId(), true);
-            res.add(orders, "Orders");
+         
+            if (!isEditMode)
+            {
+                Panel orders = new BranchOrdersHistoryPanel(branch.getId(), true);
+                res.add(orders, "Orders");
+            }
         }
 
         if (!isEditMode && branch.isChef())

@@ -25,7 +25,12 @@ public class LabeledDatePicker extends HorizontalPanel
     
     public LabeledDatePicker(String txt)
     {
-        this.date = new Date();
+        this(txt, new Date());
+    }
+
+    public LabeledDatePicker(String txt, Date date)
+    {
+        this.date = date;
         this.text = new Label(txt + " ");
         
         dateTxt = new TextBox();
@@ -38,7 +43,6 @@ public class LabeledDatePicker extends HorizontalPanel
 
         init();
     }
-
     public Date getDate()
     {
         return date;

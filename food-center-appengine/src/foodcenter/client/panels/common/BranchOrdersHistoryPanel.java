@@ -1,6 +1,7 @@
 package foodcenter.client.panels.common;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -13,7 +14,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
@@ -31,13 +34,17 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
 
     private final TreeMap<String, NetInfoPanel> idNet = new TreeMap<String, NetInfoPanel>();
 
-    private final String branchId; // Company branch id
+    private final String branchId;
 
     private final FindOrdersPanel findOrdersPanel;
 
     private final DateTimeFormat dateFormater = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm");
 
     private final boolean isRestView;
+    
+    private final Label infoPopupText; // for setting the popup text
+    private final PopupPanel infoPopup; // info popup which can be shown whenever needed
+
 
     public BranchOrdersHistoryPanel(String branchId, boolean isRestView)
     {
@@ -47,8 +54,24 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
         this.isRestView = isRestView;
 
         this.findOrdersPanel = new FindOrdersPanel();
+        infoPopup = new PopupPanel(false);
+        infoPopupText = new Label();
 
         redraw();
+    }
+
+    private void showPopup(String msg)
+    {
+        infoPopupText.setText(msg);
+        infoPopup.setWidget(infoPopupText);
+        infoPopup.center();
+        infoPopup.show();
+    }
+
+    private void hidePopup()
+    {
+        infoPopup.clear();
+        infoPopup.hide();
     }
 
     public void redraw()
@@ -82,8 +105,9 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
         private FindOrdersPanel()
         {
             super();
-
-            final LabeledDatePicker from = new LabeledDatePicker("From: ");
+            Date fromDate = new Date();
+            CalendarUtil.addMonthsToDate(fromDate, -1);
+            final LabeledDatePicker from = new LabeledDatePicker("From: ", fromDate);
             add(from);
 
             final LabeledDatePicker to = new LabeledDatePicker(" To: ");
@@ -95,6 +119,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
                 @Override
                 public void onClick(ClickEvent event)
                 {
+                    showPopup("Loading orders...");
                     if (isRestView)
                     {
                         RestaurantBranchAdminServiceRequest service = WebRequestUtils.getRequestFactory()
@@ -136,6 +161,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
                 {
                     logger.fine("got null response");
                 }
+                hidePopup();
                 redraw();
 
             }
@@ -143,6 +169,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
             @Override
             public void onFailure(ServerFailure error)
             {
+                hidePopup();
                 Window.alert("Can't get orders: " + error.getMessage());
             }
 

@@ -117,9 +117,12 @@ public class CompanyBranchPanel extends PopupPanel implements RedrawablePanel
 
             Panel workersPanel = new UsersPanel(branch.getWorkers(), isEditMode);
             res.add(workersPanel, "Workers");
-            
-            Panel orders = new BranchOrdersHistoryPanel(branch.getId(), false);
-            res.add(orders, "Orders");
+
+            if (!isEditMode)
+            {
+                Panel orders = new BranchOrdersHistoryPanel(branch.getId(), false);
+                res.add(orders, "Orders");
+            }
         }
 
         // TODO tables res.add(tablesPanel, "Tables");

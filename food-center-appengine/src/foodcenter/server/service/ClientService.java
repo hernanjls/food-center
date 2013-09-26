@@ -30,14 +30,14 @@ import foodcenter.service.enums.ServiceType;
 
 public class ClientService
 {
-
+    
     private static UserService userService = UserServiceFactory.getUserService();
     private static Logger logger = LoggerFactory.getLogger(UserService.class);
     private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
 
     public static String getLogoutUrl()
     {
-        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";        
+        String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
         return userService.createLogoutURL("/") + logoutRedirectionUrl;
     }
 
@@ -50,7 +50,7 @@ public class ClientService
     {
 
         // else save a new user to the db and return it
-        DbUser user = UsersManager.getCurrentUser();
+        DbUser user = UsersManager.getDbUser();
         if (null == user)
         {
             String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
@@ -60,7 +60,6 @@ public class ClientService
             user.setEmail(userService.getCurrentUser().getEmail());
             user.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
             user.setUserId(userService.getCurrentUser().getUserId());
-
         }
         else
         {
@@ -82,7 +81,7 @@ public class ClientService
 
     public static void logout()
     {
-        DbUser user = UsersManager.getCurrentUser();
+        DbUser user = UsersManager.getDbUser();
         if (null == user)
         {
             return;
@@ -102,63 +101,61 @@ public class ClientService
 
         // Set the user of the current order
         User user = UsersManager.getUser();
-        if (null == user)
-        {
-            return null;
-        }
-
         order.setUserEmail(user.getEmail());
         String rBranchId = order.getRestBranchId();
         if (null == rBranchId)
         {
-            return null;
+            logger.debug(ServiceError.INVALID_REST_BRANCH_ID + rBranchId);
+            throw new ServiceError(ServiceError.INVALID_REST_BRANCH_ID + rBranchId);
         }
-        DbRestaurantBranch rBranch = DbHandler.find(DbRestaurantBranch.class,
-                                                    order.getRestBranchId());
+        DbRestaurantBranch rBranch = DbHandler.find(DbRestaurantBranch.class, rBranchId);
         if (null == rBranch)
         {
-            return null;
+            logger.debug(ServiceError.INVALID_REST_BRANCH_ID + rBranchId);
+            throw new ServiceError(ServiceError.INVALID_REST_BRANCH_ID + rBranchId);
         }
         order.setRestBranchAddr(rBranch.getAddress());
 
-        
         String restId = order.getRestId();
         DbRestaurant rest = rBranch.getRestaurant();
         if (null == restId || null == rest || !rest.getId().equals(restId))
         {
-            return null;
+            logger.debug(ServiceError.INVALID_REST_ID + restId);
+            throw new ServiceError(ServiceError.INVALID_REST_ID + restId);
         }
-        
+
         order.setRestName(rest.getName());
-        
+
         DbCompanyBranch cBranch = findUserCompanyBranch(user.getEmail());
-        if (null == cBranch)
-        {
-            return null;
-        }
+
         order.setCompBranchId(cBranch.getId());
         order.setCompBranchAddr(cBranch.getAddress());
 
         DbCompany comp = cBranch.getCompany();
         if (null == comp)
         {
-            return null;
+            logger.warn(ServiceError.COMPANY_NOT_ASSOCIATED_TO_BRANCH );
+            throw new ServiceError(ServiceError.COMPANY_NOT_ASSOCIATED_TO_BRANCH);
         }
         order.setCompId(comp.getId());
         order.setCompName(comp.getName());
 
         // Save the order (using 1 transaction!)
         order = DbHandler.save(order);
-        
+        if (null == order)
+        {
+            logger.error(ServiceError.DATABASE_ISSUE + " save order");
+            throw new IllegalAccessError(ServiceError.DATABASE_ISSUE);
+        }
         broadcastOrder(order);
-        
+
         return order;
     }
 
     public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
     {
         String userEmail = UsersManager.getUser().getEmail();
-        
+
         String query = "userEmail == userEmailP";
 
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
@@ -177,13 +174,23 @@ public class ClientService
     {
         logger.info("getDefaultRestaurants is called");
         List<DbRestaurant> res = DbHandler.find(DbRestaurant.class, 10);
+        if (null == res)
+        {
+            throw new ServiceError(ServiceError.DEFAULT_RESTS_NOT_FOUND);
+        }
         return res;
     }
 
     public static DbRestaurant getRestaurantById(String id)
     {
         logger.info("getRestaurantById is called, id: " + id);
-        return DbHandler.find(DbRestaurant.class, id);
+        DbRestaurant rest = DbHandler.find(DbRestaurant.class, id);
+        if (null == rest)
+        {
+            logger.warn(ServiceError.INVALID_REST_ID + id);
+            throw new ServiceError(ServiceError.INVALID_REST_ID + id);
+        }
+        return rest;
     }
 
     public static List<DbRestaurant> findRestaurant(String pattern, List<ServiceType> services)
@@ -219,11 +226,16 @@ public class ClientService
             query.append(" )");
         }
 
-        return DbHandler.find(DbRestaurant.class, //
+        List<DbRestaurant> res = DbHandler.find(DbRestaurant.class, //
                               query.toString(),
                               declaredParams,
                               null, // sort order
                               20); // limit num of results...
+        if (null == res)
+        {
+            throw new ServiceError(ServiceError.REST_PATTERN_NOT_FOUND);
+        }
+        return res;
     }
 
     /* ************************* Companies APIs *************************** */
@@ -231,13 +243,26 @@ public class ClientService
     public static List<DbCompany> getDefaultCompanies()
     {
         logger.info("getDefaultRestaurants is called");
-        return DbHandler.find(DbCompany.class, 10);
+        List<DbCompany> res = DbHandler.find(DbCompany.class, 10);
+        if (null == res)
+        {
+            logger.debug(ServiceError.DEFAULT_COMPS_NOT_FOUND);
+            throw new ServiceError(ServiceError.DEFAULT_COMPS_NOT_FOUND);
+        }
+        return res;
+        
     }
 
     public static DbCompany getCompanyById(String id)
     {
         logger.info("getCompanyById is called, id: " + id);
-        return DbHandler.find(DbCompany.class, id);
+        DbCompany res = DbHandler.find(DbCompany.class, id);
+        if (null == res)
+        {
+            logger.warn(ServiceError.INVALID_COMP_ID + id);
+            throw new ServiceError(ServiceError.INVALID_COMP_ID + id);
+        }
+        return res;
     }
 
     public static List<DbCompany> findCompany(String pattern, List<ServiceType> services)
@@ -272,11 +297,17 @@ public class ClientService
             query.append(" )");
         }
 
-        return DbHandler.find(DbCompany.class, //
+        List<DbCompany> res = DbHandler.find(DbCompany.class, //
                               query.toString(),
                               declaredParams,
                               null,
                               20); // limit num of results...
+        
+        if (null == res)
+        {
+            throw new ServiceError(ServiceError.COMP_PATTERN_NOT_FOUND);
+        }
+        return res;
     }
 
     /* ******************************************************************************* */
@@ -285,21 +316,21 @@ public class ClientService
 
     protected static void broadcastOrder(DbOrder order)
     {
-        if (null == order)
-        {
-            return;
-        }
         String query = "branchId == branchIdP";
-        
+
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
         params.add(new DeclaredParameter("branchIdP", order.getRestBranchId()));
-            
-        List<DbChannelToken> tokens = DbHandler.find(DbChannelToken.class, query, params,null, Integer.MAX_VALUE);
+
+        List<DbChannelToken> tokens = DbHandler.find(DbChannelToken.class,
+                                                     query,
+                                                     params,
+                                                     null,
+                                                     Integer.MAX_VALUE);
         if ((null == tokens) || tokens.isEmpty())
         {
             return;
         }
-        
+
         ChannelService channelService = ChannelServiceFactory.getChannelService();
         for (DbChannelToken t : tokens)
         {
@@ -312,7 +343,12 @@ public class ClientService
         String query = "workers == emailP";
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
         params.add(new DeclaredParameter("emailP", email));
-        return DbHandler.find(DbCompanyBranch.class, query, params);
+        DbCompanyBranch res = DbHandler.find(DbCompanyBranch.class, query, params);
+        if (null == res)
+        {
+            throw new ServiceError(ServiceError.USER_COMPNAY_NOT_FOUND + email);
+        }
+        return res;
     }
 
 }
