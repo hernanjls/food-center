@@ -72,7 +72,7 @@ public abstract class AbstractDbTest extends AbstractGAETest
 
         DbCompany c = new DbCompany();
         c.setName(name);
-
+        
         for (int i = 0; i < numBranches; ++i)
         {
             DbCompanyBranch branch = new DbCompanyBranch();

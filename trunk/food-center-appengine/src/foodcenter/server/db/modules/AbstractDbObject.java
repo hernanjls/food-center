@@ -17,6 +17,7 @@ import javax.jdo.listener.StoreCallback;
 import org.slf4j.LoggerFactory;
 
 import foodcenter.server.FileManager;
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.server.service.servlet.ImageServlet;
 import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
 
@@ -40,7 +41,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     private Integer version = 0;
 
     @NotPersistent
-    private Boolean editable = false;
+    private Boolean editable;
 
     @Persistent
     private String imageKey = null;
@@ -51,7 +52,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     
     public AbstractDbObject()
     {
-        editable = false;
+        editable = UsersManager.isAdmin();
         imageUrl = "";
         // empty ctor
     }

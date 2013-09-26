@@ -358,6 +358,7 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
             @Override
             public void onFailure(ServerFailure error)
             {
+                Window.alert("Failed to save order: " + error.getMessage());
                 synchronized (orders)
                 {
                     orders.add(order);
@@ -394,6 +395,7 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
             @Override
             public void onFailure(ServerFailure error)
             {
+                Window.alert("Failed to cancel order: " + error.getMessage());
                 synchronized (orders)
                 {
                     orders.add(order);

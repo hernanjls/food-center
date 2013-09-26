@@ -25,6 +25,7 @@ public class RestaurantWorkerService extends ClientService
 {
 
     private static final Logger logger = LoggerFactory.getLogger(RestaurantWorkerService.class);
+    
     public static DbOrder cancelOrder(String orderId)
     {
         logger.info("cancel order, orderId=" + orderId);
@@ -32,17 +33,19 @@ public class RestaurantWorkerService extends ClientService
         DbOrder order = DbHandler.find(DbOrder.class, orderId);
         if (null == order)
         {
-            return null;
+            logger.error(ServiceError.INVALID_ORDER_ID + orderId);
+            throw new ServiceError(ServiceError.INVALID_ORDER_ID + orderId);
         }
         String branchId = order.getRestBranchId();
-        if (!isBranchChef(branchId))
-        {
-            return null;
-        }
+        checkBranchChef(branchId);
 
         order.setStatus(OrderStatus.CANCELD);
         order = DbHandler.save(order);
-
+        if (null == order)
+        {
+            logger.error(ServiceError.DATABASE_ISSUE + " save order");
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
+        }
         notifyUser(order);
 
         return order;
@@ -55,17 +58,20 @@ public class RestaurantWorkerService extends ClientService
         DbOrder order = DbHandler.find(DbOrder.class, orderId);
         if (null == order)
         {
-            return null;
+            logger.error(ServiceError.INVALID_ORDER_ID + orderId);
+            throw new ServiceError(ServiceError.INVALID_ORDER_ID + orderId);
         }
         String branchId = order.getRestBranchId();
-        if (!isBranchChef(branchId))
-        {
-            return null;
-        }
-
+        checkBranchChef(branchId);
+        
         order.setStatus(OrderStatus.DELIVERED);
 
         order = DbHandler.save(order);
+        if (null == order)
+        {
+            logger.error(ServiceError.DATABASE_ISSUE + " save order");
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
+        }
 
         notifyUser(order);
         return order;
@@ -73,12 +79,9 @@ public class RestaurantWorkerService extends ClientService
 
     public static List<DbOrder> getPendingOrders(String branchId)
     {
-        if (!isBranchChef(branchId))
-        {
-            return new ArrayList<DbOrder>();
-        }
-        
         logger.info("get pending orders, branchId=" + branchId);
+
+        checkBranchChef(branchId);        
         
         // perform the query
         String query = "(restBranchId == restBranchIdP)";
@@ -97,18 +100,21 @@ public class RestaurantWorkerService extends ClientService
     public static DbOrder getOrderById(String orderId)
     {
         logger.info("get order by id, orderId=" + orderId);
+        if (null == orderId)
+        {
+            logger.error(ServiceError.INVALID_ORDER_ID + orderId);
+            throw new ServiceError(ServiceError.INVALID_ORDER_ID + orderId);
+        }
         
         DbOrder order = DbHandler.find(DbOrder.class, orderId);
         if (null == order)
         {
-            return null;
+            logger.error(ServiceError.INVALID_ORDER_ID + orderId);
+            throw new ServiceError(ServiceError.INVALID_ORDER_ID + orderId);
         }
 
         String branchId = order.getRestBranchId();
-        if (!isBranchChef(branchId))
-        {
-            return null;
-        }
+        checkBranchChef(branchId);
 
         return order;
     }
@@ -116,12 +122,13 @@ public class RestaurantWorkerService extends ClientService
     public static String createChannel(String branchId)
     {
         logger.info("create channel: " + branchId);
-        
-        if (!isBranchChef(branchId))
+        if (null == branchId)
         {
-            return null;
+            logger.error(ServiceError.INVALID_ORDER_ID + branchId);
+            throw new ServiceError(ServiceError.INVALID_ORDER_ID + branchId);
         }
-
+        checkBranchChef(branchId);
+        
         String key = UsersManager.getUser().getUserId();
 
         ChannelService channelService = ChannelServiceFactory.getChannelService();
@@ -147,18 +154,15 @@ public class RestaurantWorkerService extends ClientService
 
         if (null == channelToken)
         {
-            return null;
+            logger.error(ServiceError.DATABASE_ISSUE + " create channel token");
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
         }
+        
         return channelToken.getToken();
     }
 
     private static void notifyUser(DbOrder order)
     {
-        if (null == order)
-        {
-            return;
-        }
-
         logger.info("notify user, orderId=" + order.getId() + ", order status=" + order.getStatus());
         
         StringBuilder builder = new StringBuilder();
@@ -178,15 +182,25 @@ public class RestaurantWorkerService extends ClientService
 
     }
 
-    private static boolean isBranchChef(String branchId)
+    private static void checkBranchChef(String branchId)
     {
         if (null == branchId)
         {
-            return false;
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
 
         DbRestaurantBranch branch = DbHandler.find(DbRestaurantBranch.class, branchId);
-        return ((null != branch) && branch.isChef());
+        if (null == branch)
+        {
+            logger.warn(ServiceError.INVALID_REST_BRANCH_ID + " " + branchId);
+            throw new ServiceError(ServiceError.INVALID_REST_BRANCH_ID + branchId);
+        }
+        if (!branch.isChef())
+        {
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED);
+        }
     }
 
 }

@@ -28,7 +28,7 @@ public class UsersManager
         return userService.isUserAdmin();
     }
     
-    public static DbUser getCurrentUser()
+    public static DbUser getDbUser()
     {
         String email = getUser().getEmail();
         logger.info("Load user: " + email);

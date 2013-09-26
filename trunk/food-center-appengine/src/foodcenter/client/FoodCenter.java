@@ -101,10 +101,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         service.login(null).fire(this);
     }
 
-    /**
-     * Will be called after the maps api is loaded
-     * 
-     */
+    /** Will be called after the maps api is loaded */
     @Override
     public void run()
     {
@@ -385,9 +382,9 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         @Override
         public void onFailure(ServerFailure error)
         {
+            Window.alert("Failed to delete rest: " + error.getMessage());
             hidePopup();
         }
-
     }
 
     /* ************************************************************************** */
@@ -604,7 +601,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         public void onFailure(ServerFailure error)
         {
             hidePopup();
-            Window.alert("Failed to save rest: " + error.getMessage());
+            Window.alert("Failed to get company: " + error.getMessage());
         }
 
     }
@@ -635,6 +632,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         public void onFailure(ServerFailure error)
         {
             hidePopup();
+            Window.alert("Failed to delete comp: " + error.getMessage());
         }
 
     }
@@ -647,7 +645,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
         @Override
         public void search(CompanySearchOptions options)
         {
-            showPopup("Loading Restaurants ...");
+            showPopup("Loading Companies ...");
 
             WebRequestUtils.getRequestFactory().getClientService().findCompany(options.getPattern(),
                                                                             options.getServices())
@@ -665,7 +663,7 @@ public class FoodCenter extends Receiver<UserProxy> implements EntryPoint, Runna
             if (null == response)
             {
                 hidePopup();
-                Window.alert("Get default rest recieved null");
+                Window.alert("Get default comp recieved null");
                 return;
             }
             comps.clear();
