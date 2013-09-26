@@ -142,7 +142,7 @@ public class ClientService
         order.setCompBranchId(cBranch.getId());
         order.setCompBranchAddr(cBranch.getAddress());
 
-        DbCompany comp = findCompanyOfBranch(cBranch);
+        DbCompany comp = cBranch.getCompany();
         if (null == comp)
         {
             return null;
@@ -308,19 +308,6 @@ public class ClientService
         {
             channelService.sendMessage(new ChannelMessage(t.getKey(), order.getId()));
         }
-        
-    }
-    protected static DbCompany findCompanyOfBranch(DbCompanyBranch branch)
-    {
-        if (null == branch)
-        {
-            return null;
-        }
-
-        String query = "branches == branchP";
-        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
-        params.add(new DeclaredParameter("emailP", branch));
-        return DbHandler.find(DbCompany.class, query, params);
     }
 
     protected static DbCompanyBranch findUserCompanyBranch(String email)

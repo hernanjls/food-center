@@ -22,12 +22,12 @@ public abstract class AbstractDbTest extends AbstractGAETest
         res.setPrice(course.getPrice());
         return res;
     }
-    
-    protected DbRestaurant createRest(String name, //
-                                      int numMenuCats, //
-                                      int numMenuCourses, //
-                                      int numBranches, //
-                                      int numBranchMenuCats, //
+
+    protected DbRestaurant createRest(String name,
+                                      int numMenuCats,
+                                      int numMenuCourses,
+                                      int numBranches,
+                                      int numBranchMenuCats,
                                       int numBranchMenuCourses)
     {
 
@@ -41,15 +41,15 @@ public abstract class AbstractDbTest extends AbstractGAETest
 
             for (int j = 0; j < numMenuCourses; ++j)
             {
-                category.getCourses().add(new DbCourse("course" + Math.random(), 12.2 + 10 * Math
-                    .random()));
+                category.getCourses().add(new DbCourse("course" + Math.random(),
+                                                       12.2 + 10 * Math.random()));
             }
         }
 
         for (int i = 0; i < numBranches; ++i)
         {
             DbRestaurantBranch branch = new DbRestaurantBranch();
-            r.getBranches().add(branch);
+             r.getBranches().add(branch);
 
             branch.setAddress("addr" + Math.random());
             for (int j = 0; j < numBranchMenuCats; ++j)

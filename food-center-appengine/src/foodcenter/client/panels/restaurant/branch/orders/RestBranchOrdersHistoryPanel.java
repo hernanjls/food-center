@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -30,8 +31,8 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
 
     private final TreeMap<String, CompanyInfoPanel> idComps = new TreeMap<String, CompanyInfoPanel>();
 
-    private final String branchId;
-    
+    private final String branchId; // restaurant branch id
+
     private final FindOrdersPanel findOrdersPanel;
 
     public RestBranchOrdersHistoryPanel(String branchId)
@@ -146,15 +147,16 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
         public CompanyInfoPanel(String name)
         {
             super();
-
+            setStyleName("orders-selector");
             this.name = name;
         }
 
         private void redrawCompany()
         {
             clear();
-
-            add(new Label(name));
+            Label l = new Label(name);
+            l.setStyleName("selector-name");
+            add(l);
 
             for (BranchInfoPanel branchInfoPanel : idBranch.values())
             {
@@ -182,6 +184,7 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
             private BranchInfoPanel()
             {
                 super();
+                setStyleName("branch");
                 branchOrders = new ArrayList<OrderProxy>();
             }
 
@@ -189,7 +192,9 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
             {
                 clear();
 
-                add(new Label(branchOrders.get(0).getCompBranchAddr()));
+                Label l = new Label(branchOrders.get(0).getCompBranchAddr());
+                l.setStyleName("branch-name");
+                add(l);
 
                 OrdersInfoPanel ordersInfo = new OrdersInfoPanel();
                 add(ordersInfo);
@@ -203,6 +208,12 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
 
             class OrdersInfoPanel extends FlexTable
             {
+                public OrdersInfoPanel()
+                {
+                    super();
+                    setStyleName("one-column-emphasis");
+                }
+
                 private void redrawOrders()
                 {
                     clear();
@@ -212,6 +223,8 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
                     setText(0, 3, "Courses");
                     setText(0, 4, "Price");
                     setText(0, 5, "Status");
+
+                    getRowFormatter().setStyleName(0, "th");
 
                     int row = 1;
                     for (OrderProxy o : branchOrders)
@@ -227,7 +240,8 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
                             price += c.getPrice();
                         }
 
-                        setText(row, 0, o.getDate().toString());
+                        setText(row, 0, DateTimeFormat.getFormat("dd.MM.yyyy HH:mm z Z")
+                            .format(o.getDate()));
                         setText(row, 1, o.getUserEmail());
                         setText(row, 2, o.getService().getName());
                         setWidget(row, 3, new CoursesInfoPanel(o));

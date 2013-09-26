@@ -3,6 +3,7 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.Element;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable //(detachable="true")
+@PersistenceCapable (detachable="true")
 public class DbRestaurant extends AbstractDbObject
 {
 
@@ -26,13 +27,14 @@ public class DbRestaurant extends AbstractDbObject
     @NotNull
     private String name = "";
 
-    @Persistent
+    @Persistent(defaultFetchGroup="true")
     private DbMenu menu = new DbMenu();
 
     @Persistent
     private String phone = "";
 
-    @Persistent //(mappedBy = "restaurant")
+    @Persistent (mappedBy = "restaurant")
+    @Element(dependent = "true")
     private List<DbRestaurantBranch> branches = new ArrayList<DbRestaurantBranch>();
 
     @Persistent

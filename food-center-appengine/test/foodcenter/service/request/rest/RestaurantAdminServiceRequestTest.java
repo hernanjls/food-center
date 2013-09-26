@@ -56,6 +56,7 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         rest = saveRest(service, rest, true);
         // Validate the restaurant values
+        assertNotNull(rest);
         assertNotNull(rest.getMenu());
         assertNotNull(rest.getMenu().getCategories());
         assertEquals(menuCats, rest.getMenu().getCategories().size());
@@ -230,12 +231,12 @@ public class RestaurantAdminServiceRequestTest extends AbstractRequestTest
 
         MenuCategoryProxy cat = createMenuCat(service, 0);
 
-        rest.getMenu().getCategories().add(cat);
+        menu.getCategories().add(cat); // optional
         service.addMenuCategory(menu, cat);
 
-        rest.getMenu().getCategories().remove(cat);
+        menu.getCategories().remove(cat); // optional
         service.removeMenuCategory(menu, cat);
-        
+
         rest = saveRest(service, rest, true);
         assertNotNull(rest); 
         assertEquals(menuCats, rest.getMenu().getCategories().size());
