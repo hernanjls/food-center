@@ -8,8 +8,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
-import foodcenter.server.db.security.PrivilegeManager;
-import foodcenter.server.db.security.UserPrivilege;
+import com.google.appengine.api.users.User;
+
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable (detachable="true")
@@ -54,13 +55,11 @@ public class DbCompany extends AbstractDbObject
     public void jdoPostLoad()
     {
         super.jdoPostLoad();
-        
-        // Set permissions
-        UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        if (UserPrivilege.Admin == p || UserPrivilege.CompanyAdmin == p)
-        {
-            setEditable(true);
-        }
+
+        User user = UsersManager.getUser();
+
+        // Set edit permission (this happens in post load before any changes to admins)
+        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail()));
         
         // Make sure image can be shown!
         if (0 == getImageUrl().length())

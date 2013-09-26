@@ -1,148 +1,161 @@
 /** Add css rules here for your application. */
 /** Example rules used by the template application (remove for your app) */
 h1 {
-	font-size: 2em;
-	font-weight: bold;
-	color: #777777;
-	margin: 0px 0px 70px !important;
-	text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #777777;
+    margin: 0px 0px 70px !important;
+    text-align: center;
 }
 
 .sendButton {
-	display: block;
-	font-size: 16pt;
+    display: block;
+    font-size: 16pt;
 }
 
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
-	width: 400px;
+    width: 400px;
 }
 
 .dialogVPanel {
-	margin: 0px;
+    margin: 0px;
 }
 
 .serverResponseLabelError {
-	color: red;
+    color: red;
 }
 
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
-	margin: 15px 6px 6px;
+    margin: 15px 6px 6px;
 }
 
 #profile-button {
-	margin-top: 5px;
-	margin-right: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
 }
 
 html,body {
-	width: 100% !important;
-	border: 0px !important;
-	padding: 0px !important;
-	margin: 0px !important;
-	overflow-x: hidden;
+    width: 100% !important;
+    border: 0px !important;
+    padding: 0px !important;
+    margin: 0px !important;
+    overflow-x: hidden;
 }
 
 .header-panel {
-	background-color: black;
-	color: white;
-	width: 100% !important;
-	padding: 0px !important;
-	height: 50px;
-	margin-left: 0px;
-	margin-right: 0px;
-	margin-bottom: 5px;
+    background-color: black;
+    color: white;
+    width: 100% !important;
+    padding: 0px !important;
+    height: 50px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 5px;
 }
 
 .popup-common {
-	background-color: white;
-	border: 3px solid #009;
-	width: 80%;
-	margin-left: auto;
-	margin-right: auto;
+    background-color: white;
+    border: 3px solid #009;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .popup-main-panel {
-	overflow: auto;
-	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
+    overflow: auto;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .blocking-popup-holder {
-	padding: 5px;
-	text-align: center;
-	width: 100%;
-	background-color: black;
-	min-height: 100%;
-	height: auto !important;
-	overflow: hidden;
-	height: 100%;
-	margin: 50px auto; /* -44px being the size of the footer */
-	opacity: 0.8;
-	filter: Alpha(opacity =       80); /* IE8 and earlier */
+    padding: 5px;
+    text-align: center;
+    width: 100%;
+    background-color: black;
+    min-height: 100%;
+    height: auto !important;
+    overflow: hidden;
+    height: 100%;
+    margin: 50px auto; /* -44px being the size of the footer */
+    opacity: 0.8;
+    filter: Alpha(opacity =       80); /* IE8 and earlier */
 }
 
 
 /* reference: http://coding.smashingmagazine.com/2008/08/13/top-10-css-table-designs/ */
 .one-column-emphasis
 {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
-	font-size: 12px;
-	background: #fff;
-	width: 100%;
-	text-align: left;
-	margin: 0px auto;
-	border-collapse: collapse;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 12px;
+    background: #fff;
+    width: 100%;
+    text-align: left;
+    margin: 0px auto;
+    border-collapse: collapse;
 }
 .one-column-emphasis .th
 {
-	font-size: 14px;
-	font-weight: normal;
-	padding: 10px 8px;
-	color: #039;
-	border-bottom: 2px solid #6678b1;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 8px;
+    color: #039;
+    border-bottom: 2px solid #6678b1;
 }
 .one-column-emphasis td
 {
-	padding: 9px 8px 0px 8px;
-	color: #669;
-	border-top: 1px solid #e8edff;
+    padding: 9px 8px 0px 8px;
+    color: #669;
+    border-top: 1px solid #e8edff;
 }
 
 .orders-selector
 {
-	color: #039;
-	border: 2px solid #6678b1;
-	font-size: 1px;
-	width: 98%;
-	margin: 2px auto;
-	text-align: left;
+    color: #039;
+    border: 2px solid #6678b1;
+    font-size: 1px;
+    width: 98%;
+    margin: 2px auto;
+    text-align: left;
 }
-.orders-selector .selector-name
+.orders-selector .selector-header
 {
-	color: #039;
-	font-size: 16px;
-	font-weight: bold;
-	padding-left: 2px;
-}
-.orders-selector .branch
-{
-	width: 95%;
-	background-color: white;
-	margin: 2px auto;
-	margin-bottom: 10px;
-	font-weight: normal;
-	text-align: left;
+    border: 2px solid #6678b1;
+    padding-left: 2px;
+    width: 100%;
+    color: white;
+    background-color: #039;
 }
 
-.orders-selector .branch .branch-name
+.orders-selector .selector-header .selector-header-text
 {
-	border: 2px solid #6678b1;
-	font-weight: bold;
-	background-color: white;
-	margin-left: 2px;
-	font-weight: bolder;
-	text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: 2px;
+}
+
+.orders-selector .branch
+{
+    width: 95%;
+    background-color: white;
+    margin: 2px auto;
+    margin-bottom: 10px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.orders-selector .branch .branch-header
+{
+    width: 100%;
+}
+.orders-selector .branch .branch-header .branch-header-text
+{
+    text-align: left;
+    font-weight: bolder;
+    background-color: white;
+    margin-left: 2px;
+    font-weight: bolder;
+    text-align: left;
 }

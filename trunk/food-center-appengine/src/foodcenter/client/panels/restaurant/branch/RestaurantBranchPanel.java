@@ -12,9 +12,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.client.panels.common.BranchOrdersHistoryPanel;
 import foodcenter.client.panels.common.UsersPanel;
 import foodcenter.client.panels.restaurant.branch.orders.PendingOrdersPanel;
-import foodcenter.client.panels.restaurant.branch.orders.RestBranchOrdersHistoryPanel;
 import foodcenter.client.panels.restaurant.menu.MenuPanel;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.requset.RestaurantAdminServiceRequest;
@@ -130,12 +130,11 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
             Panel chefsPanel = new UsersPanel(branch.getChefs(), isEditMode);
             res.add(chefsPanel, "Chefs");
             
-            Panel orders = new RestBranchOrdersHistoryPanel(branch.getId());
+            Panel orders = new BranchOrdersHistoryPanel(branch.getId(), true);
             res.add(orders, "Orders");
         }
 
-        // TODO fix this to be added also for chefs
-        if (!isEditMode && branch.isEditable())
+        if (!isEditMode && branch.isChef())
         {
             if (null != pendingOrders)
             {

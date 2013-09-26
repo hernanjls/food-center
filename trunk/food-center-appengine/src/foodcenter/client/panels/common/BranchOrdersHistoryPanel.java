@@ -1,4 +1,4 @@
-package foodcenter.client.panels.restaurant.branch.orders;
+package foodcenter.client.panels.common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,64 +17,64 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.client.callbacks.RedrawablePanel;
-import foodcenter.client.panels.common.LabeledDatePicker;
 import foodcenter.client.service.WebRequestUtils;
+import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.proxies.CourseOrderProxy;
 import foodcenter.service.proxies.OrderProxy;
+import foodcenter.service.requset.CompanyBranchAdminServiceRequest;
 import foodcenter.service.requset.RestaurantBranchAdminServiceRequest;
 
-public class RestBranchOrdersHistoryPanel extends VerticalPanel implements RedrawablePanel
+public class BranchOrdersHistoryPanel extends VerticalPanel
 {
 
-    private final Logger logger = Logger.getLogger(RestBranchOrdersHistoryPanel.class.toString());
+    private final Logger logger = Logger.getLogger(BranchOrdersHistoryPanel.class.toString());
 
-    private final TreeMap<String, CompanyInfoPanel> idComps = new TreeMap<String, CompanyInfoPanel>();
+    private final TreeMap<String, NetInfoPanel> idNet = new TreeMap<String, NetInfoPanel>();
 
-    private final String branchId; // restaurant branch id
+    private final String branchId; // Company branch id
 
     private final FindOrdersPanel findOrdersPanel;
 
-    public RestBranchOrdersHistoryPanel(String branchId)
+    private final DateTimeFormat dateFormater = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm");
+
+    private final boolean isRestView;
+
+    public BranchOrdersHistoryPanel(String branchId, boolean isRestView)
     {
         super();
 
         this.branchId = branchId;
+        this.isRestView = isRestView;
+
         this.findOrdersPanel = new FindOrdersPanel();
 
         redraw();
     }
 
-    @Override
     public void redraw()
     {
         clear();
 
         add(findOrdersPanel);
 
-        for (CompanyInfoPanel p : idComps.values())
+        for (NetInfoPanel p : idNet.values())
         {
             add(p);
-            p.redrawCompany();
+            p.redrawNetwork();
         }
-    }
-
-    @Override
-    public void close()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     private void addOrder(OrderProxy o)
     {
-        CompanyInfoPanel p = idComps.get(o.getCompId());
+        String id = isRestView ? o.getCompId() : o.getRestId();
+        NetInfoPanel p = idNet.get(id);
         if (null == p)
         {
-            p = new CompanyInfoPanel(o.getCompName());
-            idComps.put(o.getCompId(), p);
+            String name = isRestView ? o.getCompName() : o.getRestName();
+            p = new NetInfoPanel(name);
+            idNet.put(id, p);
         }
-        p.addOrderToCompany(o);
+        p.addOrderToNetwork(o);
     }
 
     class FindOrdersPanel extends HorizontalPanel
@@ -95,11 +95,22 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
                 @Override
                 public void onClick(ClickEvent event)
                 {
-                    RestaurantBranchAdminServiceRequest service = WebRequestUtils.getRequestFactory()
-                        .getRestaurantBranchAdminService();
-                    service.getOrders(branchId, from.getDate(), to.getDate())
-                        .with(OrderProxy.ORDER_WITH)
-                        .fire(new GetOrdersReceiver());
+                    if (isRestView)
+                    {
+                        RestaurantBranchAdminServiceRequest service = WebRequestUtils.getRequestFactory()
+                            .getRestaurantBranchAdminService();
+                        service.getOrders(branchId, from.getDate(), to.getDate())
+                            .with(OrderProxy.ORDER_WITH)
+                            .fire(new GetOrdersReceiver());
+                    }
+                    else
+                    {
+                        CompanyBranchAdminServiceRequest service = WebRequestUtils.getRequestFactory()
+                            .getCompanyBranchAdminService();
+                        service.getOrders(branchId, from.getDate(), to.getDate())
+                            .with(OrderProxy.ORDER_WITH)
+                            .fire(new GetOrdersReceiver());
+                    }
                 }
             });
 
@@ -111,7 +122,7 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
             @Override
             public void onSuccess(List<OrderProxy> response)
             {
-                idComps.clear();
+                idNet.clear();
 
                 if (null != response)
                 {
@@ -126,7 +137,7 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
                     logger.fine("got null response");
                 }
                 redraw();
-                
+
             }
 
             @Override
@@ -138,70 +149,110 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
         }
     }
 
-    class CompanyInfoPanel extends VerticalPanel
+    class NetInfoPanel extends VerticalPanel
     {
         /** branch id -> branchPanel */
         private TreeMap<String, BranchInfoPanel> idBranch = new TreeMap<String, BranchInfoPanel>();
         private final String name;
+        private double total;
+        private double totalDelivered;
 
-        public CompanyInfoPanel(String name)
+        public NetInfoPanel(String name)
         {
             super();
             setStyleName("orders-selector");
             this.name = name;
+            this.total = 0D;
+            this.totalDelivered = 0D;
         }
 
-        private void redrawCompany()
+        private void redrawNetwork()
         {
             clear();
+            HorizontalPanel h = new HorizontalPanel();
+            add(h);
+            h.setStyleName("selector-header");
+
             Label l = new Label(name);
-            l.setStyleName("selector-name");
-            add(l);
+            h.add(l);
+            l.setStylePrimaryName("selector-header-text");
+            h.setCellWidth(l, "60%");
 
             for (BranchInfoPanel branchInfoPanel : idBranch.values())
             {
                 add(branchInfoPanel);
                 branchInfoPanel.redrawBranch();
+
+                total += branchInfoPanel.total;
+                totalDelivered += branchInfoPanel.totalDelivered;
             }
+
+            Label priceLable = new Label("Delivered / Total price: " + totalDelivered
+                                         + " / "
+                                         + total);
+            h.add(priceLable);
+            priceLable.setStylePrimaryName("selector-header-text");
+            h.setCellWidth(priceLable, "40%");
         }
 
-        private void addOrderToCompany(OrderProxy o)
+        private void addOrderToNetwork(OrderProxy o)
         {
-            BranchInfoPanel branchInfoPanel = idBranch.get(o.getCompBranchId());
+            String id = isRestView ? o.getCompBranchId() : o.getRestBranchId();
+            BranchInfoPanel branchInfoPanel = idBranch.get(id);
 
             if (null == branchInfoPanel)
             {
                 branchInfoPanel = new BranchInfoPanel();
-                idBranch.put(o.getCompBranchId(), branchInfoPanel);
+
+                idBranch.put(id, branchInfoPanel);
             }
-            branchInfoPanel.addToBranchOrder(o);
+            branchInfoPanel.addOrderToBranch(o);
+
         }
 
         class BranchInfoPanel extends VerticalPanel
         {
             private List<OrderProxy> branchOrders;
+            private double total;
+            private double totalDelivered;
 
             private BranchInfoPanel()
             {
                 super();
                 setStyleName("branch");
                 branchOrders = new ArrayList<OrderProxy>();
+                this.total = 0D;
+                this.totalDelivered = 0D;
             }
 
             private void redrawBranch()
             {
                 clear();
 
-                Label l = new Label(branchOrders.get(0).getCompBranchAddr());
-                l.setStyleName("branch-name");
-                add(l);
+                HorizontalPanel h = new HorizontalPanel();
+                add(h);
+                h.setStyleName("branch-header");
+
+                String addr = isRestView ? branchOrders.get(0).getCompBranchAddr()
+                                        : branchOrders.get(0).getRestBranchAddr();
+                Label l = new Label(addr);
+                h.add(l);
+                l.setStyleName("branch-header-text");
+                h.setCellWidth(l, "73%");
 
                 OrdersInfoPanel ordersInfo = new OrdersInfoPanel();
                 add(ordersInfo);
                 ordersInfo.redrawOrders();
+
+                Label priceLabel = new Label("Delivered / Total price: " + totalDelivered
+                                             + " / "
+                                             + total);
+                h.add(priceLabel);
+                priceLabel.setStyleName("branch-header-text");
+                h.setCellWidth(priceLabel, "26%");
             }
 
-            private void addToBranchOrder(OrderProxy o)
+            private void addOrderToBranch(OrderProxy o)
             {
                 branchOrders.add(o);
             }
@@ -239,9 +290,14 @@ public class RestBranchOrdersHistoryPanel extends VerticalPanel implements Redra
                         {
                             price += c.getPrice();
                         }
+                        total += price;
 
-                        setText(row, 0, DateTimeFormat.getFormat("dd.MM.yyyy HH:mm z Z")
-                            .format(o.getDate()));
+                        if (OrderStatus.DELIVERED == o.getStatus())
+                        {
+                            totalDelivered += price;
+                        }
+
+                        setText(row, 0, dateFormater.format(o.getDate()));
                         setText(row, 1, o.getUserEmail());
                         setText(row, 2, o.getService().getName());
                         setWidget(row, 3, new CoursesInfoPanel(o));

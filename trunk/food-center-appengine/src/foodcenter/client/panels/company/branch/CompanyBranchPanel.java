@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import foodcenter.client.callbacks.PanelCallback;
 import foodcenter.client.callbacks.RedrawablePanel;
+import foodcenter.client.panels.common.BranchOrdersHistoryPanel;
 import foodcenter.client.panels.common.UsersPanel;
 import foodcenter.service.proxies.CompanyBranchProxy;
 import foodcenter.service.requset.CompanyAdminServiceRequest;
@@ -116,6 +117,9 @@ public class CompanyBranchPanel extends PopupPanel implements RedrawablePanel
 
             Panel workersPanel = new UsersPanel(branch.getWorkers(), isEditMode);
             res.add(workersPanel, "Workers");
+            
+            Panel orders = new BranchOrdersHistoryPanel(branch.getId(), false);
+            res.add(orders, "Orders");
         }
 
         // TODO tables res.add(tablesPanel, "Tables");

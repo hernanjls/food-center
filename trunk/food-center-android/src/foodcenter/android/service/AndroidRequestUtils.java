@@ -33,6 +33,7 @@ import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import foodcenter.android.R;
+import foodcenter.android.activities.main.MainActivity;
 import foodcenter.service.FoodCenterRequestFactory;
 
 /**
@@ -43,7 +44,7 @@ public class AndroidRequestUtils
 {
 
     /** The URL of the production service. */
-    public static final Boolean IS_DEV = false; // by default run on prod
+    public static final Boolean IS_DEV = false; // by default run on prod (set to false)
     private static final String PROD_URL = "https://food-center.appspot.com";
     private static final String DEV_URL = "http://10.0.0.32:8888";
 
@@ -115,7 +116,7 @@ public class AndroidRequestUtils
                                                                   Class<T> factoryClass)
     {
         // request factory uses Thread.currentThread().getContextClassLoader() to load factory
-        Thread.currentThread().setContextClassLoader(context.getApplicationContext().getClassLoader());
+        Thread.currentThread().setContextClassLoader(MainActivity.class.getClassLoader());
         T requestFactory = RequestFactorySource.create(factoryClass);
 
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(context);

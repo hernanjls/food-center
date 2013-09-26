@@ -25,7 +25,7 @@ import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;
-import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.ServiceType;
 
 public class ClientService
@@ -50,7 +50,7 @@ public class ClientService
     {
 
         // else save a new user to the db and return it
-        DbUser user = PrivilegeManager.getCurrentUser();
+        DbUser user = UsersManager.getCurrentUser();
         if (null == user)
         {
             String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
@@ -82,7 +82,7 @@ public class ClientService
 
     public static void logout()
     {
-        DbUser user = PrivilegeManager.getCurrentUser();
+        DbUser user = UsersManager.getCurrentUser();
         if (null == user)
         {
             return;
@@ -101,26 +101,13 @@ public class ClientService
         }
 
         // Set the user of the current order
-        User user = PrivilegeManager.getUser();
+        User user = UsersManager.getUser();
         if (null == user)
         {
             return null;
         }
 
         order.setUserEmail(user.getEmail());
-        String restId = order.getRestId();
-        if (null == restId)
-        {
-            return null;
-        }
-        
-        DbRestaurant rest = DbHandler.find(DbRestaurant.class, order.getRestId());
-        if (null == rest)
-        {
-            return null;
-        }
-        order.setRestName(rest.getName());
-        
         String rBranchId = order.getRestBranchId();
         if (null == rBranchId)
         {
@@ -134,6 +121,16 @@ public class ClientService
         }
         order.setRestBranchAddr(rBranch.getAddress());
 
+        
+        String restId = order.getRestId();
+        DbRestaurant rest = rBranch.getRestaurant();
+        if (null == restId || null == rest || !rest.getId().equals(restId))
+        {
+            return null;
+        }
+        
+        order.setRestName(rest.getName());
+        
         DbCompanyBranch cBranch = findUserCompanyBranch(user.getEmail());
         if (null == cBranch)
         {
@@ -160,7 +157,7 @@ public class ClientService
 
     public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
     {
-        String userEmail = PrivilegeManager.getUser().getEmail();
+        String userEmail = UsersManager.getUser().getEmail();
         
         String query = "userEmail == userEmailP";
 

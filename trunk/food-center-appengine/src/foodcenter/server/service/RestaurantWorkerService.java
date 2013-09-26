@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
-import com.google.appengine.api.users.User;
 
 import foodcenter.server.GCMSender;
 import foodcenter.server.db.DbHandler;
@@ -17,10 +16,9 @@ import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
 import foodcenter.server.db.modules.DbChannelToken;
 import foodcenter.server.db.modules.DbOrder;
-import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
 import foodcenter.server.db.modules.DbUser;
-import foodcenter.server.db.security.PrivilegeManager;
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.OrderStatus;
 
 public class RestaurantWorkerService extends ClientService
@@ -36,9 +34,8 @@ public class RestaurantWorkerService extends ClientService
         {
             return null;
         }
-        String restId = order.getRestId();
         String branchId = order.getRestBranchId();
-        if (!isBranchOrdersPrivilage(restId, branchId))
+        if (!isBranchChef(branchId))
         {
             return null;
         }
@@ -61,8 +58,7 @@ public class RestaurantWorkerService extends ClientService
             return null;
         }
         String branchId = order.getRestBranchId();
-        String restId = order.getRestId();
-        if (!isBranchOrdersPrivilage(restId, branchId))
+        if (!isBranchChef(branchId))
         {
             return null;
         }
@@ -77,7 +73,7 @@ public class RestaurantWorkerService extends ClientService
 
     public static List<DbOrder> getPendingOrders(String branchId)
     {
-        if (!isBranchOrdersPrivilage(null, branchId))
+        if (!isBranchChef(branchId))
         {
             return new ArrayList<DbOrder>();
         }
@@ -109,7 +105,7 @@ public class RestaurantWorkerService extends ClientService
         }
 
         String branchId = order.getRestBranchId();
-        if (!isBranchOrdersPrivilage(null, branchId))
+        if (!isBranchChef(branchId))
         {
             return null;
         }
@@ -121,12 +117,12 @@ public class RestaurantWorkerService extends ClientService
     {
         logger.info("create channel: " + branchId);
         
-        if (!isBranchOrdersPrivilage(null, branchId))
+        if (!isBranchChef(branchId))
         {
             return null;
         }
 
-        String key = PrivilegeManager.getUser().getUserId();
+        String key = UsersManager.getUser().getUserId();
 
         ChannelService channelService = ChannelServiceFactory.getChannelService();
         String token = channelService.createChannel(key);
@@ -182,7 +178,7 @@ public class RestaurantWorkerService extends ClientService
 
     }
 
-    public static boolean isBranchOrdersPrivilage(String restId, String branchId)
+    private static boolean isBranchChef(String branchId)
     {
         if (null == branchId)
         {
@@ -190,33 +186,7 @@ public class RestaurantWorkerService extends ClientService
         }
 
         DbRestaurantBranch branch = DbHandler.find(DbRestaurantBranch.class, branchId);
-        if (null == branch)
-        {
-            return false;
-        }
-
-        // make sure user is elligable to get branch orders
-        User user = PrivilegeManager.getUser();
-        boolean isChef = (null != branch.getChefs()) && branch.getChefs().contains(user.getEmail());
-        if (branch.isEditable() || isChef)
-        {
-            return true;
-        }
-
-        DbRestaurant rest = null;
-        if (null != restId)
-        {
-            rest = DbHandler.find(DbRestaurant.class, restId);
-        }
-        else
-        {
-            String query = "branches == branchP";
-            ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
-            params.add(new DeclaredParameter("branchP", branch));
-            rest = DbHandler.find(DbRestaurant.class, query, params);
-        }
-
-        return (null != rest && rest.isEditable());
+        return ((null != branch) && branch.isChef());
     }
 
 }

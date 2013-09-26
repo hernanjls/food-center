@@ -6,11 +6,12 @@ import java.util.List;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import foodcenter.server.db.security.PrivilegeManager;
-import foodcenter.server.db.security.UserPrivilege;
+import com.google.appengine.api.users.User;
+
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable (detachable="true")
+@PersistenceCapable(detachable = "true")
 public class DbCompanyBranch extends AbstractDbGeoObject
 {
 
@@ -19,9 +20,9 @@ public class DbCompanyBranch extends AbstractDbGeoObject
 	 */
     private static final long serialVersionUID = 1303969414427455468L;
 
-    @Persistent
+    @Persistent //(defaultFetchGroup="true")
     private DbCompany company = null;
-    
+
     @Persistent
     private List<String> admins = new ArrayList<String>(); // emails
 
@@ -45,13 +46,10 @@ public class DbCompanyBranch extends AbstractDbGeoObject
     {
         super.jdoPostLoad();
 
-        // Set privilege...
-        UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p
-            || UserPrivilege.RestaurantBranchAdmin == p)
-        {
-            setEditable(true);
-        }
+        User user = UsersManager.getUser();
+
+        // Set edit permission (this happens in post load before any changes to company / admins)
+        setEditable(getCompany().isEditable() || admins.contains(user.getEmail()));
     }
 
     public DbCompany getCompany()
@@ -83,7 +81,6 @@ public class DbCompanyBranch extends AbstractDbGeoObject
     {
         this.workers = workers;
     }
-
 
     public List<ServiceType> getServices()
     {

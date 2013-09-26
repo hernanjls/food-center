@@ -27,6 +27,8 @@ public interface RestaurantBranchProxy extends AbstractGeoLocationInterface, Ent
 
     public void setChefs(List<String> chefs);
 
+    public boolean isChef();
+    
     public List<TableProxy> getTables();
 
     public void setTables(List<TableProxy> tables);

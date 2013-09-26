@@ -1,6 +1,7 @@
 package foodcenter.server.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,12 +42,25 @@ public class RestaurantBranchAdminService extends MenuAdminService
 
     public static List<DbOrder> getOrders(String branchId, Date from, Date to)
     {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(from);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        from = calendar.getTime();
+        
+        calendar.setTime(to);
+        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        to = calendar.getTime();
+        
         logger.info("get orders, branchId=" + branchId
                     + ", from: "
                     + from.toString()
                     + ", to: "
                     + to.toString());
-        if (!RestaurantWorkerService.isBranchOrdersPrivilage(null, branchId))
+        if (!isBranchAdmin(branchId))
         {
             return null;
         }
@@ -63,5 +77,15 @@ public class RestaurantBranchAdminService extends MenuAdminService
 
         return DbHandler.find(DbOrder.class, query, params, sort, Integer.MAX_VALUE);
     }
+    
+    private static boolean isBranchAdmin(String branchId)
+    {
+        if (null == branchId)
+        {
+            return false;
+        }
 
+        DbRestaurantBranch branch = DbHandler.find(DbRestaurantBranch.class, branchId);
+        return ((null != branch) && branch.isEditable());
+    }
 }

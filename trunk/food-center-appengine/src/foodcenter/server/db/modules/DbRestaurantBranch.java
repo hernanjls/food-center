@@ -3,11 +3,13 @@ package foodcenter.server.db.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import foodcenter.server.db.security.PrivilegeManager;
-import foodcenter.server.db.security.UserPrivilege;
+import com.google.appengine.api.users.User;
+
+import foodcenter.server.db.security.UsersManager;
 import foodcenter.service.enums.ServiceType;
 
 @PersistenceCapable //(detachable="true")
@@ -31,10 +33,13 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     @Persistent
     private List<String> chefs = new ArrayList<String>(); // emails
 
+    @NotPersistent
+    private Boolean chef = false;
+
     @Persistent
     private List<DbTable> tables = new ArrayList<DbTable>();
-
-    //@Persistent(defaultFetchGroup="true")
+    
+    @Persistent
     private DbMenu menu = new DbMenu();
 
     @Persistent
@@ -54,13 +59,13 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     {
         super.jdoPostLoad();
 
-        // Set privilege...
-        UserPrivilege p = PrivilegeManager.getPrivilege(this);
-        if (UserPrivilege.Admin == p || UserPrivilege.RestaurantAdmin == p
-            || UserPrivilege.RestaurantBranchAdmin == p)
-        {
-            setEditable(true);
-        }
+        User user = UsersManager.getUser();
+     
+        // Set edit permission (this happens in post load before any changes to rest / admins)
+        setEditable(getRestaurant().isEditable() || admins.contains(user.getEmail()));
+        
+        // Set chef's privilege
+        setChef(isEditable() || chefs.contains(user.getEmail()));
     }
 
     public DbRestaurant getRestaurant()
@@ -101,6 +106,16 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     public void setChefs(List<String> chefs)
     {
         this.chefs = chefs;
+    }
+
+    public boolean isChef()
+    {
+        return chef;
+    }
+
+    public void setChef(boolean chef)
+    {
+        this.chef = chef;
     }
 
     public List<DbTable> getTables()
