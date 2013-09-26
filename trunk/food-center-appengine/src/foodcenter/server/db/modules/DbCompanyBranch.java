@@ -10,7 +10,7 @@ import foodcenter.server.db.security.PrivilegeManager;
 import foodcenter.server.db.security.UserPrivilege;
 import foodcenter.service.enums.ServiceType;
 
-@PersistenceCapable //(detachable="true")
+@PersistenceCapable (detachable="true")
 public class DbCompanyBranch extends AbstractDbGeoObject
 {
 
@@ -19,6 +19,9 @@ public class DbCompanyBranch extends AbstractDbGeoObject
 	 */
     private static final long serialVersionUID = 1303969414427455468L;
 
+    @Persistent
+    private DbCompany company = null;
+    
     @Persistent
     private List<String> admins = new ArrayList<String>(); // emails
 
@@ -49,6 +52,16 @@ public class DbCompanyBranch extends AbstractDbGeoObject
         {
             setEditable(true);
         }
+    }
+
+    public DbCompany getCompany()
+    {
+        return company;
+    }
+
+    public void setCompany(DbCompany company)
+    {
+        this.company = company;
     }
 
     public List<String> getAdmins()

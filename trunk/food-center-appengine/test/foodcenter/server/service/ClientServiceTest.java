@@ -592,12 +592,6 @@ public class ClientServiceTest extends AbstractServiceTest
         tearDownPMF();
         
         assertNull(b);
-
-        setUpPMF();
-        DbCompany c = ClientService.findCompanyOfBranch(b);
-        tearDownPMF();
-        
-        assertNull(c);
     }
 
     @Test
@@ -615,26 +609,29 @@ public class ClientServiceTest extends AbstractServiceTest
         comp.getServices().add(ServiceType.DELIVERY);
         comp.getServices().add(ServiceType.TAKE_AWAY);
 
+        name = "comp2";
+        DbCompany comp2 = createComp(name + 1, numBranches);
+        comp.getServices().add(ServiceType.DELIVERY);
+        comp.getServices().add(ServiceType.TAKE_AWAY);
+
         comp.getBranches().get(0).getWorkers().add(user.getEmail()); // add the user
 
         
         setUpPMF();
         CompanyAdminService.saveCompany(comp);
+        CompanyAdminService.saveCompany(comp2);
         tearDownPMF();
         
         setUpPMF();
         DbCompanyBranch b = ClientService.findUserCompanyBranch(user.getEmail());
+        DbCompany c = b.getCompany();
         tearDownPMF();
         
         assertNotNull(b);
-        assertEquals(comp.getBranches().get(0).getId(), b.getId());
-
-        setUpPMF();
-        DbCompany c = ClientService.findCompanyOfBranch(b);
-        tearDownPMF();
-        
+        assertEquals(comp.getBranches().get(0).getId(), b.getId());        
         assertNotNull(c);
         assertEquals(comp.getId(), c.getId());
+        
     }
 
 }

@@ -358,44 +358,44 @@ public class DbHandlerTest extends AbstractDbTest
 
         r = DbHandler.save(r);
 
-        DbRestaurant result = DbHandler.find(DbRestaurant.class, r.getId());
+        DbRestaurant rest = DbHandler.find(DbRestaurant.class, r.getId());
 
-        assertNotNull(result.getBranches());
-        assertEquals(2, result.getBranches().size());
+        assertNotNull(rest.getBranches());
+        assertEquals(2, rest.getBranches().size());
 
-        result.getBranches().add(b2);
-        result = DbHandler.save(result);
+        rest.getBranches().add(b2);
+        rest = DbHandler.save(rest);
 
-        result = DbHandler.find(DbRestaurant.class, r.getId());
-        assertNotNull(result.getBranches());
-        assertEquals(3, result.getBranches().size());
+        rest = DbHandler.find(DbRestaurant.class, r.getId());
+        assertNotNull(rest.getBranches());
+        assertEquals(3, rest.getBranches().size());
     }
 
     @Test
     public void multipleCompsBranchesTest()
     {
-        DbCompany r = comps[0];
+        DbCompany c = comps[0];
         DbCompanyBranch b1 = new DbCompanyBranch();
         DbCompanyBranch b2 = new DbCompanyBranch();
 
         b1.setAddress("addr");
         b2.setAddress("addr2");
 
-        r.getBranches().add(b1);
+        c.getBranches().add(b1);
 
-        r = DbHandler.save(r);
+        c = DbHandler.save(c);
 
-        DbCompany result = DbHandler.find(DbCompany.class, r.getId());
+        DbCompany comp = DbHandler.find(DbCompany.class, c.getId());
 
-        assertNotNull(result.getBranches());
-        assertEquals(2, result.getBranches().size());
+        assertNotNull(comp.getBranches());
+        assertEquals(2, comp.getBranches().size());
 
-        result.getBranches().add(b2);
-        result = DbHandler.save(result);
+        comp.getBranches().add(b2);
+        comp = DbHandler.save(comp);
 
-        result = DbHandler.find(DbCompany.class, r.getId());
-        assertNotNull(result.getBranches());
-        assertEquals(3, result.getBranches().size());
+        comp = DbHandler.find(DbCompany.class, c.getId());
+        assertNotNull(comp.getBranches());
+        assertEquals(3, comp.getBranches().size());
     }
 
     @Test
@@ -553,6 +553,8 @@ public class DbHandlerTest extends AbstractDbTest
 
         List<DbMenu> menus = DbHandler.find(DbMenu.class, 10);
         assertNotNull(menus);
+        
+        // menu for each branch (2) and each restaurant (1)
         assertEquals(3, menus.size());
 
     }
@@ -609,7 +611,10 @@ public class DbHandlerTest extends AbstractDbTest
 
         assertNotSame(0, o.getMenu().getCategories().get(0).getCourses().size());
         logger.info(o.getMenu().getCategories().get(0).getCourses().get(0).getClass() + " : "
-                    + JDOHelper.getObjectState(o.getMenu().getCategories().get(0).getCourses()
+                    + JDOHelper.getObjectState(o.getMenu()
+                        .getCategories()
+                        .get(0)
+                        .getCourses()
                         .get(0)));
         // assertEquals(ObjectState.TRANSIENT,
         // JDOHelper.getObjectState(o.getMenu().getCategories().get(0).getCourses().get(0)));
@@ -665,19 +670,36 @@ public class DbHandlerTest extends AbstractDbTest
             assertNotNull(rest.getBranches().get(i));
             assertNotNull(rest.getBranches().get(i).getMenu());
             assertNotNull(rest.getBranches().get(i).getMenu().getCategories());
-            assertEquals(numBranchMenuCats, rest.getBranches().get(i).getMenu().getCategories()
+            assertEquals(numBranchMenuCats, rest.getBranches()
+                .get(i)
+                .getMenu()
+                .getCategories()
                 .size());
             for (int j = 0; j < numBranchMenuCats; ++j)
             {
                 assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j));
-                assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j)
+                assertNotNull(rest.getBranches()
+                    .get(i)
+                    .getMenu()
+                    .getCategories()
+                    .get(j)
                     .getCourses());
-                assertEquals(numBranchMenuCatCourses, rest.getBranches().get(i).getMenu()
-                    .getCategories().get(j).getCourses().size());
+                assertEquals(numBranchMenuCatCourses, rest.getBranches()
+                    .get(i)
+                    .getMenu()
+                    .getCategories()
+                    .get(j)
+                    .getCourses()
+                    .size());
                 for (int k = 0; k < numBranchMenuCatCourses; ++k)
                 {
-                    assertNotNull(rest.getBranches().get(i).getMenu().getCategories().get(j)
-                        .getCourses().get(k));
+                    assertNotNull(rest.getBranches()
+                        .get(i)
+                        .getMenu()
+                        .getCategories()
+                        .get(j)
+                        .getCourses()
+                        .get(k));
                 }
 
             }

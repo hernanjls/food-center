@@ -73,6 +73,7 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
 
         restsTable = new FlexTable();
         add(restsTable);
+        restsTable.setStyleName("one-column-emphasis");
 
         redraw();
     }

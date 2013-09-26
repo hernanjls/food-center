@@ -83,3 +83,66 @@ html,body {
 	opacity: 0.8;
 	filter: Alpha(opacity =       80); /* IE8 and earlier */
 }
+
+
+/* reference: http://coding.smashingmagazine.com/2008/08/13/top-10-css-table-designs/ */
+.one-column-emphasis
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	background: #fff;
+	width: 100%;
+	text-align: left;
+	margin: 0px auto;
+	border-collapse: collapse;
+}
+.one-column-emphasis .th
+{
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 8px;
+	color: #039;
+	border-bottom: 2px solid #6678b1;
+}
+.one-column-emphasis td
+{
+	padding: 9px 8px 0px 8px;
+	color: #669;
+	border-top: 1px solid #e8edff;
+}
+
+.orders-selector
+{
+	color: #039;
+	border: 2px solid #6678b1;
+	font-size: 1px;
+	width: 98%;
+	margin: 2px auto;
+	text-align: left;
+}
+.orders-selector .selector-name
+{
+	color: #039;
+	font-size: 16px;
+	font-weight: bold;
+	padding-left: 2px;
+}
+.orders-selector .branch
+{
+	width: 95%;
+	background-color: white;
+	margin: 2px auto;
+	margin-bottom: 10px;
+	font-weight: normal;
+	text-align: left;
+}
+
+.orders-selector .branch .branch-name
+{
+	border: 2px solid #6678b1;
+	font-weight: bold;
+	background-color: white;
+	margin-left: 2px;
+	font-weight: bolder;
+	text-align: left;
+}

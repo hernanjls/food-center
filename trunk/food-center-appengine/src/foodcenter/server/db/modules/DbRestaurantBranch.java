@@ -20,6 +20,9 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     private static final long serialVersionUID = -1838782438427806774L;
 
     @Persistent
+    private DbRestaurant restaurant = null;
+
+    @Persistent
     private List<String> admins = new ArrayList<String>(); // emails
 
     @Persistent
@@ -31,7 +34,7 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
     @Persistent
     private List<DbTable> tables = new ArrayList<DbTable>();
 
-    @Persistent
+    //@Persistent(defaultFetchGroup="true")
     private DbMenu menu = new DbMenu();
 
     @Persistent
@@ -58,6 +61,16 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
         {
             setEditable(true);
         }
+    }
+
+    public DbRestaurant getRestaurant()
+    {
+        return restaurant;
+    }
+
+    public void setRestaurant(DbRestaurant restaurant)
+    {
+        this.restaurant = restaurant;
     }
 
     public List<String> getAdmins()

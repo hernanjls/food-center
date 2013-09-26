@@ -25,6 +25,12 @@
 	
 	<!-- Request Factory module inherits -->
 	<inherits name='com.google.web.bindery.requestfactory.RequestFactory'/>
+
+	<!-- DateTimeFormat -->
+	<inherits name="com.google.gwt.i18n.I18N"/>
+    <inherits name="com.google.gwt.i18n.CldrLocales" /> 
+	<!-- English language, independent of country -->
+  	<extend-property name="locale" values="en"/>
     
     <!-- OAuth2 -->
 	<!-- <inherits name="com.google.api.gwt.oauth2.OAuth2" /> -->
