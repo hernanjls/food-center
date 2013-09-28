@@ -118,7 +118,7 @@ public class LoginDialogFragment extends DialogFragment
         accountsLv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         builder.setView(view);
-
+        
         if (isLogedIn)
         {
             isSignedInView(builder);
@@ -137,7 +137,9 @@ public class LoginDialogFragment extends DialogFragment
         });
 
         // Create the AlertDialog object and return it
-        return builder.create();
+        Dialog res = builder.create();
+        res.setCanceledOnTouchOutside(false);
+        return res;
     }
 
     private void isSignedInView(AlertDialog.Builder builder)
