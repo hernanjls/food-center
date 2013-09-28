@@ -14,6 +14,7 @@ public class ActionBarDrawer
 {
     private final Activity activity;
     private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerAdapter listAdapter;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle = "Select Option";
@@ -26,11 +27,18 @@ public class ActionBarDrawer
         mDrawerList = (ListView) activity.findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ActionBarDrawerAdapter(activity, null));
+        listAdapter = new ActionBarDrawerAdapter(activity, null);
+        mDrawerList.setAdapter(listAdapter);
+        
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(onItemClick);
         mDrawerToggle = new FoodCenterActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+    
+    public void notifyDataSetChanged()
+    {
+        listAdapter.notifyDataSetChanged();
     }
     
     public void onPostCreate(Bundle savedInstanceState)

@@ -1,4 +1,4 @@
-package foodcenter.android.service.login;
+package foodcenter.android.activities.login;
 
 import java.util.Random;
 
@@ -12,7 +12,6 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.GCMIntentService;
 import foodcenter.android.R;
-import foodcenter.android.activities.main.LoginActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.UserProxy;
@@ -20,33 +19,38 @@ import foodcenter.service.requset.ClientServiceRequest;
 
 /**
  * 
- * registering gcm service with gcm regId on food-center-server <br>
- * dont forget to run execute(); <br>
+ * Registering GCM service with GCM regId on food-center-server <br>
+ * Don't forget to run signIn(); <br>
+ * 
+ * must run on non-UI thread.
  * 
  */
-public class ServerLoginAsyncTask extends Receiver<UserProxy>
+public class ServerSigninTask extends Receiver<UserProxy>
 {
     // private static final String TAG = GCMRegistrar.class.getSimpleName();
-
+    
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
 
+    private final Context context;
     private final String regId; // GCM reg id
     private int attempt;
+    
+    
     private long backoff;
 
-    private final Context context;
-
-    public ServerLoginAsyncTask(final Context context, String regId, int attempt)
+    public ServerSigninTask(final Context context, String regId, int attempt)
     {
+        super();
         this.context = context;
         this.regId = regId;
         this.attempt = attempt;
-        this.backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+        
+        backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
     }
 
     /** it actually retrieves the RF on the UI thread, but fire is on other thread */
-    public void execute()
+    public void signIn()
     {
         FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
         ClientServiceRequest service = factory.getClientService();
@@ -58,10 +62,8 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
     public void onSuccess(UserProxy user)
     {
         GCMRegistrar.setRegisteredOnServer(context, true);
-        String message = context.getString(R.string.server_registered);
-        AndroidUtils.displayMessage(context, message);
-
-        LoginActivity.closeLoginActivity(true);
+        String msg = context.getString(R.string.server_registered);
+        AndroidUtils.notifySignIn(context, msg);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
                 Thread.sleep(backoff);
                 this.attempt--;
                 this.backoff *= 2;
-                execute();
+                signIn();
                 return;
             }
 
@@ -88,17 +90,18 @@ public class ServerLoginAsyncTask extends Receiver<UserProxy>
             String msg = context.getString(R.string.server_register_error,
                                            GCMIntentService.MAX_ATTEMPTS);
 
-            AndroidUtils.displayMessage(context, msg);
+            AndroidUtils.progress(context, msg);
 
             GCMRegistrar.unregister(context);
         }
 
         catch (InterruptedException e)
         {
+            String msg = "Thread interrupted: abort remaining retries!"; //TODO change to R.string
             // Activity finished before we complete - exit.
-            Log.d(GCMIntentService.TAG, "Thread interrupted: abort remaining retries!");
-            Thread.currentThread().interrupt();
-            return;
+            Log.d(GCMIntentService.TAG, msg);
+            
+            AndroidUtils.progressDismissAndToastMsg(context, msg);
         }
     }
 }

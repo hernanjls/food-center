@@ -1,4 +1,4 @@
-package foodcenter.android.service.login;
+package foodcenter.android.activities.login;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,8 +23,9 @@ import org.apache.http.params.HttpParams;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
+import android.accounts.AccountsException;
 import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -33,114 +34,94 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
+import foodcenter.android.AndroidUtils;
 import foodcenter.android.GCMIntentService;
-import foodcenter.android.activities.main.LoginActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 
-public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boolean>
+public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void>
 {
 
     /** for logs */
-    private static final String TAG = AuthenticateAndLoginAsyncTask.class.getSimpleName();
+    private static final String TAG = AuthenticateAndSigninAsyncTask.class.getSimpleName();
+
+    private final Activity activity;
 
     private final Context appContext;
-    private final LoginActivity loginActivity;
 
-    public AuthenticateAndLoginAsyncTask(final LoginActivity loginActivity)
+    public AuthenticateAndSigninAsyncTask(Activity activity)
     {
-        this.loginActivity = loginActivity;
-        this.appContext = loginActivity.getApplicationContext();
-    }
+        super();
+        this.activity = activity;
 
-    @Override
-    protected void onPreExecute()
-    {
-        // This task is created by login activity, so we can call this function
-        LoginActivity.showSpinner("Registering ...");
-        // super.onPreExecute();
+        appContext = activity.getApplicationContext();
     }
 
     /**
      * Registers for GCM messaging with the given account name, <br>
      * stores in {@link AndroidRequestUtils#getSharedPreferences(Context)}: <br>
-     * - {@link AndroidRequestUtils#ACCOUNT_NAME} <br>
+     * - {@link AndroidRequestUtils#PREF_ACCOUNT_NAME} <br>
      * - {@link AndroidRequestUtils#AUTH_COOKIE}
      * 
      * @param accountName a String containing a Google account name
+     *            on null input, will use already existing account name
      * 
      * @return true if registration success, false othewise
      */
     @Override
-    protected Boolean doInBackground(String... params)
+    protected Void doInBackground(Void... params)
     {
+        AndroidUtils.progress(activity, "Starting Register process..."); // change to R.strings
         try
         {
-            String accountName = params[0];
-            // Store the account name in shared preferences and clear auth cookie
             final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, accountName);
+
+            // in-case we want to re-authenticate
+            String accountName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, null);
+            if (null == accountName)
+            {
+                String msg = "Can't get account name"; // TODO change to R.string
+                Log.e(TAG, msg);
+                AndroidUtils.progressDismissAndToastMsg(activity, msg);
+            }
+
             editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
             editor.commit();
 
             // Obtain an auth token and save it as a cookie
-            publishProgress("Getting authentication token...");
+            // TODO change to R.string
+            AndroidUtils.progress(activity, "Generating authentication TOKEN...");
             String authToken = getAuthToken(accountName);
 
-            publishProgress("Getting authentication cookie...");
+            // TODO change to R.string
+            AndroidUtils.progress(activity, "Getting authentication COOKIE...");
             String authCookie = getAuthCookie(authToken);
-
             editor.putString(AndroidRequestUtils.AUTH_COOKIE, authCookie);
-            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, accountName);
+            editor.putString(AndroidRequestUtils.PREF_ACCOUNT_NAME, accountName);
             editor.commit();
 
-            publishProgress("Registering on server...");
             // register to GCM (you are authenticated)
             final String regId = GCMRegistrar.getRegistrationId(appContext);
             if (regId.equals(""))
             {
-                // Device is not registered
+                // Device is not registered on GCM (sign-in is called onRegister callback)
                 GCMRegistrar.register(appContext, GCMIntentService.GCM_SENDER_ID);
             }
             else if (!GCMRegistrar.isRegisteredOnServer(appContext))
             {
-                // Device is already registered on GCM but not logged in on server
-                new ServerLoginAsyncTask(appContext, regId, 5).execute();
+                // Device is already registered on GCM but not signed-in on server
+                new ServerSigninTask(appContext, regId, 5).signIn();
             }
-
-            return true;
         }
         catch (Exception e)
         {
             // OperationCanceledException, AuthenticatorException, IOException,
             // URISyntaxException
-            Log.e(TAG, e.getClass().getSimpleName(), e);
+            String msg = "[ERROR] " + e.getMessage();
+            Log.e(TAG, msg, e);
+            AndroidUtils.progressDismissAndToastMsg(activity, msg);
         }
-        return false;
-    }
-
-    @Override
-    protected void onPostExecute(Boolean result)
-    {
-        if (true == result)
-        {
-            Log.i(TAG, "OK registering, waiting for server login to finish");
-            // context.finish(); is called from ServerLoginAsyncTask
-        }
-        else
-        {
-            Log.e(TAG, "[EROR] exception was caught");
-        }
-    }
-
-    /**
-     * updates the spinner of the current process
-     */
-    @Override
-    protected void onProgressUpdate(String... values)
-    {
-        String msg = values[0];
-        LoginActivity.showSpinner(msg);
+        return null;
     }
 
     /**
@@ -150,18 +131,14 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
      * 
      * @return auth token which can be used to create auth cookie. (will never return null).
      * 
-     * @throws OperationCanceledException
-     * @throws AuthenticatorException
-     * @throws IOException
+     * @throws IOException when auth cookie is not found
+     * @throws AccountsException when account is not found
      */
-    private String getAuthToken(String accountName) throws OperationCanceledException,
-                                                   AuthenticatorException,
-                                                   IOException
+    private String getAuthToken(String accountName) throws IOException, AccountsException
     {
 
         AccountManager mgr = AccountManager.get(appContext);
         Account acct = getAccountByName(mgr, "com.google", accountName);
-        // String AUTH_TOKEN_TYPE = "oauth2:https://www.googleapis.com/auth/analytics.readonly";
         String AUTH_TOKEN_TYPE = "ah";
         if (acct == null)
         {
@@ -170,13 +147,11 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(acct,
                                                                              AUTH_TOKEN_TYPE,
                                                                              null,
-                                                                             loginActivity,
+                                                                             activity,
                                                                              null,
                                                                              null);
         Bundle authTokenBundle = accountManagerFuture.getResult();
         String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
-        // String authToken = mgr.blockingGetAuthToken(acct, AUTH_TOKEN_TYPE, false);
-        // mgr.invalidateAuthToken("com.google", authToken);
         if (null == authToken)
         {
             throw new AuthenticatorException("authToken == null");
@@ -192,7 +167,8 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
      * @param accountName
      * @return
      */
-    private Account getAccountByName(AccountManager mgr, String type, String accountName)
+    private Account
+        getAccountByName(AccountManager mgr, String type, String accountName) throws AccountsException
     {
         Account[] accts = mgr.getAccountsByType(type);
         for (Account acct : accts)
@@ -202,7 +178,8 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
                 return acct;
             }
         }
-        return null;
+
+        throw new AccountsException("Can't find account");
     }
 
     /**
@@ -213,6 +190,7 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
      * @throws URISyntaxException
      * @throws IOException
      * @throws ClientProtocolException
+     * 
      */
     private String getAuthCookie(String authToken) throws URISyntaxException,
                                                   ClientProtocolException,
@@ -220,19 +198,21 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
     {
         // Get SACSID / ACSID cookie
         DefaultHttpClient client = new DefaultHttpClient();
-        String continueURL = AndroidRequestUtils.getBaseUrl(appContext);
+        String continueURL = AndroidRequestUtils.getBaseUrl();
         URI uri = new URI(continueURL + "/_ah/login?continue="
                           + URLEncoder.encode(continueURL, "UTF-8")
                           + "&auth="
                           + authToken);
-        
-        HttpPost httpPost = new HttpPost(uri);
-        if (AndroidRequestUtils.IS_DEV)
-        {
-            final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
-            String accName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, "myemail@gmail.com");
 
-            // attach 
+        HttpPost httpPost = new HttpPost(uri);
+        if (AndroidRequestUtils.isDev())
+        {
+            Log.d(TAG, "Auth cookie for dev server ...");
+            final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
+            String accName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME,
+                                             "myemail@gmail.com");
+
+            // attach
             List<BasicNameValuePair> devParams = new ArrayList<BasicNameValuePair>();
             devParams.add(new BasicNameValuePair("email", accName));
             devParams.add(new BasicNameValuePair("admin", "False"));
@@ -242,8 +222,8 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
         }
 
         final HttpParams params = new BasicHttpParams();
-        httpPost.setParams(params);
         HttpClientParams.setRedirecting(params, false);
+        httpPost.setParams(params);
         
         HttpResponse res = client.execute(httpPost);
         Header[] headers = res.getHeaders("Set-Cookie");
@@ -264,5 +244,4 @@ public class AuthenticateAndLoginAsyncTask extends AsyncTask<String, String, Boo
         }
         throw new IOException("AUTH_COOKIE_NAME is missing from the response");
     }
-
 }

@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import foodcenter.android.R;
 import foodcenter.android.service.AndroidRequestUtils;
-import foodcenter.android.service.history.OrderHistoryGetAsyncTask;
 
 public class OrderHistoryActivity extends Activity implements OnRefreshListener
 {
@@ -64,7 +63,7 @@ public class OrderHistoryActivity extends Activity implements OnRefreshListener
         getActionBar().setHomeButtonEnabled(true);
         
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, null);
+        String accountName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, null);
         getActionBar().setSubtitle(accountName);
 
     }

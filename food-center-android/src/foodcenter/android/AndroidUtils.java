@@ -25,24 +25,76 @@ public final class AndroidUtils
 {
 
     /** Intent used to display a message in the screen. */
-    public static final String DISPLAY_POPUP_ACTION = "foodcenter.android.DISPLAY_MESSAGE";
+    public static final String ACTION_SHOW_TOAST = "foodcenter.android.SHOW_TOAST";
 
-    /** Intent's extra that contains the message to be displayed. */
-    public static final String EXTRA_MESSAGE = "message";
+    /** Intent used to display a message in the screen. */
+    public static final String ACTION_SHOW_PROGRESS = "foodcenter.android.SHOW_PROGRESS";
+
+    /** Intent used notify sign-in. */
+    public static final String ACTION_SIGNED_IN = "foodcenter.android.SIGNED_IN";
+    
+    /** Intent used notify sign-out. */
+    public static final String ACTION_SIGNED_OUT = "foodcenter.android.SIGNED_OUT";
+    
+    public static final String EXTRA_MESSAGE = "extraMessage";
+
+    
+    public static void notifySignOut(Context context, String msg)
+    {
+        Intent intent = new Intent(ACTION_SIGNED_OUT);
+        intent.putExtra(EXTRA_MESSAGE, msg);
+        context.sendBroadcast(intent);
+    }
+    
+    public static void notifySignIn(Context context, String msg)
+    {
+        Intent intent = new Intent(ACTION_SIGNED_IN);
+        intent.putExtra(EXTRA_MESSAGE, msg);
+        context.sendBroadcast(intent);
+    }
+        
+    /**
+     * Notifies UI to display / hide a progress message. <br>
+     * It's used both by the UI and the background services and tasks.     
+     *  
+     * @param context application's context.
+     * @param message message to be displayed. null message to hide
+     */
+    public static void progress(Context context, String msg)
+    {
+        Intent intent = new Intent(ACTION_SHOW_PROGRESS);
+        intent.putExtra(EXTRA_MESSAGE, msg);
+        context.sendBroadcast(intent);
+    }
 
     /**
-     * Notifies UI to display a message.
-     * <p>
-     * This method is defined in the common helper because it's used both by the UI and the
-     * background service.
+     * Notifies UI to hide progress and show toast. <br>
+     * It's used both by the UI and the background services and tasks.
+     *      
+     * @param context
+     * @param msg
+     */
+    public static void progressDismissAndToastMsg(Context context, String msg)
+    {
+        progress(context, null);
+        toast(context, msg);
+    }
+
+    /**
+     * Notifies UI to display a toast message.<br>
+     * It's used both by the UI and the background services and tasks.
      * 
      * @param context application's context.
-     * @param message message to be displayed.
+     * @param msg message to be displayed.
      */
-    public static void displayMessage(Context context, String message)
+    public static void toast(Context context, String msg)
     {
-        Intent intent = new Intent(DISPLAY_POPUP_ACTION);
-        intent.putExtra(EXTRA_MESSAGE, message);
+        if (null == msg)
+        {
+            return;
+        }
+        Intent intent = new Intent(ACTION_SHOW_TOAST);
+        intent.putExtra(EXTRA_MESSAGE, msg);
         context.sendBroadcast(intent);
     }
     

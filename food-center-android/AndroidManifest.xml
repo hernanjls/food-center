@@ -95,11 +95,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.main.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:theme="@style/FoodCenterTheme.Login" >
-        </activity>
-        <activity
             android:name=".activities.rest.RestActivity"
             android:label="@string/title_activity_restaurant"
             android:theme="@style/FoodCenterTheme.Restaurant" >
@@ -134,6 +129,16 @@
             android:name="foodcenter.android.activities.history.OrderHistoryActivity"
             android:label="@string/title_activity_history"
             android:theme="@style/FoodCenterTheme.OrderHistory" >
+            
+            <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="foodcenter.android.activities.coworkers.CoworkersActivity"
+            android:label="@string/title_activity_coworkers"
+            android:theme="@style/FoodCenterTheme.Coworkers" >
             
             <!-- Back from header: Parent activity meta-data to support 4.0 and lower -->
             <meta-data
