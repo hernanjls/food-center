@@ -29,8 +29,11 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
-        <!-- Application theme. -->
     <style name="FoodCenterTheme.OrderHistory">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="FoodCenterTheme.Coworkers">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     

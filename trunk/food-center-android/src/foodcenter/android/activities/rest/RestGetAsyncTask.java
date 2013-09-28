@@ -1,4 +1,4 @@
-package foodcenter.android.service.restaurant;
+package foodcenter.android.activities.rest;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -8,7 +8,6 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.activities.rest.RestActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -64,7 +63,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         if (null != msg)
         {
             owner.hideSpinner();
-            AndroidUtils.displayMessage(owner, msg);
+            AndroidUtils.toast(owner, msg);
         }
         super.onPostExecute(msg);
     }
@@ -94,8 +93,16 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         @Override
         public void onFailure(ServerFailure error)
         {
-            Log.e("req context", error.getMessage());
-            AndroidUtils.displayMessage(owner, error.getMessage());
+            String msg = "type: " + error.getExceptionType() + " , msg: " + error.getMessage();
+            
+            if (error.getMessage().equals(AndroidRequestUtils.SERVER_ERROR_COOKIE_AUTH))
+            {
+                msg = "Authentication error, please logout and re-login...";
+                //TODO re-auth here ?
+            }
+            
+            Log.e(RestGetReciever.class.getSimpleName(), msg);
+            AndroidUtils.toast(owner, msg);
             publishProgress();
         }
     }

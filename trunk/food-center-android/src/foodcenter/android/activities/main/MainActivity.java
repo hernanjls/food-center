@@ -4,6 +4,7 @@ import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -29,36 +33,85 @@ import com.nostra13.universalimageloader.core.download.ImageDownloader;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.Popup;
 import foodcenter.android.R;
+import foodcenter.android.activities.SpinableActivity;
+import foodcenter.android.activities.coworkers.CoworkersActivity;
 import foodcenter.android.activities.history.OrderHistoryActivity;
+import foodcenter.android.activities.login.AuthenticateAndSigninAsyncTask;
+import foodcenter.android.activities.login.LoginDialogFragment;
+import foodcenter.android.activities.login.LoginDialogFragment.LoginDialogListener;
+import foodcenter.android.activities.login.SignontAsyncTask;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.android.service.AuthCookieImageDownloader;
-import foodcenter.android.service.restaurant.RestsGetAsyncTask;
 
-public class MainActivity extends Activity implements PullToRefreshAttacher.OnRefreshListener,
-                                          ListView.OnItemClickListener
+public class MainActivity extends FragmentActivity implements
+                                                  PullToRefreshAttacher.OnRefreshListener,
+                                                  ListView.OnItemClickListener, SpinableActivity,
+                                                  LoginDialogListener
 
 {
     private final static String TAG = MainActivity.class.getSimpleName();
-    private final static int REQ_CODE_LOGIN = 0;
-
+    private final static String LOGIN_FRAG_TAG = "Login TAG";
+    
     public MainActivity context = this;
 
     private ActionBarDrawer actionBarDrawer;
 
+//    private ServerSignCallback serverCallback;
+    
     private PullToRefreshAttacher mPullToRefreshAttacher;
+    
+    private ProgressDialog progress;
 
-    /** used by {@link AndroidUtils#displayMessage(Context, String)} */
-    private final BroadcastReceiver handlePopupReceiver = new BroadcastReceiver()
+    
+    /** uses {@link AndroidUtils#toast(Context, String)} */
+    private final BroadcastReceiver handleMessages = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            String newMessage = intent.getExtras().getString(AndroidUtils.EXTRA_MESSAGE);
-            Popup.show(MainActivity.this, newMessage);
+            handleIntent(intent);
         }
     };
+
+    @Override
+    public void onSignInClick(DialogFragment dialog)
+    {
+        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
+        {
+            new AuthenticateAndSigninAsyncTask(this).execute();
+        }
+    }
+
+    @Override
+    public void onCancelClick(DialogFragment dialog)
+    {
+        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
+        {
+            showSignInDialog();
+        }
+    }
+    
+    @Override
+    public void onSignOutClick(DialogFragment dialog)
+    {
+        if (GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
+        {
+            new SignontAsyncTask(this).execute();    
+        }
+        else
+        {
+            onCancelClick(dialog);
+        }
+        
+    }
+
+
+    @Override
+    public Activity getActivity()
+    {
+        return this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,16 +119,30 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_view);
 
+        // Setup the server URL on start-up
+        AndroidRequestUtils.setUpUrl(this);
+        progress = new ProgressDialog(MainActivity.this);;
+
+        // register msg reciever handler (to show on ui thread)
+        registerReceiver(handleMessages, new IntentFilter(AndroidUtils.ACTION_SHOW_PROGRESS));
+        registerReceiver(handleMessages, new IntentFilter(AndroidUtils.ACTION_SHOW_TOAST));
+        registerReceiver(handleMessages, new IntentFilter(AndroidUtils.ACTION_SIGNED_IN));
+        registerReceiver(handleMessages, new IntentFilter(AndroidUtils.ACTION_SIGNED_OUT));
+
         initGCMService();
         initImageLoader();
         initActionBar();
-        actionBarDrawer = new ActionBarDrawer(this, this);
 
+        actionBarDrawer = new ActionBarDrawer(this, this);
         setTitle(actionBarDrawer.getTitle());
 
         initPullToRefresh();
 
-        if (!gotoLoginActivity())
+        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
+        {
+            showSignInDialog();
+        }
+        else
         {
             handleIntent(getIntent());
         }
@@ -89,10 +156,6 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         // Make sure the manifest was properly set - comment out this line
         // while developing the app, then uncomment it when it's ready.
         // TODO GCMRegistrar.checkManifest(context);
-
-        // register msg reciever handler (to show on ui thread)
-        registerReceiver(handlePopupReceiver, new IntentFilter(AndroidUtils.DISPLAY_POPUP_ACTION));
-
     }
 
     private void initImageLoader()
@@ -145,46 +208,17 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
         ht.setProgressBarColor(getResources().getColor(android.R.color.holo_blue_dark));
     }
 
-    private boolean gotoLoginActivity()
+    private void showSignInDialog()
     {
-        if (!GCMRegistrar.isRegisteredOnServer(getApplicationContext()))
-        {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivityForResult(intent, REQ_CODE_LOGIN);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (REQ_CODE_LOGIN == requestCode)
-        {
-            if (RESULT_OK == resultCode)
-            {
-                handleIntent(data);
-            }
-            else
-            {
-                gotoLoginActivity();
-            }
-        }
-    }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        // gotoLoginActivity();
-
+        new LoginDialogFragment().show(getSupportFragmentManager(), LOGIN_FRAG_TAG);
     }
 
     @Override
     public void onRefreshStarted(View view)
     {
         ObjectStore.clear();
-        handleIntent(getIntent());
+        Intent i = new Intent(Intent.ACTION_SEARCH);
+        handleIntent(i);
     }
 
     @Override
@@ -228,18 +262,26 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
+        Intent i = null;
         switch (position)
         {
-            case 1:
-                Intent i = new Intent(this, OrderHistoryActivity.class);
+            case ActionBarDrawerAdapter.PROFILE_POSITION:
+                showSignInDialog();
+                break;
+            case ActionBarDrawerAdapter.HISTORY_POSITION:
+                i = new Intent(this, OrderHistoryActivity.class);
+                startActivity(i);
+                break;
+            case ActionBarDrawerAdapter.COWORKERS_POSITION:
+                i = new Intent(this, CoworkersActivity.class);
                 startActivity(i);
                 break;
             default:
                 String s = (String) actionBarDrawer.getItemAtPosition(position);
-                AndroidUtils.displayMessage(this, s + " not supported yet...");
+                AndroidUtils.toast(this, s + " not supported yet...");
                 break;
         }
-        
+
         actionBarDrawer.closeDrawer();
     }
 
@@ -257,15 +299,14 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
                 onRefreshStarted(null);
                 return true;
             case R.id.menu_setting:
-                AndroidUtils.displayMessage(this, "Currently not supported");
+                AndroidUtils.toast(this, "Currently not supported");
                 return true;
             case R.id.menu_help:
-                AndroidUtils.displayMessage(this, "Currently not supported");
+                AndroidUtils.toast(this, "Currently not supported");
                 return true;
             case R.id.menu_signout:
-                // Invoke the Register activity
-                startActivityForResult(new Intent(getApplicationContext(), LoginActivity.class),
-                                       REQ_CODE_LOGIN);
+                new SignontAsyncTask(this).execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -275,18 +316,19 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
     @Override
     protected void onDestroy()
     {
-        unregisterReceiver(handlePopupReceiver);
+        unregisterReceiver(handleMessages);
         GCMRegistrar.onDestroy(getApplicationContext());
-
         Log.i(TAG, "super.onDestroy");
         super.onDestroy();
     }
 
+    @Override
     public void showSpinner()
     {
         mPullToRefreshAttacher.setRefreshing(true);
     }
 
+    @Override
     public void hideSpinner()
     {
         mPullToRefreshAttacher.setRefreshComplete();
@@ -294,17 +336,80 @@ public class MainActivity extends Activity implements PullToRefreshAttacher.OnRe
 
     private void handleIntent(Intent intent)
     {
+            
         String query = null;
-
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME, null);
+        String accountName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, null);
         getActionBar().setSubtitle(accountName);
 
-        if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+        
+        final String action = intent.getAction();
+        Log.d(TAG, "handle intent: " + action);
+        
+        if (Intent.ACTION_SEARCH.equals(action))
         {
-            query = intent.getStringExtra(SearchManager.QUERY);
+            query = intent.getStringExtra(SearchManager.QUERY);            
+            // continue to default behavior
         }
-        // use the query to search your data somehow
+        else if (AndroidUtils.ACTION_SHOW_PROGRESS.equals(action))
+        {
+            String msg = intent.getStringExtra(AndroidUtils.EXTRA_MESSAGE);
+            
+            if (null != msg)
+            {
+                progress.setMessage(msg);
+                progress.show();    
+            }
+            else
+            {
+                progress.dismiss();
+            }
+            return;
+        }
+        
+        else if (AndroidUtils.ACTION_SHOW_TOAST.equals(action))
+        {
+            String msg = intent.getStringExtra(AndroidUtils.EXTRA_MESSAGE);
+            if (null != msg)
+            {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
+        else if (AndroidUtils.ACTION_SIGNED_IN.equals(action))
+        {
+            progress.dismiss();
+            
+            String msg = intent.getStringExtra(AndroidUtils.EXTRA_MESSAGE);
+            if (null != msg)
+            {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+            
+            actionBarDrawer.notifyDataSetChanged();
+            // continue to default behavior
+        }
+        else if (AndroidUtils.ACTION_SIGNED_OUT.equals(action))
+        {
+            progress.dismiss();
+            
+            actionBarDrawer.notifyDataSetChanged();
+            
+            String msg = intent.getStringExtra(AndroidUtils.EXTRA_MESSAGE);
+            if (null != msg)
+            {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+            
+            ObjectStore.clear();
+            
+            showSignInDialog();
+            
+            return;
+        }
+
+        // by default show restaurants on screen
         new RestsGetAsyncTask(this).execute(query);
+
     }
 }

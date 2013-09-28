@@ -18,7 +18,6 @@ import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.branch.BranchMenuListAdapter;
 import foodcenter.android.data.OrderData;
-import foodcenter.android.service.restaurant.MakeOrderAsyncTask;
 
 public class OrderActivity extends ListActivity
 {
@@ -150,7 +149,7 @@ public class OrderActivity extends ListActivity
             return;
         }
         hideSpinner();
-        AndroidUtils.displayMessage(this, msg);
+        AndroidUtils.toast(this, msg);
     }
     
     public void orderSuccess()
@@ -158,7 +157,7 @@ public class OrderActivity extends ListActivity
         hideSpinner();
 
         String msg = getString(R.string.order_success);
-        AndroidUtils.displayMessage(this, msg);
+        AndroidUtils.toast(this, msg);
         
         // remove the Order and the Adapter from cache
         ObjectStore.put(OrderData.class, OrderData.CACHE_KEY, null);

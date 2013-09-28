@@ -3,9 +3,17 @@
 
     <string name="app_name">Food Center</string>
 
+   	<!-- LoginDialogFragment -->
+    <string name="signin_title">Login to server</string>
+    <string name="signin_select_server">Select server:</string>
+    <string name="signin_select_account">Select account:</string>
+    <string name="signin_cancel">Cancel</string>
+    <string name="signin_signin">SignIn</string>
+    <string name="signin_signout">SignOut</string>
+    
     <!-- GCM -->
-    <string name="gcm_registered">[GCM OK] device successfully registered!</string>
-    <string name="gcm_unregistered">[GCM OK] device successfully unregistered!</string>
+    <string name="gcm_registered">[GCM] Device successfully registered, sign in to server.</string>
+    <string name="gcm_unregistered">[GCM] Device successfully unregistered!</string>
     <string name="gcm_message">[GCM MESSAGE] you got message!</string>
     <string name="gcm_error">[GCM ERROR] %1$s.</string>
     <string name="gcm_recoverable_error">[GCM ERROR] recoverable error (%1$s).</string>
@@ -37,56 +45,21 @@
     <string name="makeing_order_retry">Making Order ... (Retry %1$d)</string>
     <string name="subtitle_order_confirmation">Service:</string>
     
-    <!-- LoginActivity -->
-    <string name="title_activity_login">Login Options</string>
     
     <!-- HistoryActivity -->
     <string name="title_activity_history">Orders History</string>
     <string name="history_loading">Loading Order History</string>
 	<string name="swipe_down_to_load_more">Swipe down to get more ...</string>    
 	
-    <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="connect_text">This application requests permission to connect your mobile device to the server.</string>
-
-    <!-- Header text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="connect_to_the_cloud">Food Center</string>
-
-    <!-- List view header text [CHAR LIMIT=NONE] -->
-    <string name="select_account">Select the account you wish to authorize:</string>
-
-    <!-- Footer text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="do_you_want_to_connect">Do you want to connect?</string>
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-    <string name="exit">Close</string>
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-    <string name="connect">Connect</string>
-
-    <!-- Header text for "Connected" screen [CHAR LIMIT=NONE] -->
-    <string name="connected_to_the_cloud">Connected To Server</string>
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-    <string name="disconnect">Disconnect</string>
-
-    <!-- Dialog message text [CHAR LIMIT=NONE] -->
-    <string name="needs_account">To receive notifications from this app, you must first create an account.</string>
-
-    <!-- Dialog button [CHAR LIMIT=NONE] -->
-    <string name="add_account">Add Account..</string>
-
-    <!-- Dialog button text [CHAR LIMIT=NONE] -->
-    <string name="skip">Skip</string>
-
-    <!-- Dialog title text [CHAR LIMIT=NONE] -->
-    <string name="attention">Attention</string>
+	<!-- CoworkersActivity -->
+	<string name="title_activity_coworkers">Coworkers</string>
 
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
     <string name="disconnect_text">This device is currently connected as %1$s.  To disconnect, press the button below.</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_setting">Setting</string>
     <string name="menu_help">Help</string>
-    <string name="menu_signout">Sign Out</string>
+    <string name="menu_signout">SignOut</string>
     <string name="default_desc">This is ignored desc</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Search Restaurant</string>
@@ -121,4 +94,13 @@
     <!-- API Keys created by GAE Api consule and needed by the app -->
     <string name="android_api_key"></string>
     <string name="browser_api_key">AIzaSyD304OJtRcgd-t5L6hsDDJxDgYXOdVzQVw</string>
+    
+    
+    <!-- Unknown ... TBD -->
+    <!-- Dialog button text [CHAR LIMIT=NONE] -->
+    <string name="skip">Skip</string>
+
+    <!-- Dialog title text [CHAR LIMIT=NONE] -->
+    <string name="attention">Attention</string>
+    
 </resources>

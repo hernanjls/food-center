@@ -1,4 +1,4 @@
-package foodcenter.android.service.history;
+package foodcenter.android.activities.history;
 
 import java.util.List;
 
@@ -10,8 +10,6 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.activities.history.OrderHistoryActivity;
-import foodcenter.android.activities.history.OrderHistoryListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.OrderProxy;
@@ -76,7 +74,7 @@ public class OrderHistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, Str
     {
         if (null != msg)
         {
-            AndroidUtils.displayMessage(activity, msg);
+            AndroidUtils.toast(activity, msg);
         }
         // Notify PullToRefreshAttacher that the refresh has finished
         activity.hideSpinner();
@@ -112,7 +110,7 @@ public class OrderHistoryGetAsyncTask extends AsyncTask<Integer, OrderProxy, Str
         public void onFailure(ServerFailure error)
         {
             Log.e("req context", error.getMessage());
-            AndroidUtils.displayMessage(activity, error.getMessage());
+            AndroidUtils.toast(activity, error.getMessage());
 
             publishProgress(new OrderProxy[0]);
         }

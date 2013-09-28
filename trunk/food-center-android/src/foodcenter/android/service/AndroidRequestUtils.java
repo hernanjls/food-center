@@ -43,14 +43,18 @@ import foodcenter.service.FoodCenterRequestFactory;
 public class AndroidRequestUtils
 {
 
+    public static final String SERVER_ERROR_COOKIE_AUTH = "Could not parse payload: payload[0] = <";
+    
     /** The URL of the production service. */
-    public static final Boolean IS_DEV = false; // by default run on prod (set to false)
-    private static final String PROD_URL = "https://food-center.appspot.com";
-    private static final String DEV_URL = "http://10.0.0.32:8888";
+    public static final String PROD_URL = "https://food-center.appspot.com";
+    public static final String DEV_URL = "http://10.0.0.32:8888";
+    
 
     /** Cookie name for authorization. */
     private static final String PROD_AUTH_COOKIE_NAME = "SACSID";
     private static final String DEV_AUTH_COOKIE_NAME = "dev_appserver_login";
+    
+    private static String SERVER_URL = null;
     
 
     /** Tag for logging. */
@@ -58,8 +62,9 @@ public class AndroidRequestUtils
 
     // Shared constants
 
-    /** Key for account name in shared preferences. */
-    public static final String ACCOUNT_NAME = "accountName";
+    /** Key for server/account name in shared preferences. */
+    public static final String PREF_SERVER_URL = "PREF_SERVER_URL";
+    public static final String PREF_ACCOUNT_NAME = "accountName";
 
     /** Key for auth cookie name in shared preferences. */
     public static final String AUTH_COOKIE = "authCookie";
@@ -79,18 +84,28 @@ public class AndroidRequestUtils
     /** Container for the request factory. */
     private static FoodCenterRequestFactory foodCenterRF = null;
 
-    /**
-     * Returns the (debug or production) URL associated with the registration
-     * service.
-     */
-    public static String getBaseUrl(Context context)
+    /** Should be called on startup and after login */
+    public static void setUpUrl(Context context)
     {
-        return IS_DEV ? DEV_URL : PROD_URL;
+        SharedPreferences p = getSharedPreferences(context);
+        SERVER_URL = p.getString(PREF_SERVER_URL, PROD_URL);
+    }
+    
+    /** Returns the (debug or production) URL associated with the registration service. */
+    public static String getBaseUrl()
+    {
+        return SERVER_URL;
     }
 
+    public static boolean isDev()
+    {
+        return (!SERVER_URL.equals(PROD_URL));
+    }
+
+    /** Default behavior for non-production URL is development-server cookie */
     public static String getAuthCookieName()
     {
-        return IS_DEV ? DEV_AUTH_COOKIE_NAME : PROD_AUTH_COOKIE_NAME;
+        return (isDev()) ?  DEV_AUTH_COOKIE_NAME : PROD_AUTH_COOKIE_NAME ;
     }
     
     /**
@@ -122,7 +137,7 @@ public class AndroidRequestUtils
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(context);
         String authCookie = prefs.getString(AndroidRequestUtils.AUTH_COOKIE, null);
 
-        String uriString = AndroidRequestUtils.getBaseUrl(context) + RF_METHOD;
+        String uriString = AndroidRequestUtils.getBaseUrl() + RF_METHOD;
         URI uri;
         try
         {

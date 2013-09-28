@@ -1,4 +1,4 @@
-package foodcenter.android.service.restaurant;
+package foodcenter.android.activities.main;
 
 import java.util.List;
 
@@ -12,8 +12,6 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
-import foodcenter.android.activities.main.MainActivity;
-import foodcenter.android.activities.main.MainRestListAdapter;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -71,18 +69,23 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Except
     @Override
     protected void onProgressUpdate(RestaurantProxy... rests)
     {
+        // Notify PullToRefreshAttacher that the refresh has finished
+        owner.hideSpinner();
+        
+        if (null == rests || rests.length <= 0)
+        {
+            return;
+        }
+        
         // find the text view to add the text to.
         GridView gridView = (GridView) owner.findViewById(R.id.rest_grid_view);
 
         // update the view for all the restaurants
         MainRestListAdapter adapter = new MainRestListAdapter(owner,
-                                                AndroidRequestUtils.getDefaultDisplayImageOptions(owner),
-                                                rests);
+                                                              AndroidRequestUtils.getDefaultDisplayImageOptions(owner),
+                                                              rests);
 
         gridView.setAdapter(adapter);
-
-        // Notify PullToRefreshAttacher that the refresh has finished
-        owner.hideSpinner();
     }
 
     @Override
@@ -90,9 +93,10 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Except
     {
         if (null != result)
         {
-            AndroidUtils.displayMessage(owner, result.getMessage());
+            AndroidUtils.toast(owner, result.getMessage());
+            publishProgress(new RestaurantProxy[0]);
         }
-        
+
         super.onPostExecute(result);
     }
 
@@ -116,9 +120,16 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Except
         @Override
         public void onFailure(ServerFailure error)
         {
-            Log.e("req context", error.getMessage());
-            AndroidUtils.displayMessage(owner, error.getMessage());
-            publishProgress(new RestaurantProxy[] {});
+            String msg = "type: " + error.getExceptionType() + " , msg: " + error.getMessage();
+            if (error.getMessage().equals(AndroidRequestUtils.SERVER_ERROR_COOKIE_AUTH))
+            {
+                msg = "Authentication error, please logout and re-login...";
+                //TODO re-auth here ?
+            }
+            
+            Log.e(RestsGetReciever.class.getSimpleName(), msg);
+            AndroidUtils.toast(owner, msg);
+            publishProgress();
         }
     }
 }

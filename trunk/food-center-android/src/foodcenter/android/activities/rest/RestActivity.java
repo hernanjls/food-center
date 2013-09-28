@@ -19,7 +19,6 @@ import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.service.AndroidRequestUtils;
-import foodcenter.android.service.restaurant.RestGetAsyncTask;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
 
@@ -54,7 +53,7 @@ public class RestActivity extends Activity
         getActionBar().setHomeButtonEnabled(true);
 
         SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(this);
-        String accountName = prefs.getString(AndroidRequestUtils.ACCOUNT_NAME,
+        String accountName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME,
                                              getString(R.string.unknown_user));
         getActionBar().setSubtitle(accountName);
     }
@@ -109,7 +108,7 @@ public class RestActivity extends Activity
                 onBackPressed();
                 return true;
             case R.id.menu_help:
-                AndroidUtils.displayMessage(this, "Currently not supported");
+                AndroidUtils.toast(this, "Currently not supported");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -156,7 +155,7 @@ public class RestActivity extends Activity
 
         // Load the image of this restaurant
         ImageView imageView = (ImageView) findViewById(R.id.rest_info_img);
-        String url = AndroidRequestUtils.getBaseUrl(this) + rest.getImageUrl();
+        String url = AndroidRequestUtils.getBaseUrl() + rest.getImageUrl();
 
         ImageLoader.getInstance().displayImage(url,
                                                imageView,

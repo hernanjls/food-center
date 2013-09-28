@@ -21,7 +21,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
-import android.os.AsyncTask;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
@@ -30,10 +29,9 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.activities.main.LoginActivity;
+import foodcenter.android.activities.login.ServerSigninTask;
 import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.AndroidRequestUtils;
-import foodcenter.android.service.login.ServerLoginAsyncTask;
 import foodcenter.service.FoodCenterRequestFactory;
 
 /**
@@ -57,29 +55,29 @@ public class GCMIntentService extends GCMBaseIntentService
     protected void onRegistered(Context context, String regId)
     {
         Log.i(TAG, "GCM: Device registered: regId = " + regId);
-        AndroidUtils.displayMessage(context, getString(R.string.gcm_registered));
+        AndroidUtils.progress(context, getString(R.string.gcm_registered));
 
-        Log.i(TAG, "Server: registering gcm device (regId = " + regId + ")");
-        new ServerLoginAsyncTask(context, regId, 5).execute();
+        new ServerSigninTask(context, regId, 5).signIn();
     }
 
     @Override
     protected void onUnregistered(Context context, String regId)
     {
         Log.i(TAG, "Device unregistered");
-        AndroidUtils.displayMessage(context, getString(R.string.gcm_unregistered));
+        AndroidUtils.toast(context, getString(R.string.gcm_unregistered));
 
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
             Log.i(TAG, "unregistering device (regId = " + regId + ")");
-            new GCMUnRegisterAsyncTask(context).execute();
+            signOut(context);
         }
         else
         {
             // This callback results from the call to unregister made on
             // ServerUtilities when the registration to the server failed.
+
             Log.i(TAG, "Ignoring unregister callback");
-            LoginActivity.closeLoginActivity(false);
+            AndroidUtils.notifySignOut(context, null);
         }
     }
 
@@ -88,7 +86,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received message");
         String message = intent.getExtras().getString("msg");
-        AndroidUtils.displayMessage(context, message);
+        AndroidUtils.toast(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -98,7 +96,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received deleted messages notification");
         String message = getString(R.string.gcm_deleted, total);
-        AndroidUtils.displayMessage(context, message);
+        AndroidUtils.toast(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -107,7 +105,7 @@ public class GCMIntentService extends GCMBaseIntentService
     public void onError(Context context, String errorId)
     {
         Log.e(TAG, "Received error: " + errorId);
-        AndroidUtils.displayMessage(context, getString(R.string.gcm_error, errorId));
+        AndroidUtils.toast(context, getString(R.string.gcm_error, errorId));
     }
 
     @Override
@@ -115,7 +113,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         // log message
         Log.i(TAG, "Received recoverable error: " + errorId);
-        AndroidUtils.displayMessage(context, getString(R.string.gcm_recoverable_error, errorId));
+        AndroidUtils.toast(context, getString(R.string.gcm_recoverable_error, errorId));
         return super.onRecoverableError(context, errorId);
     }
 
@@ -152,78 +150,66 @@ public class GCMIntentService extends GCMBaseIntentService
         // mId allows you to update the notification later on.
         mNotificationManager.notify(0, builder.getNotification());
     }
-}
 
-class GCMUnRegisterAsyncTask extends AsyncTask<Void, String, Void>
-{
-
-    private final Context context;
-
-    public GCMUnRegisterAsyncTask(final Context context)
+    private void signOut(final Context context)
     {
-        this.context = context.getApplicationContext();
-    }
+        String msg = "Signing out of server ..."; // TODO change to R.strings
+        AndroidUtils.progress(context, msg);
 
-    @Override
-    protected Void doInBackground(Void... params)
-    {
         try
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
-            factory.getClientService().logout().fire(new GCMUnregisterReciever());
+            factory.getClientService().logout().fire(new SignOutReciever(context));
         }
         catch (Exception e)
         {
-            Log.e(getClass().getSimpleName(), e.getMessage(), e);
-            publishProgress(e.getMessage());
+            msg = e.getMessage();
+            Log.e(getClass().getSimpleName(), msg, e);
+            AndroidUtils.progressDismissAndToastMsg(context, msg);
+            return;
         }
-        return null;
     }
 
-    @Override
-    protected void onProgressUpdate(String... values)
+    class SignOutReciever extends Receiver<Void>
     {
-        if (null != values && values.length > 0)
+        private final Context context;
+
+        public SignOutReciever(Context context)
         {
-            LoginActivity.showSpinner(values[0]);
+            this.context = context;
         }
-        LoginActivity.closeLoginActivity(false);
 
-    }
+        /** Common for both success or failure */
+        private void onCommon()
+        {
+            GCMRegistrar.setRegisteredOnServer(context, false);
+            
+            //Delete the current auth cookie from shared preferences 
+            Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
+            editor.putString(AndroidRequestUtils.PREF_ACCOUNT_NAME, null);
+            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
+            editor.commit();
 
-    class GCMUnregisterReciever extends Receiver<Void>
-    {
+        }
+
         @Override
         public void onSuccess(Void arg0)
         {
-            GCMRegistrar.setRegisteredOnServer(context, false);
-
-            // Delete the current auth cookie from shared preferences
-            Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
-            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
-            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
-            editor.commit();
-            publishProgress();
+            onCommon();
+            AndroidUtils.notifySignOut(context, null);
         }
 
         @Override
         public void onFailure(ServerFailure error)
         {
-            GCMRegistrar.setRegisteredOnServer(context, false);
+            onCommon();
 
-            // Delete the current auth cookie from shared preferences
-            Editor editor = AndroidRequestUtils.getSharedPreferences(context).edit();
-            editor.putString(AndroidRequestUtils.ACCOUNT_NAME, null).commit();
-            editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
-            editor.commit();
-
-            // At this point the device is unregistered from GCM, but still
-            // registered in the server.
-            // We could try to unregister again, but it is not necessary:
-            // if the server tries to send a message to the device, it will get
-            // a "NotRegistered" error message and should unregister the device.
+            // At this point the device is unregistered from GCM, but still registered in the
+            // server. We could try to unregister again, but it is not necessary. server deals
+            // with "NotRegistered" error
             String msg = context.getString(R.string.server_unregister_error, error.getMessage());
-            publishProgress(msg);
+            AndroidUtils.notifySignOut(context, msg);
         }
     }
+
 }

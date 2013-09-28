@@ -10,17 +10,6 @@ public class Popup
     private final static String[] rec = new String[] {};
 
     
-    /**
-     * show this msg, this method must run from UI Thread <br>
-     * on o.runOnUiThread(new Runnable(...))
-     * 
-     * @param o is the owner Activity
-     * @param m
-     */
-    public static void show(final Activity o, final String m)
-    {
-        Toast.makeText(o, m, Toast.LENGTH_LONG).show();
-    }
 
     
     /**
@@ -43,7 +32,8 @@ public class Popup
         }
         catch (final android.content.ActivityNotFoundException ex)
         {
-            Popup.show(o, "If you had a mail client, you could have send this msg by mail: " + m);
+            m = "If you had a mail client, you could have send this msg by mail: " + m;
+            Toast.makeText(o, m, Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -176,6 +176,7 @@ public class ClientService
         List<DbRestaurant> res = DbHandler.find(DbRestaurant.class, 10);
         if (null == res)
         {
+            logger.warn(ServiceError.DEFAULT_RESTS_NOT_FOUND);
             throw new ServiceError(ServiceError.DEFAULT_RESTS_NOT_FOUND);
         }
         return res;
@@ -240,6 +241,16 @@ public class ClientService
 
     /* ************************* Companies APIs *************************** */
 
+    public static List<String> getCoworkers()
+    {
+        User user = UsersManager.getUser();
+        logger.info("getCoworkers is called: " + user.getEmail());
+        
+        DbCompanyBranch b = findUserCompanyBranch(user.getEmail());
+        
+        return b.getWorkers();
+    }
+    
     public static List<DbCompany> getDefaultCompanies()
     {
         logger.info("getDefaultRestaurants is called");
@@ -346,6 +357,7 @@ public class ClientService
         DbCompanyBranch res = DbHandler.find(DbCompanyBranch.class, query, params);
         if (null == res)
         {
+            logger.warn(ServiceError.USER_COMPNAY_NOT_FOUND + email);
             throw new ServiceError(ServiceError.USER_COMPNAY_NOT_FOUND + email);
         }
         return res;

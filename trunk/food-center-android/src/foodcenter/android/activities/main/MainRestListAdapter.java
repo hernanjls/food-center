@@ -80,7 +80,7 @@ public class MainRestListAdapter extends BaseAdapter implements OnClickListener
         textView.setText(r.getName());
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.main_view_rest_grid_item_img);
-        String url = AndroidRequestUtils.getBaseUrl(activity) + r.getImageUrl();
+        String url = AndroidRequestUtils.getBaseUrl() + r.getImageUrl();
         ImageLoader.getInstance().displayImage(url, imageView, options);
 
         // Restaurant is not fully loaded => don't add it to obj cache

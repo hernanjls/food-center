@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -38,10 +37,18 @@ public class ActionBarDrawerAdapter extends BaseAdapter
         }
 
         txt[PROFILE_POSITION] = AndroidRequestUtils.getSharedPreferences(activity)
-            .getString(AndroidRequestUtils.ACCOUNT_NAME, "Unknown Account");
+            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account");
 
     }
 
+    @Override
+    public void notifyDataSetChanged()
+    {
+        txt[PROFILE_POSITION] = AndroidRequestUtils.getSharedPreferences(activity)
+            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account");
+        
+        super.notifyDataSetChanged();
+    }
     @Override
     public int getCount()
     {
@@ -67,31 +74,31 @@ public class ActionBarDrawerAdapter extends BaseAdapter
     }
 
     // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(int position, View view, ViewGroup parent)
     {
-        final LinearLayout layout;
-        if (convertView == null)
+        if (view == null)
         {
-            layout = (LinearLayout) activity.getLayoutInflater()
+            view = activity.getLayoutInflater()
                 .inflate(R.layout.main_view_drawer_list_item, parent, false);
-        }
-        else
-        {
-            layout = (LinearLayout) convertView;
-        }
-        
-        if (position >= txt.length)
-        {
-            return layout;
+            
+            // findViewById is expensive, reusing with ViewHolder
+            ViewHolder holder = new ViewHolder();
+            holder.img = (ImageView) view.findViewById(R.id.main_view_drawer_list_item_img);
+            holder.txt = (TextView) view.findViewById(R.id.main_view_drawer_list_item_txt);
+            view.setTag(holder);
         }
         
-        TextView textView = (TextView) layout.getChildAt(1);
-        textView.setText(txt[position]);
+        ViewHolder holder = (ViewHolder) view.getTag();
+        holder.txt.setText(txt[position]);
+        holder.img.setImageResource(imgs[position]);
 
-        ImageView imageView = (ImageView) layout.getChildAt(0);
-        imageView.setImageResource(imgs[position]);
+        return view;
+    }
 
-        return layout;
+    private class ViewHolder
+    {
+        private ImageView img;
+        private TextView txt;
     }
 
 }
