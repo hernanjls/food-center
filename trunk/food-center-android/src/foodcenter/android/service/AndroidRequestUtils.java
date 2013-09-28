@@ -80,10 +80,6 @@ public class AndroidRequestUtils
     /** Key for shared preferences. */
     private static final String SHARED_PREFS = "FOODCENTER_PREFS";
 
-    
-    /** Container for the request factory. */
-    private static FoodCenterRequestFactory foodCenterRF = null;
-
     /** Should be called on startup and after login */
     public static void setUpUrl(Context context)
     {
@@ -115,11 +111,13 @@ public class AndroidRequestUtils
      */
     public static FoodCenterRequestFactory getFoodCenterRF(Context context)
     {
-        if (null == foodCenterRF)
-        {
-            foodCenterRF = getRequestFactory(context, FoodCenterRequestFactory.class);
-        }
-        return foodCenterRF;
+//        if (null == foodCenterRF)
+//        {
+//            foodCenterRF = getRequestFactory(context, FoodCenterRequestFactory.class);
+//        }
+//        return foodCenterRF;
+        
+        return getRequestFactory(context, FoodCenterRequestFactory.class);
     }
 
     /**

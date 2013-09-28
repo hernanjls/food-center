@@ -84,6 +84,10 @@ public class LoginDialogFragment extends DialogFragment
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         accounts = getGoogleAccounts();
+        if (accounts.isEmpty())
+        {
+            accounts.add("You can't signin without google account!");
+        }
         servers = getAvailableServers();
 
         View view = inflater.inflate(R.layout.signin, null);
@@ -169,6 +173,7 @@ public class LoginDialogFragment extends DialogFragment
                 selectedServer = position;
             }
         });
+        serversLv.setItemChecked(0, true);
 
         accountsLv.setOnItemClickListener(new OnItemClickListener()
         {
@@ -178,7 +183,8 @@ public class LoginDialogFragment extends DialogFragment
                 selectedAccount = position;
             }
         });
-
+        accountsLv.setItemChecked(0, true);
+        
         builder.setTitle("Select Server and Account");
 
         builder.setPositiveButton(R.string.signin_signin, new DialogInterface.OnClickListener()

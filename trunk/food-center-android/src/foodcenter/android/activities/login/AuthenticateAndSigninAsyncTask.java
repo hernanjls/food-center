@@ -1,6 +1,7 @@
 package foodcenter.android.activities.login;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -91,11 +92,11 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
             // Obtain an auth token and save it as a cookie
             // TODO change to R.string
             AndroidUtils.progress(activity, "Generating authentication TOKEN...");
-            String authToken = getAuthToken(accountName);
+            String authToken = getAuthToken(accountName, null); // don't invalidate
 
             // TODO change to R.string
             AndroidUtils.progress(activity, "Getting authentication COOKIE...");
-            String authCookie = getAuthCookie(authToken);
+            String authCookie = getAuthCookie(accountName, authToken);
             editor.putString(AndroidRequestUtils.AUTH_COOKIE, authCookie);
             editor.putString(AndroidRequestUtils.PREF_ACCOUNT_NAME, accountName);
             editor.commit();
@@ -128,13 +129,15 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
      * this is blocking!!!
      * 
      * @param accountName is the account name to get auth token for.
+     * @param token when not null invalidates this token before generating a new one
      * 
      * @return auth token which can be used to create auth cookie. (will never return null).
      * 
      * @throws IOException when auth cookie is not found
      * @throws AccountsException when account is not found
      */
-    private String getAuthToken(String accountName) throws IOException, AccountsException
+    private String getAuthToken(String accountName, String token) throws IOException,
+                                                                 AccountsException
     {
 
         AccountManager mgr = AccountManager.get(appContext);
@@ -144,6 +147,12 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
         {
             throw new AuthenticatorException("account == null");
         }
+
+        if (null != token)
+        {
+            mgr.invalidateAuthToken("com.google", token);
+        }
+
         AccountManagerFuture<Bundle> accountManagerFuture = mgr.getAuthToken(acct,
                                                                              AUTH_TOKEN_TYPE,
                                                                              null,
@@ -152,6 +161,7 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
                                                                              null);
         Bundle authTokenBundle = accountManagerFuture.getResult();
         String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
+        // mgr.invalidateAuthToken(accountType, authToken);
         if (null == authToken)
         {
             throw new AuthenticatorException("authToken == null");
@@ -167,8 +177,9 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
      * @param accountName
      * @return
      */
-    private Account
-        getAccountByName(AccountManager mgr, String type, String accountName) throws AccountsException
+    private Account getAccountByName(AccountManager mgr, //
+                                     String type,
+                                     String accountName) throws AccountsException
     {
         Account[] accts = mgr.getAccountsByType(type);
         for (Account acct : accts)
@@ -190,48 +201,40 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
      * @throws URISyntaxException
      * @throws IOException
      * @throws ClientProtocolException
+     * @throws AccountsException
      * 
      */
-    private String getAuthCookie(String authToken) throws URISyntaxException,
+    private String getAuthCookie(String accountName, //
+                                 String authToken) throws URISyntaxException,
                                                   ClientProtocolException,
-                                                  IOException
+                                                  IOException,
+                                                  AccountsException
     {
-        // Get SACSID / ACSID cookie
-        DefaultHttpClient client = new DefaultHttpClient();
-        String continueURL = AndroidRequestUtils.getBaseUrl();
-        URI uri = new URI(continueURL + "/_ah/login?continue="
-                          + URLEncoder.encode(continueURL, "UTF-8")
-                          + "&auth="
-                          + authToken);
+        // Get SACSID cookie (ACSID is for http which is not used here)
+        DefaultHttpClient client = null;
 
-        HttpPost httpPost = new HttpPost(uri);
-        if (AndroidRequestUtils.isDev())
+        for (int i = 0; i < 2; ++i)
         {
-            Log.d(TAG, "Auth cookie for dev server ...");
-            final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
-            String accName = prefs.getString(AndroidRequestUtils.PREF_ACCOUNT_NAME,
-                                             "myemail@gmail.com");
+            HttpPost httpPost = createHttpPost(accountName, authToken);
 
-            // attach
-            List<BasicNameValuePair> devParams = new ArrayList<BasicNameValuePair>();
-            devParams.add(new BasicNameValuePair("email", accName));
-            devParams.add(new BasicNameValuePair("admin", "False"));
-            devParams.add(new BasicNameValuePair("action", "Login"));
-            HttpEntity entity = new UrlEncodedFormEntity(devParams);
-            httpPost.setEntity(entity);
-        }
-
-        final HttpParams params = new BasicHttpParams();
-        HttpClientParams.setRedirecting(params, false);
-        httpPost.setParams(params);
-        
-        HttpResponse res = client.execute(httpPost);
-        Header[] headers = res.getHeaders("Set-Cookie");
-        if (res.getStatusLine().getStatusCode() != 302 || headers.length == 0)
-        {
-            throw new IOException("status= " + res.getStatusLine().getStatusCode()
-                                  + " headers length = "
-                                  + headers.length);
+            client = new DefaultHttpClient();
+            HttpResponse res = client.execute(httpPost);
+            Header[] headers = res.getHeaders("Set-Cookie");
+            if (res.getStatusLine().getStatusCode() != 302 || 0 == headers.length)
+            {
+                Log.w(TAG, "error: status= " + res.getStatusLine().getStatusCode()
+                           + " headers length = "
+                           + headers.length
+                           + " "
+                           + " -> Invalidating auth token");
+                // TODO change to R.string
+                AndroidUtils.progress(activity, "Invalidating authentication TOKEN...");
+                authToken = getAuthToken(accountName, authToken);
+            }
+            else
+            {
+                break;
+            }
         }
 
         final String authCookieName = AndroidRequestUtils.getAuthCookieName();
@@ -243,5 +246,36 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
             }
         }
         throw new IOException("AUTH_COOKIE_NAME is missing from the response");
+    }
+
+    private HttpPost createHttpPost(String accountName, //
+                                    String authToken) throws UnsupportedEncodingException,
+                                                     URISyntaxException
+    {
+        String continueURL = AndroidRequestUtils.getBaseUrl();
+        URI uri = new URI(continueURL + "/_ah/login?continue="
+                          + URLEncoder.encode(continueURL, "UTF-8")
+                          + "&auth="
+                          + authToken);
+
+        HttpPost httpPost = new HttpPost(uri);
+        if (AndroidRequestUtils.isDev())
+        {
+            Log.d(TAG, "Auth cookie for dev server ...");
+
+            // attach
+            List<BasicNameValuePair> devParams = new ArrayList<BasicNameValuePair>();
+            devParams.add(new BasicNameValuePair("email", accountName));
+            devParams.add(new BasicNameValuePair("admin", "False"));
+            devParams.add(new BasicNameValuePair("action", "Login"));
+            HttpEntity entity = new UrlEncodedFormEntity(devParams);
+            httpPost.setEntity(entity);
+        }
+
+        final HttpParams params = new BasicHttpParams();
+        HttpClientParams.setRedirecting(params, false);
+        httpPost.setParams(params);
+
+        return httpPost;
     }
 }

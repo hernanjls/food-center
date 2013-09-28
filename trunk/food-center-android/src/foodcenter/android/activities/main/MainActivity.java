@@ -217,7 +217,7 @@ public class MainActivity extends FragmentActivity implements
     public void onRefreshStarted(View view)
     {
         ObjectStore.clear();
-        Intent i = new Intent(Intent.ACTION_SEARCH);
+        Intent i = new Intent(Intent.ACTION_MAIN);
         handleIntent(i);
     }
 
