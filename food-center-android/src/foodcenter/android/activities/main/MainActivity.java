@@ -121,7 +121,8 @@ public class MainActivity extends FragmentActivity implements
 
         // Setup the server URL on start-up
         AndroidRequestUtils.setUpUrl(this);
-        progress = new ProgressDialog(MainActivity.this);;
+        progress = new ProgressDialog(MainActivity.this);
+        progress.setCanceledOnTouchOutside(false);
 
         // register msg reciever handler (to show on ui thread)
         registerReceiver(handleMessages, new IntentFilter(AndroidUtils.ACTION_SHOW_PROGRESS));
