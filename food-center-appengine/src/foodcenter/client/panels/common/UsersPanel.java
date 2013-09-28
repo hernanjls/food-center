@@ -137,7 +137,7 @@ public class UsersPanel extends FlexTable
         @Override
         public void onClick(ClickEvent event)
         {
-            String email = text.getText();
+            String email = text.getText().toLowerCase();
             users.add(email);
             redraw();
             newUserButton.setEnabled(true);

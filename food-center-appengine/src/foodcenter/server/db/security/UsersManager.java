@@ -30,7 +30,7 @@ public class UsersManager
     
     public static DbUser getDbUser()
     {
-        String email = getUser().getEmail();
+        String email = getUser().getEmail().toLowerCase();
         logger.info("Load user: " + email);
         
         String query = "email == emailP";

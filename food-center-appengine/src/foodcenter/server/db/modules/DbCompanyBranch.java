@@ -49,7 +49,7 @@ public class DbCompanyBranch extends AbstractDbGeoObject
         User user = UsersManager.getUser();
 
         // Set edit permission (this happens in post load before any changes to company / admins)
-        setEditable(getCompany().isEditable() || admins.contains(user.getEmail()));
+        setEditable(getCompany().isEditable() || admins.contains(user.getEmail().toLowerCase()));
     }
 
     public DbCompany getCompany()

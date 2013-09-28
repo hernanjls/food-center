@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.ListView;
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
@@ -24,15 +25,15 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     private final SpinableActivity activity;
     private final Context context;
     private final ListView lv;
-    
+
     private final String query = CoworkersGetAsyncTask.class.getName();
-    
+
     public CoworkersGetAsyncTask(SpinableActivity activity, ListView lv)
     {
         super();
         this.activity = activity;
         this.lv = lv;
-        
+
         context = activity.getActivity().getApplicationContext();
     }
 
@@ -50,7 +51,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
         try
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
-            
+
             @SuppressWarnings("unchecked")
             List<String> rests = ObjectStore.get(List.class, query);
             if (null != rests)
@@ -89,7 +90,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
             AndroidUtils.toast(context, result.getMessage());
             publishProgress(new String[0]);
         }
-        
+
         super.onPostExecute(result);
     }
 
@@ -108,6 +109,16 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
                 coworkers = response.toArray(coworkers);
             }
             publishProgress(coworkers);
+        }
+
+        @Override
+        public void onFailure(ServerFailure error)
+        {
+            String msg = error.getMessage();
+            Log.e(TAG, msg);
+            AndroidUtils.toast(context, msg);
+            
+            publishProgress(new String[0]);
         }
     }
 }

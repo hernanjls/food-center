@@ -62,7 +62,7 @@ public class DbRestaurantBranch extends AbstractDbGeoObject
         User user = UsersManager.getUser();
      
         // Set edit permission (this happens in post load before any changes to rest / admins)
-        setEditable(getRestaurant().isEditable() || admins.contains(user.getEmail()));
+        setEditable(getRestaurant().isEditable() || admins.contains(user.getEmail().toLowerCase()));
         
         // Set chef's privilege
         setChef(isEditable() || chefs.contains(user.getEmail()));

@@ -26,7 +26,7 @@ public class RestaurantBranchAdminService extends MenuAdminService
     {
         if (!branch.isEditable())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
 
@@ -39,7 +39,7 @@ public class RestaurantBranchAdminService extends MenuAdminService
     {
         if (!branch.isEditable())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
         
@@ -52,7 +52,7 @@ public class RestaurantBranchAdminService extends MenuAdminService
     {
         if (!branch.isEditable())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
         
@@ -119,7 +119,8 @@ public class RestaurantBranchAdminService extends MenuAdminService
         
         if (!branch.isEditable())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " "
+                        + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
     }
