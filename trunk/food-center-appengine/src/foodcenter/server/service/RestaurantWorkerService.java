@@ -186,7 +186,8 @@ public class RestaurantWorkerService extends ClientService
     {
         if (null == branchId)
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " "
+                        + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
 
@@ -198,7 +199,7 @@ public class RestaurantWorkerService extends ClientService
         }
         if (!branch.isChef())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
     }

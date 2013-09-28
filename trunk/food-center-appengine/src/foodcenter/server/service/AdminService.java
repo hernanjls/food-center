@@ -20,20 +20,21 @@ public class AdminService
     /******************** company apis ********************/
 
     public static Boolean deleteCompany(String id)
-    {        
+    {
         if (!userService.isUserAdmin())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " "
+                        + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
-        
+
         DbCompany d = DbHandler.find(DbCompany.class, id);
         if (null == d)
         {
             logger.error(ServiceError.INVALID_COMP_ID + id);
             throw new ServiceError(ServiceError.INVALID_COMP_ID + id);
         }
-        
+
         d.deleteImage();
         long deletedRows = DbHandler.delete(DbCompany.class, id);
         return (deletedRows > 0);
@@ -45,7 +46,8 @@ public class AdminService
     {
         if (!userService.isUserAdmin())
         {
-            logger.warn(ServiceError.PREMISSION_DENIED + " " + UsersManager.getUser().getEmail());
+            logger.warn(ServiceError.PREMISSION_DENIED + " "
+                        + UsersManager.getUser().getEmail().toLowerCase());
             throw new ServiceError(ServiceError.PREMISSION_DENIED);
         }
 
@@ -59,5 +61,5 @@ public class AdminService
         long deletedRows = DbHandler.delete(DbRestaurant.class, id);
         return (deletedRows > 0);
     }
- 
+
 }

@@ -53,7 +53,7 @@ public class DbUser extends AbstractDbObject
         {
             setImageUrl(DEFAULT_ICON_PATH);
         }
-        setEditable(ClientService.getCurrentUser().getEmail().equals(email));
+        setEditable(ClientService.getCurrentUser().getEmail().toLowerCase().equals(email));
         
         setAdmin(UsersManager.isAdmin());
 	}

@@ -66,7 +66,7 @@ public class DbRestaurant extends AbstractDbObject
         User user = UsersManager.getUser();
      
         // Set edit permission (this happens in post load before any changes to admins)
-        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail()));
+        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail().toLowerCase()));
         
         // Make sure image can be shown!
         if (0 == getImageUrl().length())

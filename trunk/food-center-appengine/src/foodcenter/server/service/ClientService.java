@@ -57,7 +57,7 @@ public class ClientService
 
             user = new DbUser();
 
-            user.setEmail(userService.getCurrentUser().getEmail());
+            user.setEmail(userService.getCurrentUser().getEmail().toLowerCase());
             user.setLogoutUrl(userService.createLogoutURL("/") + logoutRedirectionUrl);
             user.setUserId(userService.getCurrentUser().getUserId());
         }
@@ -66,7 +66,7 @@ public class ClientService
             logger.info("User already exsists");
         }
 
-        logger.info("Login info: " + user.getEmail());
+        logger.info("Login info: " + user.getEmail().toLowerCase());
 
         user.setNickName(userService.getCurrentUser().getNickname());
         user.setAdmin(userService.isUserAdmin());
@@ -101,7 +101,7 @@ public class ClientService
 
         // Set the user of the current order
         User user = UsersManager.getUser();
-        order.setUserEmail(user.getEmail());
+        order.setUserEmail(user.getEmail().toLowerCase());
         String rBranchId = order.getRestBranchId();
         if (null == rBranchId)
         {
@@ -154,7 +154,7 @@ public class ClientService
 
     public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
     {
-        String userEmail = UsersManager.getUser().getEmail();
+        String userEmail = UsersManager.getUser().getEmail().toLowerCase();
 
         String query = "userEmail == userEmailP";
 
@@ -244,7 +244,7 @@ public class ClientService
     public static List<String> getCoworkers()
     {
         User user = UsersManager.getUser();
-        logger.info("getCoworkers is called: " + user.getEmail());
+        logger.info("getCoworkers is called: " + user.getEmail().toLowerCase());
         
         DbCompanyBranch b = findUserCompanyBranch(user.getEmail());
         
@@ -351,6 +351,7 @@ public class ClientService
 
     protected static DbCompanyBranch findUserCompanyBranch(String email)
     {
+        email = email.toLowerCase();
         String query = "workers == emailP";
         ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
         params.add(new DeclaredParameter("emailP", email));

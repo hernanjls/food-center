@@ -1,5 +1,6 @@
 package foodcenter.android.activities.coworkers;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -9,6 +10,7 @@ import foodcenter.android.R;
 import foodcenter.android.activities.SpinableActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 
+@SuppressLint("DefaultLocale")
 public class CoworkersListAdapter extends BaseAdapter
 {
     private static final int PROFILE_IMG = R.drawable.ic_person;
@@ -27,7 +29,7 @@ public class CoworkersListAdapter extends BaseAdapter
 
         me = AndroidRequestUtils.getSharedPreferences(activity.getActivity()
             .getApplicationContext())
-            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account");
+            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account").toLowerCase();
 
     }
 
@@ -77,6 +79,7 @@ public class CoworkersListAdapter extends BaseAdapter
         }
 
         String email = getItem(position);
+        
         int img = ((null != email) && email.equals(me)) ? PROFILE_IMG : COWORKER_IMG;
 
         CoworkerViewHolder holder = (CoworkerViewHolder) view.getTag();
