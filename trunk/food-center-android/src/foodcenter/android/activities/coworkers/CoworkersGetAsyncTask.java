@@ -27,11 +27,14 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
 
     private final String query = CoworkersGetAsyncTask.class.getName();
 
-    public CoworkersGetAsyncTask(CoworkersActivity activity, ListView lv)
+    private final boolean isEnabled; 
+    
+    public CoworkersGetAsyncTask(CoworkersActivity activity, ListView lv, boolean isEnabled)
     {
         super();
         this.activity = activity;
         this.lv = lv;
+        this.isEnabled = isEnabled;
 
         context = activity.getApplicationContext();
     }
@@ -73,7 +76,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     protected void onProgressUpdate(String... coworkers)
     {
         // update the view for all the restaurants
-        CoworkersListAdapter adapter = new CoworkersListAdapter(activity, coworkers);
+        CoworkersListAdapter adapter = new CoworkersListAdapter(activity, coworkers, isEnabled);
 
         lv.setAdapter(adapter);
 
