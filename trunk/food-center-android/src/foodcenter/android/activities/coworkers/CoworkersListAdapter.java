@@ -88,6 +88,12 @@ public class CoworkersListAdapter extends BaseAdapter
         return view;
     }
 
+    @Override
+    public boolean isEnabled(int position)
+    {
+        return false;
+    }
+    
     private class CoworkerViewHolder
     {
         private ImageView img;
