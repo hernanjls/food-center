@@ -10,9 +10,8 @@ import android.widget.ListView;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
-import foodcenter.android.activities.SpinableActivity;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.main.RestsGetAsyncTask;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
@@ -22,19 +21,19 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
 
     private final static String TAG = RestsGetAsyncTask.class.getSimpleName();
 
-    private final SpinableActivity activity;
+    private final CoworkersActivity activity;
     private final Context context;
     private final ListView lv;
 
     private final String query = CoworkersGetAsyncTask.class.getName();
 
-    public CoworkersGetAsyncTask(SpinableActivity activity, ListView lv)
+    public CoworkersGetAsyncTask(CoworkersActivity activity, ListView lv)
     {
         super();
         this.activity = activity;
         this.lv = lv;
 
-        context = activity.getActivity().getApplicationContext();
+        context = activity.getApplicationContext();
     }
 
     @Override
@@ -87,7 +86,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     {
         if (null != result)
         {
-            AndroidUtils.toast(context, result.getMessage());
+            MsgBroadcastReceiver.toast(context, result.getMessage());
             publishProgress(new String[0]);
         }
 
@@ -116,7 +115,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
         {
             String msg = error.getMessage();
             Log.e(TAG, msg);
-            AndroidUtils.toast(context, msg);
+            MsgBroadcastReceiver.toast(context, msg);
             
             publishProgress(new String[0]);
         }

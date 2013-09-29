@@ -29,6 +29,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.login.ServerSigninTask;
 import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.AndroidRequestUtils;
@@ -55,7 +56,7 @@ public class GCMIntentService extends GCMBaseIntentService
     protected void onRegistered(Context context, String regId)
     {
         Log.i(TAG, "GCM: Device registered: regId = " + regId);
-        AndroidUtils.progress(context, getString(R.string.gcm_registered));
+        MsgBroadcastReceiver.progress(context, getString(R.string.gcm_registered));
 
         new ServerSigninTask(context, regId, 5).signIn();
     }
@@ -64,7 +65,7 @@ public class GCMIntentService extends GCMBaseIntentService
     protected void onUnregistered(Context context, String regId)
     {
         Log.i(TAG, "Device unregistered");
-        AndroidUtils.toast(context, getString(R.string.gcm_unregistered));
+        MsgBroadcastReceiver.toast(context, getString(R.string.gcm_unregistered));
 
         if (GCMRegistrar.isRegisteredOnServer(context))
         {
@@ -86,7 +87,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received message");
         String message = intent.getExtras().getString("msg");
-        AndroidUtils.toast(context, message);
+        MsgBroadcastReceiver.toast(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -96,7 +97,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         Log.i(TAG, "Received deleted messages notification");
         String message = getString(R.string.gcm_deleted, total);
-        AndroidUtils.toast(context, message);
+        MsgBroadcastReceiver.toast(context, message);
         // notifies user
         generateNotification(context, message);
     }
@@ -105,7 +106,7 @@ public class GCMIntentService extends GCMBaseIntentService
     public void onError(Context context, String errorId)
     {
         Log.e(TAG, "Received error: " + errorId);
-        AndroidUtils.toast(context, getString(R.string.gcm_error, errorId));
+        MsgBroadcastReceiver.toast(context, getString(R.string.gcm_error, errorId));
     }
 
     @Override
@@ -113,7 +114,7 @@ public class GCMIntentService extends GCMBaseIntentService
     {
         // log message
         Log.i(TAG, "Received recoverable error: " + errorId);
-        AndroidUtils.toast(context, getString(R.string.gcm_recoverable_error, errorId));
+        MsgBroadcastReceiver.toast(context, getString(R.string.gcm_recoverable_error, errorId));
         return super.onRecoverableError(context, errorId);
     }
 
@@ -154,7 +155,7 @@ public class GCMIntentService extends GCMBaseIntentService
     private void signOut(final Context context)
     {
         String msg = "Signing out of server ..."; // TODO change to R.strings
-        AndroidUtils.progress(context, msg);
+        MsgBroadcastReceiver.progress(context, msg);
 
         try
         {
@@ -165,7 +166,7 @@ public class GCMIntentService extends GCMBaseIntentService
         {
             msg = e.getMessage();
             Log.e(getClass().getSimpleName(), msg, e);
-            AndroidUtils.progressDismissAndToastMsg(context, msg);
+            MsgBroadcastReceiver.progressDismissAndToastMsg(context, msg);
             return;
         }
     }

@@ -6,34 +6,35 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import foodcenter.android.AndroidUtils;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 
 /**
  * Unregister from GCM and sign-out from server
+ * 
  * @author stream2
- *
+ * 
  */
 public class SignontAsyncTask extends AsyncTask<Void, String, Void>
 {
 
-	/** for logs */
-	private static final String TAG = SignontAsyncTask.class.getSimpleName();
+    /** for logs */
+    private static final String TAG = SignontAsyncTask.class.getSimpleName();
 
-	private final Context context;	
-	
-	public SignontAsyncTask(Context context)
-	{
-		this.context = context;
-	}
+    private final Context context;
 
-	@Override
-	protected Void doInBackground(Void... params)
-	{
-	    String msg = "Unregistering from GCM ..."; // TODO change to R.string
-	    AndroidUtils.progress(context, msg);
+    public SignontAsyncTask(Context context)
+    {
+        this.context = context;
+    }
+
+    @Override
+    protected Void doInBackground(Void... params)
+    {
+        String msg = "Unregistering from GCM ..."; // TODO change to R.string
+        MsgBroadcastReceiver.progress(context, msg);
         Log.i(TAG, msg);
-        
-		GCMRegistrar.unregister(context.getApplicationContext());
-		return null;
-	}
+
+        GCMRegistrar.unregister(context.getApplicationContext());
+        return null;
+    }
 }

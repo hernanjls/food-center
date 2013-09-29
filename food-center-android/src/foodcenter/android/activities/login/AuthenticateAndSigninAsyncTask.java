@@ -35,8 +35,8 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.GCMIntentService;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 
 public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void>
@@ -71,7 +71,7 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
     @Override
     protected Void doInBackground(Void... params)
     {
-        AndroidUtils.progress(activity, "Starting Register process..."); // change to R.strings
+        MsgBroadcastReceiver.progress(activity, "Starting Register process..."); // change to R.strings
         try
         {
             final SharedPreferences prefs = AndroidRequestUtils.getSharedPreferences(appContext);
@@ -83,7 +83,7 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
             {
                 String msg = "Can't get account name"; // TODO change to R.string
                 Log.e(TAG, msg);
-                AndroidUtils.progressDismissAndToastMsg(activity, msg);
+                MsgBroadcastReceiver.progressDismissAndToastMsg(activity, msg);
             }
 
             editor.putString(AndroidRequestUtils.AUTH_COOKIE, null);
@@ -91,11 +91,11 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
 
             // Obtain an auth token and save it as a cookie
             // TODO change to R.string
-            AndroidUtils.progress(activity, "Generating authentication TOKEN...");
+            MsgBroadcastReceiver.progress(activity, "Generating authentication TOKEN...");
             String authToken = getAuthToken(accountName, null); // don't invalidate
 
             // TODO change to R.string
-            AndroidUtils.progress(activity, "Getting authentication COOKIE...");
+            MsgBroadcastReceiver.progress(activity, "Getting authentication COOKIE...");
             String authCookie = getAuthCookie(accountName, authToken);
             editor.putString(AndroidRequestUtils.AUTH_COOKIE, authCookie);
             editor.putString(AndroidRequestUtils.PREF_ACCOUNT_NAME, accountName);
@@ -120,7 +120,7 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
             // URISyntaxException
             String msg = "[ERROR] " + e.getMessage();
             Log.e(TAG, msg, e);
-            AndroidUtils.progressDismissAndToastMsg(activity, msg);
+            MsgBroadcastReceiver.progressDismissAndToastMsg(activity, msg);
         }
         return null;
     }
@@ -228,7 +228,7 @@ public class AuthenticateAndSigninAsyncTask extends AsyncTask<Void, String, Void
                            + " "
                            + " -> Invalidating auth token");
                 // TODO change to R.string
-                AndroidUtils.progress(activity, "Invalidating authentication TOKEN...");
+                MsgBroadcastReceiver.progress(activity, "Invalidating authentication TOKEN...");
                 authToken = getAuthToken(accountName, authToken);
             }
             else

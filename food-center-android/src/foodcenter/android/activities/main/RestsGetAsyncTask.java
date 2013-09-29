@@ -9,9 +9,9 @@ import android.widget.GridView;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -93,7 +93,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Except
     {
         if (null != result)
         {
-            AndroidUtils.toast(owner, result.getMessage());
+            MsgBroadcastReceiver.toast(owner, result.getMessage());
             publishProgress(new RestaurantProxy[0]);
         }
 
@@ -128,7 +128,7 @@ public class RestsGetAsyncTask extends AsyncTask<String, RestaurantProxy, Except
             }
             
             Log.e(RestsGetReciever.class.getSimpleName(), msg);
-            AndroidUtils.toast(owner, msg);
+            MsgBroadcastReceiver.toast(owner, msg);
             publishProgress();
         }
     }
