@@ -19,9 +19,9 @@ public class CoworkersListAdapter extends BaseAdapter
     private final String me;
 
     private final CoworkersActivity activity;
-    
-    private final  boolean enabled;
-    
+
+    private final boolean enabled;
+
     public CoworkersListAdapter(CoworkersActivity activity, String[] coworkers, boolean isEnabled)
     {
         super();
@@ -96,7 +96,7 @@ public class CoworkersListAdapter extends BaseAdapter
     {
         return enabled;
     }
-    
+
     private class CoworkerViewHolder
     {
         private ImageView img;
