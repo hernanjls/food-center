@@ -53,7 +53,8 @@
 	
 	<!-- CoworkersActivity -->
 	<string name="title_activity_coworkers">Coworkers</string>
-
+    <string name="load_coworkers">Loading coworkers ...</string>
+    
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
     <string name="disconnect_text">This device is currently connected as %1$s.  To disconnect, press the button below.</string>
     <string name="menu_refresh">Refresh</string>
