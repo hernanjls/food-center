@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/coworkers_select_reserve"
+        android:icon="@drawable/reserve_table_button"
+        android:showAsAction="always"
+        android:title="@string/coworkers_select_reserve"/>
+
+</menu>

@@ -19,12 +19,15 @@ public class CoworkersListAdapter extends BaseAdapter
     private final String me;
 
     private final CoworkersActivity activity;
-
-    public CoworkersListAdapter(CoworkersActivity activity, String[] coworkers)
+    
+    private final  boolean enabled;
+    
+    public CoworkersListAdapter(CoworkersActivity activity, String[] coworkers, boolean isEnabled)
     {
         super();
         this.activity = activity;
         this.coworkers = coworkers;
+        this.enabled = isEnabled;
 
         me = AndroidRequestUtils.getSharedPreferences(activity.getApplicationContext())
             .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account")
@@ -91,7 +94,7 @@ public class CoworkersListAdapter extends BaseAdapter
     @Override
     public boolean isEnabled(int position)
     {
-        return false;
+        return enabled;
     }
     
     private class CoworkerViewHolder

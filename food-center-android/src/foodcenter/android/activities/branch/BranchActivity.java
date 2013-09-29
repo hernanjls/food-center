@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.activities.coworkers.CoworkersActivity;
 import foodcenter.android.activities.order.OrderActivity;
 import foodcenter.android.activities.rest.RestActivity;
 import foodcenter.android.data.OrderData;
@@ -148,7 +149,10 @@ public class BranchActivity extends FragmentActivity implements
                 onBackPressed();
                 return true;
             case R.id.branch_menu_table:
-                break;
+                Intent i = new Intent(this, CoworkersActivity.class);
+                i.putExtra(CoworkersActivity.IS_TABLE_RESERVATION_VIEW, true);
+                startActivity(i);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

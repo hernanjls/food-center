@@ -6,19 +6,29 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import foodcenter.android.R;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 
-public class CoworkersActivity extends Activity
+public class CoworkersActivity extends Activity implements OnItemClickListener
 {
+    public static final String IS_TABLE_RESERVATION_VIEW = "foodcenter.android.IS_RESERVATION_VIEW";
+    
     private ListView lv;
 
     // this is not pull-able, but help changing action bar :)
     private PullToRefreshAttacher pullToRefreshAttacher;
 
+    private boolean isTableReservation;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -26,7 +36,13 @@ public class CoworkersActivity extends Activity
         setContentView(R.layout.coworkers_view);
 
         lv = (ListView) findViewById(R.id.coworkers_view_list);
+        lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        lv.setMultiChoiceModeListener(new ModeCallback());
+        lv.setOnItemClickListener(this);
 
+        Bundle extras = getIntent().getExtras();
+        isTableReservation = (null == extras) ? false : extras.getBoolean(IS_TABLE_RESERVATION_VIEW, false);
+        
         initActionBar();
         initPullToRefresh();
     }
@@ -36,9 +52,16 @@ public class CoworkersActivity extends Activity
     {
         super.onStart();
         
-        new CoworkersGetAsyncTask(this, lv).execute();
+        new CoworkersGetAsyncTask(this, lv, isTableReservation).execute();
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
+    {
+        boolean isChecked = lv.isItemChecked(position);
+        lv.setItemChecked(position, !isChecked);
+    }
+    
     private void initActionBar()
     {
         getActionBar().setDisplayShowTitleEnabled(true);
@@ -112,5 +135,87 @@ public class CoworkersActivity extends Activity
     {
         pullToRefreshAttacher.setRefreshComplete();
     }
+    
+    
+    
+    private class ModeCallback implements ListView.MultiChoiceModeListener
+    {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.coworkers_select_menu, menu);
+//
+//            menu.findItem(android.R.id.home);
+//            boolean isTakeAway = services.contains(ServiceType.TAKE_AWAY);
+//            menu.findItem(R.id.branch_menu_takeaway).setVisible(isTakeAway);
+//
+//            boolean isDelivery = services.contains(ServiceType.DELIVERY);
+//            menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
+//
+//            mode.setTitle("Select Items");
+//            showTotalPrice(mode);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+        {
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
+        {
+            switch (item.getItemId())
+            {
+                case R.id.coworkers_select_reserve:
+                    
+                    MsgBroadcastReceiver.toast(CoworkersActivity.this, "Not implemented yet!");
+                    break;
+//                    // mode.finish();
+//                    break;
+//                case R.id.branch_menu_delivery:
+//                    // mode.finish();
+//                    OpenOrderVerification(ServiceType.DELIVERY);
+//                    break;
+//                case R.id.branch_menu_takeaway:
+//                    // mode.finish();
+//                    OpenOrderVerification(ServiceType.TAKE_AWAY);
+//                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode)
+        {
+//            adapter.clearCounters();
+        }
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode,
+                                              int position,
+                                              long id,
+                                              boolean checked)
+        {
+
+//            // Select & add 1 to counter
+//            if (checked && 0 == adapter.getCounter(position))
+//            {
+//                onSwipeRight(lv, new int[] { position });
+//            }
+//            else if (!checked)
+//            {
+//                adapter.clearCounter(position);
+//            }
+//
+//            showTotalPrice(mode);
+        }
+
+    }
+
 
 }
