@@ -2,8 +2,6 @@ package foodcenter.android.activities.rest;
 
 import java.util.List;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.Activity;
@@ -15,9 +13,12 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import foodcenter.android.AndroidUtils;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -108,7 +109,7 @@ public class RestActivity extends Activity
                 onBackPressed();
                 return true;
             case R.id.menu_help:
-                AndroidUtils.toast(this, "Currently not supported");
+                MsgBroadcastReceiver.toast(this, "Currently not supported");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -129,14 +130,14 @@ public class RestActivity extends Activity
     public void showRestaurant(RestaurantProxy rest)
     {
         this.rest = rest;
-        
+
         TextView info = (TextView) findViewById(R.id.rest_info_txt);
         if (null != rest.getInfo())
         {
             String i = rest.getInfo().replace("<br>", "\n");
             info.setText(i);
         }
-        
+
         ListView branchesListView = (ListView) findViewById(R.id.rest_branch_list);
 
         // update the view for all the restaurant branches
@@ -145,7 +146,9 @@ public class RestActivity extends Activity
         {
             RestaurantBranchProxy[] branchesArray = new RestaurantBranchProxy[branches.size()];
             rest.getBranches().toArray(branchesArray);
-            RestBranchListAdapter adapter = new RestBranchListAdapter(this, branchesArray, rest.getId());
+            RestBranchListAdapter adapter = new RestBranchListAdapter(this,
+                                                                      branchesArray,
+                                                                      rest.getId());
 
             branchesListView.setAdapter(adapter);
         }
@@ -157,9 +160,8 @@ public class RestActivity extends Activity
         ImageView imageView = (ImageView) findViewById(R.id.rest_info_img);
         String url = AndroidRequestUtils.getBaseUrl() + rest.getImageUrl();
 
-        ImageLoader.getInstance().displayImage(url,
-                                               imageView,
-                                               AndroidRequestUtils.getDefaultDisplayImageOptions(this));
+        ImageLoader.getInstance()
+            .displayImage(url, imageView, AndroidRequestUtils.getDefaultDisplayImageOptions(this));
 
         // TODO Load the info of this restaurant
 
@@ -174,14 +176,14 @@ public class RestActivity extends Activity
             setTitle("Can't find restaurant id");
             return;
         }
-        
+
         rest = ObjectStore.get(RestaurantProxy.class, restId);
         if (null == rest)
         {
             new RestGetAsyncTask(this).execute(restId);
-            return;            
+            return;
         }
-        
+
         showRestaurant(rest);
     }
 }

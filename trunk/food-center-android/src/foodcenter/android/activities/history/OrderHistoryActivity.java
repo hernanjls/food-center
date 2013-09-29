@@ -98,26 +98,7 @@ public class OrderHistoryActivity extends Activity implements OnRefreshListener
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        onBackPressed();
-//        switch (item.getItemId())
-//        {
-//            case R.id.menu_refresh:
-//                onRefreshStarted(null);
-//                return true;
-//            case R.id.menu_setting:
-//                AndroidUtils.displayMessage(this, "Currently not supported");
-//                return true;
-//            case R.id.menu_help:
-//                AndroidUtils.displayMessage(this, "Currently not supported");
-//                return true;
-//            case R.id.menu_signout:
-//                // Invoke the Register activity
-//                startActivityForResult(new Intent(getApplicationContext(), LoginActivity.class),
-//                                       REQ_CODE_LOGIN);
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-        
+        onBackPressed();        
         return super.onOptionsItemSelected(item);
     }
 

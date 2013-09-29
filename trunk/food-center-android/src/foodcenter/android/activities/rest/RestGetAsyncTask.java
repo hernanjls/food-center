@@ -6,8 +6,8 @@ import android.util.Log;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.RestaurantProxy;
@@ -39,7 +39,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         if (null == restId || restId.length == 0 || null == restId[0])
         {
             return null;
-        }        
+        }
         try
         {
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(owner);
@@ -63,10 +63,11 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         if (null != msg)
         {
             owner.hideSpinner();
-            AndroidUtils.toast(owner, msg);
+            MsgBroadcastReceiver.toast(owner, msg);
         }
         super.onPostExecute(msg);
     }
+
     @Override
     protected void onProgressUpdate(RestaurantProxy... rest)
     {
@@ -76,7 +77,7 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         {
             return;
         }
-        
+
         owner.showRestaurant(rest[0]);
 
     }
@@ -94,15 +95,15 @@ public class RestGetAsyncTask extends AsyncTask<String, RestaurantProxy, String>
         public void onFailure(ServerFailure error)
         {
             String msg = "type: " + error.getExceptionType() + " , msg: " + error.getMessage();
-            
+
             if (error.getMessage().equals(AndroidRequestUtils.SERVER_ERROR_COOKIE_AUTH))
             {
                 msg = "Authentication error, please logout and re-login...";
-                //TODO re-auth here ?
+                // TODO re-auth here ?
             }
-            
+
             Log.e(RestGetReciever.class.getSimpleName(), msg);
-            AndroidUtils.toast(owner, msg);
+            MsgBroadcastReceiver.toast(owner, msg);
             publishProgress();
         }
     }

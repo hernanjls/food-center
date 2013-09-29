@@ -12,6 +12,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import foodcenter.android.AndroidUtils;
 import foodcenter.android.GCMIntentService;
 import foodcenter.android.R;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 import foodcenter.service.proxies.UserProxy;
@@ -90,7 +91,7 @@ public class ServerSigninTask extends Receiver<UserProxy>
             String msg = context.getString(R.string.server_register_error,
                                            GCMIntentService.MAX_ATTEMPTS);
 
-            AndroidUtils.progress(context, msg);
+            MsgBroadcastReceiver.progress(context, msg);
 
             GCMRegistrar.unregister(context);
         }
@@ -101,7 +102,7 @@ public class ServerSigninTask extends Receiver<UserProxy>
             // Activity finished before we complete - exit.
             Log.d(GCMIntentService.TAG, msg);
             
-            AndroidUtils.progressDismissAndToastMsg(context, msg);
+            MsgBroadcastReceiver.progressDismissAndToastMsg(context, msg);
         }
     }
 }

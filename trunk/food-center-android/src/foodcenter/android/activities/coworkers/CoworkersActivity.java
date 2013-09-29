@@ -8,10 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import foodcenter.android.R;
-import foodcenter.android.activities.SpinableActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 
-public class CoworkersActivity extends Activity implements SpinableActivity
+public class CoworkersActivity extends Activity
 {
     private ListView lv;
 
@@ -60,22 +59,13 @@ public class CoworkersActivity extends Activity implements SpinableActivity
         }
     }
 
-    @Override
     public void showSpinner()
     {
         // TODO Auto-generated method stub        
     }
 
-    @Override
     public void hideSpinner()
     {
         // TODO Auto-generated method stub
     }
-
-    @Override
-    public Activity getActivity()
-    {
-        return this;
-    }
-
 }

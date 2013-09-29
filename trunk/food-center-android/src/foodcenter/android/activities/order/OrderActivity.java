@@ -13,17 +13,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import foodcenter.android.AndroidUtils;
 import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
+import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.branch.BranchMenuListAdapter;
 import foodcenter.android.data.OrderData;
 
 public class OrderActivity extends ListActivity
 {
+    
+
     private OrderData data;
     private final DecimalFormat df = new DecimalFormat("#.0");
-    private ProgressDialog spiner;
+    private ProgressDialog progress;
+    private MsgBroadcastReceiver handleMsg;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -33,16 +36,20 @@ public class OrderActivity extends ListActivity
         ListView lv = getListView();
         lv.setChoiceMode(ListView.CHOICE_MODE_NONE);
 
-        initSpiner();
+        initProgressDialog();
+        
+        handleMsg = new MsgBroadcastReceiver(progress);
+        handleMsg.registerMe(this);
+    
         initActionBar();
         handleIntent(getIntent());
     }
 
-    private void initSpiner()
+    private void initProgressDialog()
     {
-        spiner = new ProgressDialog(this);
-        spiner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        spiner.setCancelable(false);
+        progress = new ProgressDialog(this);
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setCancelable(false);
 
     }
 
@@ -115,7 +122,7 @@ public class OrderActivity extends ListActivity
                 onBackPressed();
                 return true;
             case R.id.order_confirm_menu_ok:
-                showSpinner(getString(R.string.makeing_order));
+                MsgBroadcastReceiver.progress(this, getString(R.string.makeing_order));
                 new MakeOrderAsyncTask(this, 1).execute(data);
                 return true;
         }
@@ -125,39 +132,33 @@ public class OrderActivity extends ListActivity
     @Override
     protected void onDestroy()
     {
-        hideSpinner();
-
+        
+        progress.dismiss();
+        
+        unregisterReceiver(handleMsg);
+        
         super.onDestroy();
     }
 
-    private void showSpinner(String msg)
-    {
-        spiner.setMessage(msg);
-        if (!spiner.isShowing())
-        {
-            spiner.show();
-        }
-    }
 
     public void orderFail(String msg, boolean retry, int attempt)
     {   
         if (retry && ( attempt < MakeOrderAsyncTask.MAX_ATTEMPS))
         {
             
-            showSpinner(getString(R.string.makeing_order_retry, attempt) + ": " + msg);
+            MsgBroadcastReceiver.progress(this, getString(R.string.makeing_order_retry, attempt) + ": " + msg);
             new MakeOrderAsyncTask(this, attempt + 1 ).execute(data);
             return;
         }
-        hideSpinner();
-        AndroidUtils.toast(this, msg);
+        MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
     }
     
     public void orderSuccess()
     {
-        hideSpinner();
+        MsgBroadcastReceiver.progress(this, null);
 
         String msg = getString(R.string.order_success);
-        AndroidUtils.toast(this, msg);
+        MsgBroadcastReceiver.toast(this, msg);
         
         // remove the Order and the Adapter from cache
         ObjectStore.put(OrderData.class, OrderData.CACHE_KEY, null);
@@ -165,13 +166,5 @@ public class OrderActivity extends ListActivity
         
         // Navigate back to main view
         NavUtils.navigateUpFromSameTask(this);
-    }
-
-    private void hideSpinner()
-    {
-        if (spiner.isShowing())
-        {
-            spiner.dismiss();
-        }
-    }
+    }    
 }

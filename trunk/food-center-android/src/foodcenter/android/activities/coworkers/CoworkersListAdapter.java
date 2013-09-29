@@ -7,7 +7,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import foodcenter.android.R;
-import foodcenter.android.activities.SpinableActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 
 @SuppressLint("DefaultLocale")
@@ -19,17 +18,17 @@ public class CoworkersListAdapter extends BaseAdapter
     private final String[] coworkers;
     private final String me;
 
-    private final SpinableActivity activity;
+    private final CoworkersActivity activity;
 
-    public CoworkersListAdapter(SpinableActivity activity, String[] coworkers)
+    public CoworkersListAdapter(CoworkersActivity activity, String[] coworkers)
     {
         super();
         this.activity = activity;
         this.coworkers = coworkers;
 
-        me = AndroidRequestUtils.getSharedPreferences(activity.getActivity()
-            .getApplicationContext())
-            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account").toLowerCase();
+        me = AndroidRequestUtils.getSharedPreferences(activity.getApplicationContext())
+            .getString(AndroidRequestUtils.PREF_ACCOUNT_NAME, "Unknown Account")
+            .toLowerCase();
 
     }
 
@@ -66,9 +65,9 @@ public class CoworkersListAdapter extends BaseAdapter
     {
         if (view == null)
         {
-            view = activity.getActivity()
-                .getLayoutInflater()
-                .inflate(R.layout.coworkers_view_list_item, parent, false);
+            view = activity.getLayoutInflater().inflate(R.layout.coworkers_view_list_item,
+                                                        parent,
+                                                        false);
 
             CoworkerViewHolder holder = new CoworkerViewHolder();
             view.setTag(holder);
@@ -79,7 +78,7 @@ public class CoworkersListAdapter extends BaseAdapter
         }
 
         String email = getItem(position);
-        
+
         int img = ((null != email) && email.equals(me)) ? PROFILE_IMG : COWORKER_IMG;
 
         CoworkerViewHolder holder = (CoworkerViewHolder) view.getTag();
