@@ -5,7 +5,6 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,14 +20,15 @@ import foodcenter.android.service.AndroidRequestUtils;
 public class CoworkersActivity extends Activity implements OnItemClickListener
 {
     public static final String IS_TABLE_RESERVATION_VIEW = "foodcenter.android.IS_RESERVATION_VIEW";
-    
+
     private ListView lv;
 
     // this is not pull-able, but help changing action bar :)
     private PullToRefreshAttacher pullToRefreshAttacher;
 
     private boolean isTableReservation;
-    
+    private int totalSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -41,27 +41,31 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
         lv.setOnItemClickListener(this);
 
         Bundle extras = getIntent().getExtras();
-        isTableReservation = (null == extras) ? false : extras.getBoolean(IS_TABLE_RESERVATION_VIEW, false);
-        
+        isTableReservation = (null == extras) ? false
+                                             : extras.getBoolean(IS_TABLE_RESERVATION_VIEW, false);
+
+        totalSelected = 0;
+
         initActionBar();
         initPullToRefresh();
     }
-    
+
     @Override
     protected void onStart()
     {
         super.onStart();
-        
+
         new CoworkersGetAsyncTask(this, lv, isTableReservation).execute();
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
     {
-        boolean isChecked = lv.isItemChecked(position);
-        lv.setItemChecked(position, !isChecked);
+        // 1st click, after this moving to action mode
+        lv.setItemChecked(position, true);
+        ++totalSelected;
     }
-    
+
     private void initActionBar()
     {
         getActionBar().setDisplayShowTitleEnabled(true);
@@ -118,8 +122,8 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
         switch (item.getItemId())
         {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                // onBackPressed();
+                // NavUtils.navigateUpFromSameTask(this);
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -135,9 +139,7 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
     {
         pullToRefreshAttacher.setRefreshComplete();
     }
-    
-    
-    
+
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {
         @Override
@@ -145,16 +147,9 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
         {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.coworkers_select_menu, menu);
-//
-//            menu.findItem(android.R.id.home);
-//            boolean isTakeAway = services.contains(ServiceType.TAKE_AWAY);
-//            menu.findItem(R.id.branch_menu_takeaway).setVisible(isTakeAway);
-//
-//            boolean isDelivery = services.contains(ServiceType.DELIVERY);
-//            menu.findItem(R.id.branch_menu_delivery).setVisible(isDelivery);
-//
-//            mode.setTitle("Select Items");
-//            showTotalPrice(mode);
+
+            mode.setTitle("Select coworkers");
+            showTotalSelected(mode);
             return true;
         }
 
@@ -170,19 +165,8 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
             switch (item.getItemId())
             {
                 case R.id.coworkers_select_reserve:
-                    
                     MsgBroadcastReceiver.toast(CoworkersActivity.this, "Not implemented yet!");
                     break;
-//                    // mode.finish();
-//                    break;
-//                case R.id.branch_menu_delivery:
-//                    // mode.finish();
-//                    OpenOrderVerification(ServiceType.DELIVERY);
-//                    break;
-//                case R.id.branch_menu_takeaway:
-//                    // mode.finish();
-//                    OpenOrderVerification(ServiceType.TAKE_AWAY);
-//                    break;
                 default:
                     break;
             }
@@ -192,7 +176,8 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
-//            adapter.clearCounters();
+            // reset the counter for next time
+            totalSelected = 0;
         }
 
         @Override
@@ -202,20 +187,15 @@ public class CoworkersActivity extends Activity implements OnItemClickListener
                                               boolean checked)
         {
 
-//            // Select & add 1 to counter
-//            if (checked && 0 == adapter.getCounter(position))
-//            {
-//                onSwipeRight(lv, new int[] { position });
-//            }
-//            else if (!checked)
-//            {
-//                adapter.clearCounter(position);
-//            }
-//
-//            showTotalPrice(mode);
+            totalSelected += checked ? 1 : -1;
+            showTotalSelected(mode);
         }
 
+        private void showTotalSelected(ActionMode mode)
+        {
+            String s = getString(R.string.total_selected, totalSelected);
+            mode.setSubtitle(s);
+        }
     }
-
 
 }
