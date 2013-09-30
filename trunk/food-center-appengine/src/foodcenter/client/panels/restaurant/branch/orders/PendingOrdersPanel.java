@@ -10,6 +10,7 @@ import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCall
 import com.google.gwt.appengine.channel.client.Socket;
 import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -25,6 +26,10 @@ import foodcenter.client.WebClientUtils;
 import foodcenter.client.callbacks.RedrawablePanel;
 import foodcenter.client.panels.common.EditableImage;
 import foodcenter.client.service.WebRequestUtils;
+import foodcenter.service.autobean.AutoBeanHelper;
+import foodcenter.service.autobean.OrderBroadcast;
+import foodcenter.service.autobean.OrderBroadcastAutoBeanFactory;
+import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CourseOrderProxy;
 import foodcenter.service.proxies.OrderProxy;
@@ -43,6 +48,8 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
     private final static Integer SERVICE_TYPE_IMG_WIDTH_PX = 50;
     private final static Integer SERVICE_TYPE_IMG_HEIGHT_PX = 50;
 
+    private final static OrderBroadcastAutoBeanFactory factory = GWT.create(OrderBroadcastAutoBeanFactory.class);
+    
     public PendingOrdersPanel(String branchId)
     {
         super();
@@ -108,16 +115,16 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
         }
 
         @Override
-        public void onMessage(String orderId)
+        public void onMessage(String json)
         {
-            logger.fine("got orderId in msg: " + orderId);
-            
+            logger.fine("got order in msg: " + json);
+            OrderBroadcast order = AutoBeanHelper.deserializeFromJson(factory, OrderBroadcast.class, json);
             // message is received - can reset counter for socket errors (num open retries)
             socketErrors = 0;
             
             RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
                 .getRestaurantChefService();
-            service.getOrderById(orderId).with(OrderProxy.ORDER_WITH).fire(new NewOrderReciever());
+            service.getOrderById(order.getId()).with(OrderProxy.ORDER_WITH).fire(new NewOrderReciever());
         }
 
         @Override
@@ -177,7 +184,6 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
 
     private class NewOrderReciever extends Receiver<OrderProxy>
     {
-
         @Override
         public void onSuccess(OrderProxy response)
         {
@@ -188,7 +194,13 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
 
             synchronized (orders)
             {
-                if (!orders.contains(response))
+                
+                if (OrderStatus.CREATED != response.getStatus())
+                {
+                    orders.remove(response);
+                    redraw();
+                }
+                else 
                 {
                     orders.add(response);
                     redraw();

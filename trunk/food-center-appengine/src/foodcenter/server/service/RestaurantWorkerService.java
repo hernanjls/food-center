@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 
-import foodcenter.server.GCMSender;
 import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
@@ -17,8 +16,8 @@ import foodcenter.server.db.DbHandler.SortOrderDirection;
 import foodcenter.server.db.modules.DbChannelToken;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurantBranch;
-import foodcenter.server.db.modules.DbUser;
 import foodcenter.server.db.security.UsersManager;
+import foodcenter.service.autobean.OrderBroadcastType;
 import foodcenter.service.enums.OrderStatus;
 
 public class RestaurantWorkerService extends ClientService
@@ -47,7 +46,8 @@ public class RestaurantWorkerService extends ClientService
             throw new ServiceError(ServiceError.DATABASE_ISSUE);
         }
         notifyUser(order);
-
+        CommonServices.broadcastToRestaurant(order, OrderBroadcastType.ORDER);
+        
         return order;
     }
 
@@ -74,6 +74,7 @@ public class RestaurantWorkerService extends ClientService
         }
 
         notifyUser(order);
+        CommonServices.broadcastToRestaurant(order, OrderBroadcastType.ORDER);
         return order;
     }
 
@@ -161,6 +162,7 @@ public class RestaurantWorkerService extends ClientService
         return channelToken.getToken();
     }
 
+    
     private static void notifyUser(DbOrder order)
     {
         logger.info("notify user, orderId=" + order.getId() + ", order status=" + order.getStatus());
@@ -171,15 +173,7 @@ public class RestaurantWorkerService extends ClientService
         builder.append(" is ");
         builder.append(order.getStatus().getName());
 
-        String query = "email == emailP";
-
-        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
-        params.add(new DeclaredParameter("emailP", order.getUserEmail()));
-
-        DbUser user = DbHandler.find(DbUser.class, query, params);
-        // user should never be null!
-        GCMSender.send(builder.toString(), user.getGcmKey(), 5);
-
+        CommonServices.broadcastToUsers(builder.toString(), order.getUserEmail());
     }
 
     private static void checkBranchChef(String branchId)
