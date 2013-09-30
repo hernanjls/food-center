@@ -10,6 +10,8 @@ public class ServiceError extends Error
     public static final String UNKNOWN_ISSUE = "Unknown issue";
     public static final String DATABASE_ISSUE = "Database issue! please contact Administrator";
     public static final String PREMISSION_DENIED = "Premission denied!, your attempt has been logged";
+    public static final String PREMISSION_DENIED_MODIFY_ORDER = "Premission denied to modify Order!, your attempt has been logged";
+    public static final String INVALID_NULL_INPUT = "Invalid null input";
     public static final String INVALID_REST_BRANCH_ID = "Invalid Restaurant Branch ID: ";
     public static final String INVALID_REST_ID = "Invalid Restaurant ID: ";
     public static final String INVALID_COMP_BRANCH_ID = "Invalid Company Branch ID: ";

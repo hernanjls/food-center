@@ -1,16 +1,16 @@
 package foodcenter.service.enums;
 
-public enum OrderStatus
+public enum TableReservationStatus
 {
     CREATED("Created"),
-    DELIVERED("Delivered"),
-    CANCELD("Canceld"),
+    CONFIRMED("Confirmed"),
+    DECLINED("Declined"),
     ;
     
     
     private final String name;
     
-    private OrderStatus(String name)
+    private TableReservationStatus(String name)
     {
         this.name = name;
     }
@@ -20,9 +20,9 @@ public enum OrderStatus
         return name;
     };
     
-    public static OrderStatus forName(String name)
+    public static TableReservationStatus forName(String name)
     {
-        for (OrderStatus s : OrderStatus.values())
+        for (TableReservationStatus s : TableReservationStatus.values())
         {
             if (s.getName().equals(name))
             {
@@ -31,4 +31,5 @@ public enum OrderStatus
         }
         return null;
     }
+
 }

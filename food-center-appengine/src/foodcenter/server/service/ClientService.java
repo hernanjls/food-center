@@ -1,14 +1,15 @@
 package foodcenter.server.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.appengine.api.channel.ChannelMessage;
-import com.google.appengine.api.channel.ChannelService;
-import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -18,14 +19,16 @@ import foodcenter.server.db.DbHandler;
 import foodcenter.server.db.DbHandler.DeclaredParameter;
 import foodcenter.server.db.DbHandler.SortOrder;
 import foodcenter.server.db.DbHandler.SortOrderDirection;
-import foodcenter.server.db.modules.DbChannelToken;
+import foodcenter.server.db.modules.AbstractDbOrder;
 import foodcenter.server.db.modules.DbCompany;
 import foodcenter.server.db.modules.DbCompanyBranch;
 import foodcenter.server.db.modules.DbOrder;
 import foodcenter.server.db.modules.DbRestaurant;
 import foodcenter.server.db.modules.DbRestaurantBranch;
+import foodcenter.server.db.modules.DbTableReservation;
 import foodcenter.server.db.modules.DbUser;
 import foodcenter.server.db.security.UsersManager;
+import foodcenter.service.autobean.OrderBroadcastType;
 import foodcenter.service.enums.ServiceType;
 
 public class ClientService
@@ -35,6 +38,7 @@ public class ClientService
     private static Logger logger = LoggerFactory.getLogger(UserService.class);
     private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
 
+    private static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     public static String getLogoutUrl()
     {
         String logoutRedirectionUrl = isDev ? "food_center.jsp?gwt.codesvr=127.0.0.1:9997" : "";
@@ -91,12 +95,19 @@ public class ClientService
         DbHandler.save(user);
     }
 
-    public static DbOrder makeOrder(DbOrder order)
+    
+    private static void fillAbstractOrder(AbstractDbOrder order)
     {
-        logger.info("makeOrder is called");
+        logger.info("fillAbstractOrder is called");
         if (null == order)
         {
-            return null;
+            logger.debug(ServiceError.INVALID_REST_BRANCH_ID);
+            throw new ServiceError(ServiceError.INVALID_NULL_INPUT);
+        }
+        if (null != order.getId())
+        {
+            logger.debug(ServiceError.PREMISSION_DENIED_MODIFY_ORDER + " orderId=" + order.getId());
+            throw new ServiceError(ServiceError.PREMISSION_DENIED_MODIFY_ORDER);
         }
 
         // Set the user of the current order
@@ -139,7 +150,14 @@ public class ClientService
         }
         order.setCompId(comp.getId());
         order.setCompName(comp.getName());
-
+        
+    }
+    public static DbOrder makeOrder(DbOrder order)
+    {
+        logger.info("makeOrder is called");
+        
+        fillAbstractOrder(order);
+        
         // Save the order (using 1 transaction!)
         order = DbHandler.save(order);
         if (null == order)
@@ -147,9 +165,51 @@ public class ClientService
             logger.error(ServiceError.DATABASE_ISSUE + " save order");
             throw new IllegalAccessError(ServiceError.DATABASE_ISSUE);
         }
-        broadcastOrder(order);
+        CommonServices.broadcastToRestaurant(order, OrderBroadcastType.ORDER);
 
         return order;
+    }
+
+    public DbTableReservation reserveTable(DbTableReservation reservation)
+    {
+        logger.info("reserveTable is called");
+        
+        fillAbstractOrder(reservation);
+
+        // Save the order (using 1 transaction!)
+        reservation = DbHandler.save(reservation);
+        if (null == reservation)
+        {
+            logger.error(ServiceError.DATABASE_ISSUE + " save order");
+            throw new IllegalAccessError(ServiceError.DATABASE_ISSUE);
+        }
+        CommonServices.broadcastToRestaurant(reservation, OrderBroadcastType.TABLE);
+        
+        // it will hold at least 1 user (current user which makes the reservation)
+        Set<String> users = new TreeSet<String>();
+        users.addAll(reservation.getUsers());
+        users.add(reservation.getUserEmail());
+        
+        StringBuilder msg = new StringBuilder();
+        msg.append("Table reservation was made by ");
+        msg.append(reservation.getUserEmail());
+        msg.append("\nTo ");
+        msg.append(reservation.getRestName());
+        msg.append("\nBranch address: ");
+        msg.append(reservation.getRestBranchAddr());
+        msg.append("\n\nTable should be ready between ");
+        msg.append(dateFormat.format(reservation.getFromDate()));
+        msg.append(" to ");
+        msg.append(dateFormat.format(reservation.getToDate()));
+        msg.append("\nPlease wait for confirmation and reservation time!");
+        msg.append("\n\n participents:");
+        for (String s : users)
+        {
+            msg.append(s + "\n");
+        }
+
+        CommonServices.broadcastToUsers(msg.toString(), users.toArray(new String[0]));
+        return reservation;
     }
 
     public static List<DbOrder> getOrders(Integer startIdx, Integer endIdx)
@@ -325,30 +385,7 @@ public class ClientService
     /* **************************** private functions ******************************** */
     /* ******************************************************************************* */
 
-    protected static void broadcastOrder(DbOrder order)
-    {
-        String query = "branchId == branchIdP";
-
-        ArrayList<DeclaredParameter> params = new ArrayList<DeclaredParameter>();
-        params.add(new DeclaredParameter("branchIdP", order.getRestBranchId()));
-
-        List<DbChannelToken> tokens = DbHandler.find(DbChannelToken.class,
-                                                     query,
-                                                     params,
-                                                     null,
-                                                     Integer.MAX_VALUE);
-        if ((null == tokens) || tokens.isEmpty())
-        {
-            return;
-        }
-
-        ChannelService channelService = ChannelServiceFactory.getChannelService();
-        for (DbChannelToken t : tokens)
-        {
-            channelService.sendMessage(new ChannelMessage(t.getKey(), order.getId()));
-        }
-    }
-
+        
     protected static DbCompanyBranch findUserCompanyBranch(String email)
     {
         email = email.toLowerCase();
