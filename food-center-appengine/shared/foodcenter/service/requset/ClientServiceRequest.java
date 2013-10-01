@@ -10,6 +10,7 @@ import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CompanyProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.proxies.RestaurantProxy;
+import foodcenter.service.proxies.TableReservationProxy;
 import foodcenter.service.proxies.UserProxy;
 
 @ServiceName(value = "foodcenter.server.service.ClientService")
@@ -19,6 +20,8 @@ public interface ClientServiceRequest extends RequestContext
     public Request<UserProxy> login(String gcmKey);
     public Request<OrderProxy> makeOrder(OrderProxy order);
     public Request<List<OrderProxy>> getOrders(Integer startIdx, Integer endIdx);
+    public Request<TableReservationProxy> reserveTable(TableReservationProxy reservation);
+    
     public Request<List<String>> getCoworkers();
     
     //services the user needs for restaurant

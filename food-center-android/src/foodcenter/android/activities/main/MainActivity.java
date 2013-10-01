@@ -60,7 +60,7 @@ public class MainActivity extends FragmentActivity implements
     private ProgressDialog progress;
 
     
-    /** uses {@link AndroidUtils#toast(Context, String)} */
+    /** Handles dialog calls and toasts */
     private MsgBroadcastReceiver handleMsg;
     
     private final BroadcastReceiver handleSign = new BroadcastReceiver()

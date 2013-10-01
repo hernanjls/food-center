@@ -2,7 +2,7 @@ package foodcenter.android.activities.coworkers;
 
 import java.util.List;
 
-import android.content.Context;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
@@ -19,24 +19,33 @@ import foodcenter.service.FoodCenterRequestFactory;
 public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
 {
 
+    public interface CoworkersGetCallback
+    {
+        public void showSpinner();
+        
+        public void hideSpinner();
+    }
+
     private final static String TAG = RestsGetAsyncTask.class.getSimpleName();
 
-    private final CoworkersActivity activity;
-    private final Context context;
+    private final Activity activity;
+    private final CoworkersGetCallback callback;
     private final ListView lv;
 
     private final String query = CoworkersGetAsyncTask.class.getName();
 
     private final boolean isEnabled; 
     
-    public CoworkersGetAsyncTask(CoworkersActivity activity, ListView lv, boolean isEnabled)
+    
+    
+    public CoworkersGetAsyncTask(Activity activity, CoworkersGetCallback callback, ListView lv, boolean isEnabled)
     {
         super();
         this.activity = activity;
+        this.callback = callback;
         this.lv = lv;
         this.isEnabled = isEnabled;
 
-        context = activity.getApplicationContext();
     }
 
     @Override
@@ -44,7 +53,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     {
         super.onPreExecute();
 
-        activity.showSpinner();
+        callback.showSpinner();
     }
 
     @Override
@@ -52,7 +61,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     {
         try
         {
-            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(context);
+            FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(activity);
 
             @SuppressWarnings("unchecked")
             List<String> rests = ObjectStore.get(List.class, query);
@@ -81,7 +90,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
         lv.setAdapter(adapter);
 
         // Notify PullToRefreshAttacher that the refresh has finished
-        activity.hideSpinner();
+        callback.hideSpinner();
     }
 
     @Override
@@ -89,7 +98,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     {
         if (null != result)
         {
-            MsgBroadcastReceiver.toast(context, result.getMessage());
+            MsgBroadcastReceiver.toast(activity, result.getMessage());
             publishProgress(new String[0]);
         }
 
@@ -118,7 +127,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
         {
             String msg = error.getMessage();
             Log.e(TAG, msg);
-            MsgBroadcastReceiver.toast(context, msg);
+            MsgBroadcastReceiver.toast(activity, msg);
             
             publishProgress(new String[0]);
         }

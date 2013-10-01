@@ -92,43 +92,25 @@ public class LoginDialogFragment extends DialogFragment
 
         View view = inflater.inflate(R.layout.signin, null);
         serversLv = (ListView) view.findViewById(R.id.login_server_list);
-        serversLv.setAdapter(new ArrayAdapter<String>(getActivity(),
-                                                      R.layout.signin_lv_item,
-                                                      servers)
-        {
-            @Override
-            public boolean isEnabled(int position)
-            {
-                return !isLogedIn;
-            }
-        });
+        serversLv.setAdapter(new StringArrayAdapter(R.layout.signin_lv_item, servers));
         serversLv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         accountsLv = (ListView) view.findViewById(R.id.login_accounts_list);
-        accountsLv.setAdapter(new ArrayAdapter<String>(getActivity(),
-                                                       R.layout.signin_lv_item,
-                                                       accounts)
-        {
-            @Override
-            public boolean isEnabled(int position)
-            {
-                return !isLogedIn;
-            }
-        });
+        accountsLv.setAdapter(new StringArrayAdapter(R.layout.signin_lv_item, accounts));
         accountsLv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         builder.setView(view);
-        
+
         if (isLogedIn)
         {
-            isSignedInView(builder);
+            showSignedInView(builder);
         }
         else
         {
-            isSignedOutView(builder);
+            showSignedOutView(builder);
         }
 
-        builder.setNegativeButton(R.string.signin_cancel, new DialogInterface.OnClickListener()
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -142,7 +124,7 @@ public class LoginDialogFragment extends DialogFragment
         return res;
     }
 
-    private void isSignedInView(AlertDialog.Builder builder)
+    private void showSignedInView(AlertDialog.Builder builder)
     {
         int sPos = servers.indexOf(AndroidRequestUtils.getBaseUrl());
         serversLv.setItemChecked(sPos, true);
@@ -165,7 +147,7 @@ public class LoginDialogFragment extends DialogFragment
 
     }
 
-    private void isSignedOutView(AlertDialog.Builder builder)
+    private void showSignedOutView(AlertDialog.Builder builder)
     {
         serversLv.setOnItemClickListener(new OnItemClickListener()
         {
@@ -186,7 +168,7 @@ public class LoginDialogFragment extends DialogFragment
             }
         });
         accountsLv.setItemChecked(0, true);
-        
+
         builder.setTitle("Select Server and Account");
 
         builder.setPositiveButton(R.string.signin_signin, new DialogInterface.OnClickListener()
@@ -230,5 +212,19 @@ public class LoginDialogFragment extends DialogFragment
         }
 
         return result;
+    }
+
+    private class StringArrayAdapter extends ArrayAdapter<String>
+    {
+        public StringArrayAdapter(int layout, List<String> objects)
+        {
+            super(getActivity(), layout, objects);
+        }
+
+        @Override
+        public boolean isEnabled(int position)
+        {
+            return !isLogedIn;
+        }
     }
 }

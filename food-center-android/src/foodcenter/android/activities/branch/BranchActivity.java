@@ -42,7 +42,7 @@ public class BranchActivity extends FragmentActivity implements
 {
 
     public final static int REQ_CODE_ORDER = 1;
-    public final static String EXTRA_BRANCH_ID = "Extra Branch ID";
+    public final static String EXTRA_BRANCH_ID = "foodcenter.android.EXTRA_BRANCH_ID";
 
     private final static String TAG = BranchActivity.class.getSimpleName();
 
@@ -150,7 +150,8 @@ public class BranchActivity extends FragmentActivity implements
                 return true;
             case R.id.branch_menu_table:
                 Intent i = new Intent(this, CoworkersActivity.class);
-                i.putExtra(CoworkersActivity.IS_TABLE_RESERVATION_VIEW, true);
+                i.putExtra(EXTRA_BRANCH_ID, branch.getId());
+                i.putExtra(RestActivity.EXTRA_REST_ID, restId);
                 startActivity(i);
                 return true;
         }
