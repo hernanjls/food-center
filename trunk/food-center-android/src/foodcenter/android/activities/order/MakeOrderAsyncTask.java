@@ -2,6 +2,7 @@ package foodcenter.android.activities.order;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -22,15 +23,25 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
 
     private final static String TAG = MakeOrderAsyncTask.class.getSimpleName();
 
-    private OrderActivity activity;
-
+    private final Context context;
+    private final MakeOrderCallback callback;
     private final int attempt;
 
-    public MakeOrderAsyncTask(OrderActivity activity, int attempt)
+    public interface MakeOrderCallback
+    {
+        /** callback for {@link MakeOrderAsyncTask} when order fails */
+        public void onOrderFail(String msg, boolean retry, int attempt);
+
+        /** callback for {@link MakeOrderAsyncTask} when order success */
+        public void onOrderSuccess();
+    }
+    
+    public MakeOrderAsyncTask(Context context, MakeOrderCallback callback, int attempt)
     {
         super();
 
-        this.activity = activity;
+        this.context = context;
+        this.callback = callback;
         this.attempt = attempt;
     }
 
@@ -44,7 +55,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
             {
                 Thread.sleep(100);
             }
-            FoodCenterRequestFactory rf = AndroidRequestUtils.getFoodCenterRF(activity.getApplicationContext());
+            FoodCenterRequestFactory rf = AndroidRequestUtils.getFoodCenterRF(context.getApplicationContext());
             ClientServiceRequest service = rf.getClientService();
             OrderProxy order = createOrder(service, data[0]);
 
@@ -65,7 +76,7 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
     {
         if (null != result)
         {
-            activity.orderFail(result, true, attempt);
+            callback.onOrderFail(result, true, attempt);
         }
         super.onPostExecute(result);
     }
@@ -101,14 +112,14 @@ public class MakeOrderAsyncTask extends AsyncTask<OrderData, String, String>
         @Override
         public void onSuccess(OrderProxy response)
         {
-            activity.orderSuccess();
+            callback.onOrderSuccess();
         }
 
         @Override
         public void onFailure(ServerFailure error)
         {
             Log.e(TAG, error.getMessage());
-            activity.orderFail(error.getMessage(), false, attempt);
+            callback.onOrderFail(error.getMessage(), false, attempt);
         }
     }
 

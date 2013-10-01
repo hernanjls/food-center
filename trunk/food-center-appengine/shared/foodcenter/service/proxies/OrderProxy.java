@@ -8,35 +8,13 @@ import com.google.web.bindery.requestfactory.shared.ProxyForName;
 
 import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.enums.ServiceType;
-import foodcenter.service.proxies.interfaces.AbstractEntityInterface;
+import foodcenter.service.proxies.interfaces.AbstractOrderProxy;
 
 @ProxyForName(value = "foodcenter.server.db.modules.DbOrder", locator = "foodcenter.server.db.DbObjectLocator")
-public interface OrderProxy extends EntityProxy, AbstractEntityInterface
+public interface OrderProxy extends EntityProxy, AbstractOrderProxy
 {
 
     public final static String[] ORDER_WITH = { "courses" , "date", "deliveryDate" };
-
-    public String getUserEmail();
-
-    public String getCompId();
-
-    public String getCompBranchId();
-
-    public String getCompName();
-
-    public String getCompBranchAddr();
-
-    public String getRestId();
-
-    public void setRestId(String restId);
-    
-    public String getRestName();
-
-    public String getRestBranchId();
-
-    public String getRestBranchAddr();
-    
-    public void setRestBranchId(String restBranchId);
 
     public List<CourseOrderProxy> getCourses();
 

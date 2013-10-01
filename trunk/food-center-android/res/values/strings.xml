@@ -7,7 +7,7 @@
     <string name="signin_title">Login to server</string>
     <string name="signin_select_server">Select server:</string>
     <string name="signin_select_account">Select account:</string>
-    <string name="signin_cancel">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="signin_signin">SignIn</string>
     <string name="signin_signout">SignOut</string>
     
@@ -56,6 +56,9 @@
     <string name="load_coworkers">Loading coworkers ...</string>
 	<string name="coworkers_select_reserve">Click to reserve a table</string>
 	<string name="total_selected">Total selected: %1$d</string>
+	<string name="make_table_reservation">Making table reservation ...</string>
+	<string name="reserve_button">Reserve</string>
+	<string name="reservation_success">Reservation Success!</string>
 	
     <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
     <string name="disconnect_text">This device is currently connected as %1$s.  To disconnect, press the button below.</string>

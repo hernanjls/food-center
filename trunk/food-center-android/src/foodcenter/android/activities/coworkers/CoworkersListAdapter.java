@@ -1,6 +1,7 @@
 package foodcenter.android.activities.coworkers;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,11 +19,11 @@ public class CoworkersListAdapter extends BaseAdapter
     private final String[] coworkers;
     private final String me;
 
-    private final CoworkersActivity activity;
+    private final Activity activity;
 
     private final boolean enabled;
 
-    public CoworkersListAdapter(CoworkersActivity activity, String[] coworkers, boolean isEnabled)
+    public CoworkersListAdapter(Activity activity, String[] coworkers, boolean isEnabled)
     {
         super();
         this.activity = activity;

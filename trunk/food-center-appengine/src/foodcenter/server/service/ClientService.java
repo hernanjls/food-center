@@ -170,18 +170,29 @@ public class ClientService
         return order;
     }
 
-    public DbTableReservation reserveTable(DbTableReservation reservation)
+    public static DbTableReservation reserveTable(DbTableReservation reservation)
     {
         logger.info("reserveTable is called");
         
         fillAbstractOrder(reservation);
-
+        
+        if (null == reservation.getFromDate())
+        {
+            logger.debug(ServiceError.ACCEPTABLE_START_DATE_NOT_FOUND);
+            throw new ServiceError(ServiceError.ACCEPTABLE_START_DATE_NOT_FOUND);
+        }
+        if (null == reservation.getToDate())
+        {
+            logger.debug(ServiceError.ACCEPTABLE_START_DATE_NOT_FOUND);
+            throw new ServiceError(ServiceError.ACCEPTABLE_END_DATE_NOT_FOUND);
+        }
+        
         // Save the order (using 1 transaction!)
         reservation = DbHandler.save(reservation);
         if (null == reservation)
         {
             logger.error(ServiceError.DATABASE_ISSUE + " save order");
-            throw new IllegalAccessError(ServiceError.DATABASE_ISSUE);
+            throw new ServiceError(ServiceError.DATABASE_ISSUE);
         }
         CommonServices.broadcastToRestaurant(reservation, OrderBroadcastType.TABLE);
         

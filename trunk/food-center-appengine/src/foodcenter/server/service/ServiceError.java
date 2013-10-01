@@ -17,13 +17,16 @@ public class ServiceError extends Error
     public static final String INVALID_COMP_BRANCH_ID = "Invalid Company Branch ID: ";
     public static final String INVALID_COMP_ID = "Invalid Company ID: ";
     public static final String INVALID_ORDER_ID = "Invalid Order ID: ";
+    
     public static final String COMPANY_NOT_ASSOCIATED_TO_BRANCH = "Company branch is not associated to Company";
     public static final String DEFAULT_RESTS_NOT_FOUND = "Default restaurants not found...";
     public static final String DEFAULT_COMPS_NOT_FOUND = "Default companies not found...";
     public static final String REST_PATTERN_NOT_FOUND = "Can't find Restaurants, please use different pattern ...";
     public static final String COMP_PATTERN_NOT_FOUND = "Can't find Companies, please use different pattern ...";
     public static final String USER_COMPNAY_NOT_FOUND = "Can't find User's company: ";
-
+    public static final String ACCEPTABLE_START_DATE_NOT_FOUND = "Can't find acceptable start date";
+    public static final String ACCEPTABLE_END_DATE_NOT_FOUND = "Can't find acceptable end date";
+    
     public ServiceError()
     {
         this(UNKNOWN_ISSUE);

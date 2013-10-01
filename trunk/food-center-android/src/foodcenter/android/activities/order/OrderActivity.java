@@ -17,16 +17,28 @@ import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.branch.BranchMenuListAdapter;
+import foodcenter.android.activities.order.MakeOrderAsyncTask.MakeOrderCallback;
 import foodcenter.android.data.OrderData;
 
-public class OrderActivity extends ListActivity
+/**
+ * Order confirmation screen. <br>
+ * This screen shows the info of the chosen "cart", service selected and
+ * an "Order Now" button
+ * 
+ */
+public class OrderActivity extends ListActivity implements MakeOrderCallback
 {
+    /** Data to show on the screen */
+    private OrderData data = null;
     
-
-    private OrderData data;
+    /** Formating the double numbers */
     private final DecimalFormat df = new DecimalFormat("#.0");
-    private ProgressDialog progress;
-    private MsgBroadcastReceiver handleMsg;
+    
+    /** Progress dialog for ordering */
+    private ProgressDialog progress = null;
+    
+    /** Msg receiver to show progress from {@link MakeOrderAsyncTask}*/
+    private MsgBroadcastReceiver handleMsg = null;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,7 +50,10 @@ public class OrderActivity extends ListActivity
 
         initProgressDialog();
         
-        handleMsg = new MsgBroadcastReceiver(progress);
+        if (null == handleMsg)
+        {
+            handleMsg = new MsgBroadcastReceiver(progress);
+        }
         handleMsg.registerMe(this);
     
         initActionBar();
@@ -47,10 +62,13 @@ public class OrderActivity extends ListActivity
 
     private void initProgressDialog()
     {
-        progress = new ProgressDialog(this);
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setCancelable(false);
-
+        if (null == progress)
+        {
+            progress = new ProgressDialog(this);
+            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progress.setCancelable(false);
+            progress.setCanceledOnTouchOutside(false);
+        }
     }
 
     private void initActionBar()
@@ -93,7 +111,6 @@ public class OrderActivity extends ListActivity
         String subtitle = getString(R.string.subtitle_order_confirmation) + " " + data.getService().getName();
         setSubtitle(subtitle);
         
-
         // Set the adapter
         ListView branchView = getListView();
         branchView.setAdapter(adapter);
@@ -123,7 +140,7 @@ public class OrderActivity extends ListActivity
                 return true;
             case R.id.order_confirm_menu_ok:
                 MsgBroadcastReceiver.progress(this, getString(R.string.makeing_order));
-                new MakeOrderAsyncTask(this, 1).execute(data);
+                new MakeOrderAsyncTask(this, this, 1).execute(data);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -132,7 +149,6 @@ public class OrderActivity extends ListActivity
     @Override
     protected void onDestroy()
     {
-        
         progress.dismiss();
         
         unregisterReceiver(handleMsg);
@@ -140,25 +156,26 @@ public class OrderActivity extends ListActivity
         super.onDestroy();
     }
 
-
-    public void orderFail(String msg, boolean retry, int attempt)
+    /** callback for {@link MakeOrderAsyncTask}*/
+    @Override
+    public void onOrderFail(String msg, boolean retry, int attempt)
     {   
         if (retry && ( attempt < MakeOrderAsyncTask.MAX_ATTEMPS))
         {
             
             MsgBroadcastReceiver.progress(this, getString(R.string.makeing_order_retry, attempt) + ": " + msg);
-            new MakeOrderAsyncTask(this, attempt + 1 ).execute(data);
+            new MakeOrderAsyncTask(this, this, attempt + 1 ).execute(data);
             return;
         }
         MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
     }
-    
-    public void orderSuccess()
-    {
-        MsgBroadcastReceiver.progress(this, null);
 
+    /** callback for {@link MakeOrderAsyncTask} */
+    @Override
+    public void onOrderSuccess()
+    {
         String msg = getString(R.string.order_success);
-        MsgBroadcastReceiver.toast(this, msg);
+        MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
         
         // remove the Order and the Adapter from cache
         ObjectStore.put(OrderData.class, OrderData.CACHE_KEY, null);
