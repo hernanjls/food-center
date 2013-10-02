@@ -29,6 +29,7 @@ import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.autobean.AutoBeanHelper;
 import foodcenter.service.autobean.OrderBroadcast;
 import foodcenter.service.autobean.OrderBroadcastAutoBeanFactory;
+import foodcenter.service.autobean.OrderBroadcastType;
 import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -122,9 +123,12 @@ public class PendingOrdersPanel extends VerticalPanel implements RedrawablePanel
             // message is received - can reset counter for socket errors (num open retries)
             socketErrors = 0;
             
-            RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
-                .getRestaurantChefService();
-            service.getOrderById(order.getId()).with(OrderProxy.ORDER_WITH).fire(new NewOrderReciever());
+            if (OrderBroadcastType.ORDER == order.getType())
+            {
+                RestaurantChefServiceRequest service = WebRequestUtils.getRequestFactory()
+                    .getRestaurantChefService();
+                service.getOrderById(order.getId()).with(OrderProxy.ORDER_WITH).fire(new NewOrderReciever());
+            }
         }
 
         @Override
