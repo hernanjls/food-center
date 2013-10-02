@@ -202,21 +202,19 @@ public class ClientService
         users.add(reservation.getUserEmail());
         
         StringBuilder msg = new StringBuilder();
-        msg.append("Table reservation was made by ");
-        msg.append(reservation.getUserEmail());
-        msg.append("\nTo ");
-        msg.append(reservation.getRestName());
-        msg.append("\nBranch address: ");
-        msg.append(reservation.getRestBranchAddr());
-        msg.append("\n\nTable should be ready between ");
+        msg.append("Table reservation\n");
+        msg.append("By: " + reservation.getUserEmail() + "\n");
+        msg.append("To :" + reservation.getRestName() + "\n");
+        msg.append("Address: " + reservation.getRestBranchAddr() + "\n");
+        msg.append("Acceptable: ");
         msg.append(dateFormat.format(reservation.getFromDate()));
         msg.append(" to ");
-        msg.append(dateFormat.format(reservation.getToDate()));
-        msg.append("\nPlease wait for confirmation and reservation time!");
-        msg.append("\n\n participents:");
+        msg.append(dateFormat.format(reservation.getToDate()) + "\n");
+        msg.append("Please wait for confirmation and reservation time!\n\n");
+        msg.append("Participents:\n");
         for (String s : users)
         {
-            msg.append(s + "\n");
+            msg.append(" " + s + "\n");
         }
 
         CommonServices.broadcastToUsers(msg.toString(), users.toArray(new String[0]));

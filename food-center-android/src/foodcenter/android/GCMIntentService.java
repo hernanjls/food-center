@@ -89,7 +89,7 @@ public class GCMIntentService extends GCMBaseIntentService
         String message = intent.getExtras().getString("msg");
         MsgBroadcastReceiver.toast(context, message);
         // notifies user
-        generateNotification(context, message);
+        AndroidUtils.generateNotification(context, message);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class GCMIntentService extends GCMBaseIntentService
         String message = getString(R.string.gcm_deleted, total);
         MsgBroadcastReceiver.toast(context, message);
         // notifies user
-        generateNotification(context, message);
+        AndroidUtils.generateNotification(context, message);
     }
 
     @Override
@@ -116,40 +116,6 @@ public class GCMIntentService extends GCMBaseIntentService
         Log.i(TAG, "Received recoverable error: " + errorId);
         MsgBroadcastReceiver.toast(context, getString(R.string.gcm_recoverable_error, errorId));
         return super.onRecoverableError(context, errorId);
-    }
-
-    /**
-     * Issues a notification to inform the user that server has sent a message.
-     */
-    private static void generateNotification(Context context, String message)
-    {
-
-        Notification.Builder builder = new Notification.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_food_center)
-            .setContentTitle(context.getString(R.string.app_name))
-            .setContentText(message);
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(context, MainActivity.class);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
-
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
-                                                                          PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // mId allows you to update the notification later on.
-        mNotificationManager.notify(0, builder.getNotification());
     }
 
     private void signOut(final Context context)
