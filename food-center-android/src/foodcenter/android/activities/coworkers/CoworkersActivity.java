@@ -235,16 +235,15 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         Date fromDate = fromCalendar.getTime();
         res.setFromDate(fromDate);
         
-     // Set acceptable end date
+        // Set acceptable end date
         Calendar toCalendar = Calendar.getInstance();
         toCalendar.setTime(new Date());
-        toCalendar.set(Calendar.HOUR, startHr);
-        toCalendar.set(Calendar.MINUTE, startMin);
+        toCalendar.set(Calendar.HOUR, endHr);
+        toCalendar.set(Calendar.MINUTE, endMin);
         toCalendar.set(Calendar.SECOND, 0);
         Date toDate = toCalendar.getTime();
         res.setToDate(toDate);
 
-        
         return res;
     }
 
