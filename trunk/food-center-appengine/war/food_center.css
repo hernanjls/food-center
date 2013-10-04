@@ -104,9 +104,9 @@ html,body {
     color: #039;
     border-bottom: 2px solid #6678b1;
 }
-.one-column-emphasis td
+.one-column-emphasis .td
 {
-    padding: 9px 8px 0px 8px;
+    padding: 9px 0px 0px 8px;
     color: #669;
     border-top: 1px solid #e8edff;
 }
