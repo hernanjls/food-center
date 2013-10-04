@@ -65,28 +65,28 @@ public abstract class AbstractCourseAdapter extends BaseAdapter
             view = activity.getLayoutInflater().inflate(R.layout.branch_view_list_course_item,
                                                         parent,
                                                         false);
+            CourseViewHolder holder = new CourseViewHolder(view);
+            view.setTag(holder);
         }
-
-        TextView txtView = (TextView) view.findViewById(R.id.branch_view_list_item_txt);
+        
+        CourseViewHolder holder = (CourseViewHolder) view.getTag();
+        
         if (null != c.getName())
         {
-            txtView.setText(c.getName());
+            holder.txtView.setText(c.getName());
         }
 
-        TextView priceView = (TextView) view.findViewById(R.id.branch_view_list_item_price);
         if (null != c.getPrice())
         {
-            priceView.setText(c.getPrice().toString());
+            holder.priceView.setText(c.getPrice().toString());
         }
 
-        EditText cntView = (EditText) view.findViewById(R.id.branch_view_list_item_cnt);
-        cntView.setText(counter.get(position).toString());
+        holder.cntView.setText(counter.get(position).toString());
 
-        TextView infoView = (TextView) view.findViewById(R.id.branch_view_list_item_info);
         if (null != c.getInfo())
         {
             String info = c.getInfo().replace("\\n", "\n");
-            infoView.setText(info);
+            holder.infoView.setText(info);
         }
 
         return view;
@@ -111,5 +111,22 @@ public abstract class AbstractCourseAdapter extends BaseAdapter
             totalCost += getPrice(i);
         }
         return totalCost;
+    }
+    
+    /** Holder for the view, getViewById is expensive */
+    private class CourseViewHolder
+    {
+        private final TextView txtView;
+        private final TextView priceView;
+        private final EditText cntView;
+        private final TextView infoView;
+        
+        private CourseViewHolder(View view)
+        {
+            txtView = (TextView) view.findViewById(R.id.branch_view_list_item_txt);
+            priceView = (TextView) view.findViewById(R.id.branch_view_list_item_price);
+            cntView = (EditText) view.findViewById(R.id.branch_view_list_item_cnt);
+            infoView = (TextView) view.findViewById(R.id.branch_view_list_item_info);;
+        }         
     }
 }

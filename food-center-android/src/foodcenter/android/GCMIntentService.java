@@ -15,13 +15,9 @@
  */
 package foodcenter.android;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -31,7 +27,6 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.login.ServerSigninTask;
-import foodcenter.android.activities.main.MainActivity;
 import foodcenter.android.service.AndroidRequestUtils;
 import foodcenter.service.FoodCenterRequestFactory;
 
@@ -41,6 +36,7 @@ import foodcenter.service.FoodCenterRequestFactory;
 public class GCMIntentService extends GCMBaseIntentService
 {
 
+    /** tag for logger */
     public static final String TAG = "GCMIntentService";
     public static final int MAX_ATTEMPTS = 5;
 
@@ -52,6 +48,10 @@ public class GCMIntentService extends GCMBaseIntentService
         super(GCM_SENDER_ID);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * This notifies the server (do login) with the GCM key.
+     */
     @Override
     protected void onRegistered(Context context, String regId)
     {
@@ -61,6 +61,11 @@ public class GCMIntentService extends GCMBaseIntentService
         new ServerSigninTask(context, regId, 5).signIn();
     }
 
+
+    /**
+     * {@inheritDoc} <br>
+     * This notifies the server (do logout) and remove GCM key.
+     */
     @Override
     protected void onUnregistered(Context context, String regId)
     {
@@ -82,6 +87,13 @@ public class GCMIntentService extends GCMBaseIntentService
         }
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Notifies the user with the message. <br>
+     * 
+     * @see {@link AndroidUtils#generateNotification(Context, String)} 
+     * @see {@link MsgBroadcastReceiver#toast(Context, String) }
+     */
     @Override
     protected void onMessage(Context context, Intent intent)
     {
@@ -92,6 +104,13 @@ public class GCMIntentService extends GCMBaseIntentService
         AndroidUtils.generateNotification(context, message);
     }
 
+    /**
+     * {@inheritDoc} <br>
+     * Notifies the user with the message. <br>
+     * 
+     * @see {@link AndroidUtils#generateNotification(Context, String)} 
+     * @see {@link MsgBroadcastReceiver#toast(Context, String) }
+     */
     @Override
     protected void onDeletedMessages(Context context, int total)
     {
@@ -118,6 +137,11 @@ public class GCMIntentService extends GCMBaseIntentService
         return super.onRecoverableError(context, errorId);
     }
 
+    /**
+     * Sign out of the server (remove GCM key from server)
+     * 
+     * @param context - passed from unregister
+     */
     private void signOut(final Context context)
     {
         String msg = "Signing out of server ..."; // TODO change to R.strings
@@ -137,6 +161,9 @@ public class GCMIntentService extends GCMBaseIntentService
         }
     }
 
+    /**
+     * Receives the server response for the sign out.
+     */
     class SignOutReciever extends Receiver<Void>
     {
         private final Context context;

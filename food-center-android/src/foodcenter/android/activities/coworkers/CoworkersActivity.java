@@ -2,6 +2,8 @@ package foodcenter.android.activities.coworkers;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
@@ -10,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.branch.BranchActivity;
@@ -28,6 +32,9 @@ import foodcenter.android.activities.rest.RestActivity;
 import foodcenter.android.data.ReservationData;
 import foodcenter.android.service.AndroidRequestUtils;
 
+/**
+ * Shows the co-worker list / allow to reserve a table
+ */
 public class CoworkersActivity extends FragmentActivity implements OnItemClickListener,
                                                        MakeTableReservationCallback,
                                                        CoworkersGetCallback,
@@ -36,6 +43,9 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
 
     private final static String RESERVE_FRAG_TAG = "foodcenter.android.RESERVE_FRAG_TAG";
 
+    public final static String SELECTED_KEY = "foodcenter.android.SELECTED_COWORKERS_KEY";
+    
+    /** list view hold all the workers */
     private ListView lv;
 
     /** this is not pull-able, but help changing action bar :) */
@@ -47,7 +57,10 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     /** Handles dialog calls and toasts */
     private ProgressDialog progress;
     private MsgBroadcastReceiver handleMsg;
+    
+    private Map<Integer, Boolean> selected = null;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,11 +73,18 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         handleMsg = new MsgBroadcastReceiver(progress);
         handleMsg.registerMe(this);
         
+        selected = ObjectStore.get(Map.class, SELECTED_KEY);
+        if (null == selected)
+        {
+            selected = new TreeMap<Integer, Boolean>();
+            ObjectStore.put(Map.class, SELECTED_KEY, selected);
+        }
+        
         lv = (ListView) findViewById(R.id.coworkers_view_list);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
         lv.setOnItemClickListener(this);
-
+            
         initActionBar();
         initPullToRefresh();
 
@@ -98,6 +118,7 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     {
         // 1st click, after this moving to action mode
         lv.setItemChecked(position, true);
+        selected.put(position, true);
     }
 
     private void initActionBar()
@@ -165,6 +186,13 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     }
 
     @Override
+    public void onBackPressed()
+    {
+        selected.clear();
+        super.onBackPressed();
+    }
+    
+    @Override
     public void onReservationFail(String msg)
     {
         MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
@@ -176,6 +204,9 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         String msg = getString(R.string.reservation_success);
         MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
 
+        // Clear the object store
+        ObjectStore.put(Map.class, SELECTED_KEY, null);
+        
         // Navigate back to main view
         NavUtils.navigateUpFromSameTask(this);
     }
@@ -205,8 +236,7 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     @Override
     public void onCancelClick(RangeTimePickerFragment dialog)
     {
-        // do nothing!
-
+        // Do nothing here !!!!
     }
 
     private ReservationData getReservationData(int startHr, int startMin, int endHr, int endMin)
@@ -292,12 +322,15 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
                                               long id,
                                               boolean checked)
         {
+            selected.put(position, checked);
             showTotalSelected(mode);
         }
 
         private void showTotalSelected(ActionMode mode)
         {
-            String s = getString(R.string.total_selected, lv.getCheckedItemCount());
+            
+            String s = getString(R.string.total_selected, lv.getCheckItemIds().length);
+            Log.d("showTotalSelected", "num checked items: " + lv.getCheckItemIds().length);
             mode.setSubtitle(s);
         }
     }

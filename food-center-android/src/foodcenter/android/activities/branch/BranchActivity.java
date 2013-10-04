@@ -36,7 +36,12 @@ import foodcenter.android.data.OrderData;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
 
-public class BranchActivity extends FragmentActivity implements
+/**
+ * Displays the branch menu and location dialogs. <br>
+ * Allow user to make an order / table reservation.
+ */
+public class BranchActivity extends FragmentActivity
+                                                    implements
                                                     BranchSwipeListViewTouchListener.OnSwipeCallback,
                                                     OnItemClickListener
 {
@@ -68,9 +73,9 @@ public class BranchActivity extends FragmentActivity implements
         lv.setMultiChoiceModeListener(new ModeCallback());
 
         BranchSwipeListViewTouchListener touchListener = new BranchSwipeListViewTouchListener(lv,
-                                                                                  this,
-                                                                                  false,
-                                                                                  false);
+                                                                                              this,
+                                                                                              false,
+                                                                                              false);
         lv.setOnTouchListener(touchListener);
         lv.setOnItemClickListener(this);
 
@@ -85,6 +90,7 @@ public class BranchActivity extends FragmentActivity implements
         handleIntent(getIntent());
     }
 
+    /** Initialize the action bar of this activity */
     private void initActionBar()
     {
         getActionBar().setDisplayShowTitleEnabled(true);
@@ -165,7 +171,13 @@ public class BranchActivity extends FragmentActivity implements
 
     }
 
-    private void OpenOrderVerification(ServiceType service)
+    /**
+     * Opens the order verification activity
+     * 
+     * @param service - is the type of the order
+     * @see {@link ServiceType} - for available service types
+     */
+    private void openOrderVerification(ServiceType service)
     {
         Intent intent = new Intent(this, OrderActivity.class);
 
@@ -178,6 +190,12 @@ public class BranchActivity extends FragmentActivity implements
         startActivity(intent);
     }
 
+    /**
+     * handle the intent used to create this activity.<br>
+     * parse branchId and restId from this intent.
+     * 
+     * @param intent
+     */
     private void handleIntent(Intent intent)
     {
         // Get the ids from the intent
@@ -213,6 +231,17 @@ public class BranchActivity extends FragmentActivity implements
             ObjectStore.put(BranchMenuListAdapter.class, branch.getId(), adapter);
         }
         lv.setAdapter(adapter);
+
+        int n = adapter.getCount();
+
+        // Set the checked items after rotating the screen
+        for (int i = 0; i < n; ++i)
+        {
+            if (adapter.isEnabled(i) && adapter.getCounter(i) > 0)
+            {
+                lv.setItemChecked(i, true);
+            }
+        }
 
         TextView phone = (TextView) findViewById(R.id.branch_drawer_phone);
         phone.setText(branch.getPhone());
@@ -278,6 +307,10 @@ public class BranchActivity extends FragmentActivity implements
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    /**
+     * Callback for the ActionMode.<br>
+     * (After selecting an item in the list, ActionMode is used instead of ActionBar)
+     */
     private class ModeCallback implements ListView.MultiChoiceModeListener
     {
         private final DecimalFormat df = new DecimalFormat("#.0");
@@ -316,11 +349,11 @@ public class BranchActivity extends FragmentActivity implements
                     break;
                 case R.id.branch_menu_delivery:
                     // mode.finish();
-                    OpenOrderVerification(ServiceType.DELIVERY);
+                    openOrderVerification(ServiceType.DELIVERY);
                     break;
                 case R.id.branch_menu_takeaway:
                     // mode.finish();
-                    OpenOrderVerification(ServiceType.TAKE_AWAY);
+                    openOrderVerification(ServiceType.TAKE_AWAY);
                     break;
                 default:
                     break;
@@ -331,7 +364,7 @@ public class BranchActivity extends FragmentActivity implements
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
-            adapter.clearCounters();
+//            adapter.clearCounters();
         }
 
         @Override
@@ -354,6 +387,7 @@ public class BranchActivity extends FragmentActivity implements
             showTotalPrice(mode);
         }
 
+        /** Shows the total price in the action mode subtitle */
         private void showTotalPrice(ActionMode mode)
         {
             String s = getString(R.string.total_price) + " " + df.format(adapter.getTotalPrice());

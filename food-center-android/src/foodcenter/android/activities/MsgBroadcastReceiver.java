@@ -9,6 +9,9 @@ import android.content.IntentFilter;
 import android.widget.Toast;
 import foodcenter.android.AndroidUtils;
 
+/**
+ * {@link BroadcastReceiver} for handleing messages 
+ */
 public class MsgBroadcastReceiver extends BroadcastReceiver
 {
 
@@ -18,12 +21,19 @@ public class MsgBroadcastReceiver extends BroadcastReceiver
     /** Intent used to display a message in the screen. */
     public static final String ACTION_SHOW_PROGRESS = "foodcenter.android.SHOW_PROGRESS";
     
-    public static final String EXTRA_MESSAGE = "extraMessage";
+    /** tag for the message to put/ display */
+    private static final String EXTRA_MESSAGE = "extraMessage";
 
+    /** progress dialog to show progress on */
     private ProgressDialog progress;
     
+    /**
+     * Creates a new MsgReceiver.
+     * @param progress - progress dialog to show progress.
+     */
     public MsgBroadcastReceiver(ProgressDialog progress)
     {
+        super();
         this.progress = progress;
     }
     
@@ -56,7 +66,8 @@ public class MsgBroadcastReceiver extends BroadcastReceiver
 
     /**
      * Notifies UI to display a toast message.<br>
-     * It's used both by the UI and the background services and tasks.
+     * It's used both by the UI and the background services and tasks.<br>
+     * Notifies all registered MsgBroadcastHandlers
      * 
      * @param context application's context.
      * @param msg message to be displayed.
@@ -72,13 +83,17 @@ public class MsgBroadcastReceiver extends BroadcastReceiver
         context.sendBroadcast(intent);
     }
 
-    
+    /**
+     * Register this receiver to the activity.
+     * @param activity
+     */
     public void registerMe(Activity activity)
     {
         activity.registerReceiver(this, new IntentFilter(ACTION_SHOW_PROGRESS));
         activity.registerReceiver(this, new IntentFilter(ACTION_SHOW_TOAST));
 
     }
+
     @Override
     public void onReceive(Context context, Intent intent)
     {
