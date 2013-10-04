@@ -186,6 +186,9 @@ public class ClientService
             logger.debug(ServiceError.ACCEPTABLE_START_DATE_NOT_FOUND);
             throw new ServiceError(ServiceError.ACCEPTABLE_END_DATE_NOT_FOUND);
         }
+
+        // Remove the user's email from the users list if its there
+        reservation.getUsers().remove(reservation.getUserEmail());
         
         // Save the order (using 1 transaction!)
         reservation = DbHandler.save(reservation);

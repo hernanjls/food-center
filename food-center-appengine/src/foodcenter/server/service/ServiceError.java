@@ -17,6 +17,7 @@ public class ServiceError extends Error
     public static final String INVALID_COMP_BRANCH_ID = "Invalid Company Branch ID: ";
     public static final String INVALID_COMP_ID = "Invalid Company ID: ";
     public static final String INVALID_ORDER_ID = "Invalid Order ID: ";
+    public static final String INVALID_RESERVATION_ID = "Invalid Reservation ID: ";
     
     public static final String COMPANY_NOT_ASSOCIATED_TO_BRANCH = "Company branch is not associated to Company";
     public static final String DEFAULT_RESTS_NOT_FOUND = "Default restaurants not found...";

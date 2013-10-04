@@ -123,5 +123,4 @@ public class CommonServices
             GCMSender.send(msg, gcmKeys, 5);
         }
     }
-    
 }

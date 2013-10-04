@@ -18,6 +18,7 @@ public class DbTableReservation extends AbstractDbOrder
      */
     private static final long serialVersionUID = -4697560980672152593L;
 
+    public static final String DEFAULT_ICON_PATH = "/images/service/table.png";
     
     @Persistent
     private Date fromDate = null;
@@ -49,6 +50,18 @@ public class DbTableReservation extends AbstractDbOrder
         {
             status = TableReservationStatus.CREATED;
         }        
+    }
+    
+    @Override
+    public void jdoPostLoad()
+    {
+        super.jdoPostLoad();
+        
+        // Make sure image can be shown!
+        if (0 == getImageUrl().length())
+        {
+            setImageUrl(DEFAULT_ICON_PATH);
+        }
     }
     
     public Date getFromDate()

@@ -23,7 +23,7 @@
     <!--                                                               -->
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="food_center.css">
+    <link type="text/css" rel="stylesheet" href="food_center.css"/>
 
     <!--                                           -->
     <!-- Any title is fine                         -->
