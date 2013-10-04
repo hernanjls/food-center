@@ -2,14 +2,18 @@ package foodcenter.server;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
 
 public class GCMSender
 {
+    
+    private static Logger logger = LoggerFactory.getLogger(GCMSender.class);
+    
     private static String SERVER_API_KEY_GCM = "AIzaSyBRTi4GJOeB0aYwxRjr-hbe3FZDvOQzQ3w";
 
     public static void send(String msg, String dev, int numRetries)
@@ -22,7 +26,7 @@ public class GCMSender
         }
         catch (IOException e)
         {
-            Logger.getLogger(GCMSender.class.getName()).log(Level.WARNING, e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
     }
@@ -37,7 +41,7 @@ public class GCMSender
         }
         catch (IOException e)
         {
-            Logger.getLogger(GCMSender.class.getName()).log(Level.WARNING, e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 }

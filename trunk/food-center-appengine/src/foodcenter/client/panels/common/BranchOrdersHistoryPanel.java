@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -20,6 +19,7 @@ import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
+import foodcenter.client.WebClientUtils;
 import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -37,9 +37,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
     private final String branchId;
 
     private final FindOrdersPanel findOrdersPanel;
-
-    private final DateTimeFormat dateFormater = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm");
-
+    
     private final boolean isRestView;
     
     private final Label infoPopupText; // for setting the popup text
@@ -324,7 +322,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
                             totalDelivered += price;
                         }
 
-                        setText(row, 0, dateFormater.format(o.getDate()));
+                        setText(row, 0, WebClientUtils.getDateFormatter().format(o.getDate()));
                         setText(row, 1, o.getUserEmail());
                         setText(row, 2, o.getService().getName());
                         setWidget(row, 3, new CoursesInfoPanel(o));
