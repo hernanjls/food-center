@@ -18,8 +18,16 @@ public class RangeTimePickerFragment extends DialogFragment
 
     public interface RangeTimePickerListener
     {
+        /**
+         * called after a reserve click
+         * @param dialog
+         */
         public void onReserveClick(RangeTimePickerFragment dialog);
 
+        /**
+         * called after a cancel click
+         * @param dialog
+         */
         public void onCancelClick(RangeTimePickerFragment dialog);
     }
 

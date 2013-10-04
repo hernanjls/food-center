@@ -15,9 +15,13 @@ import foodcenter.service.proxies.CourseProxy;
 import foodcenter.service.proxies.MenuCategoryProxy;
 import foodcenter.service.proxies.MenuProxy;
 
+/**
+ * List Adapter which handles the menu items.
+ */
 public class BranchMenuListAdapter extends AbstractCourseAdapter
 {
 
+    /** (position -> category name) , null if this is a course position */ 
     private final TreeMap<Integer, String> categoryNames;
     
     public BranchMenuListAdapter(Activity activity, MenuProxy menu)
@@ -33,29 +37,34 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
 
         // For each idx if courses is null than there is a category (or end of items)
         int n = menu.getCategories().size();
+        int k = 0;
         for (int i = 0; i < n; ++i)
         {
             MenuCategoryProxy cat = menu.getCategories().get(i);
-            int k = courses.size();
             categoryNames.put(k, cat.getCategoryTitle());
-            courses.add(null);
+            courses.add(null);  // courses holds null where there is categories
+            ++k;
 
+            // When category is empty, continue to the next category.
             if (null == cat.getCourses() || 0 == cat.getCourses().size())
             {
                 continue;
             }
 
+            // Add all the courses to the adapter courses.
             int m = cat.getCourses().size();
             for (int j = 0; j < m; ++j)
             {
-                k = courses.size();
                 counter.put(k, 0);
                 courses.add(cat.getCourses().get(j));
+                ++k;
             }
         }
     }
 
-    // create a new ImageView for each item referenced by the Adapter
+    /**
+     * create a new ImageView for each item referenced by the Adapter
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
@@ -72,7 +81,7 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
     @Override
     public boolean isEnabled(int position)
     {
-        // Category is considered as a separator (disable swiping)
+        // Category is considered as a separator (disable clicking/ swiping)
         return null != getItem(position);
     }
     
@@ -90,7 +99,7 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
 
     private View getHeaderView(int position, View view, ViewGroup parent)
     {
-        String txt = categoryNames.get(position);
+        
         if (view == null || !(view instanceof TextView))
         {
             // on scrolling view can be course view
@@ -98,13 +107,15 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
                                                         parent,
                                                         false);
         }
+        
+        String txt = categoryNames.get(position);
         TextView res = (TextView) view;
         res.setText(txt);
         view.setTag(R.id.swipable, false);
         return res;
     }
 
-    
+    /** aggregate the order information into a OrderData holder */
     public OrderData getOrderConfData(ServiceType service)
     {
         OrderData res = new OrderData();
@@ -121,6 +132,13 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
         }
         return res;        
     }
+    
+    /** 
+     * Increase the counter of item at position. <br>
+     * Usually called on swipe right
+     * 
+     * @param position
+     */
     public void increaseCounter(int position)
     {
         int old = counter.get(position);
@@ -128,7 +146,9 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
         notifyDataSetChanged();
     }
 
-    /**
+    /** 
+     * Increase the counter of item at position. <br>
+     * Usually called on swipe left
      * 
      * @param position
      * @return true if can still decrease
@@ -146,12 +166,20 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
         return false;
     }
 
+    /**
+     * Clear the counter for position
+     * 
+     * @param pos
+     */
     public void clearCounter(int pos)
     {
         counter.put(pos, 0);
         notifyDataSetChanged();
     }
 
+    /**
+     * Clear counters for all the items
+     */
     public void clearCounters()
     {
         for (Integer pos : counter.keySet())
@@ -162,6 +190,10 @@ public class BranchMenuListAdapter extends AbstractCourseAdapter
 
     }
 
+    /**
+     * @param pos
+     * @return the counter of item at pos
+     */
     public Integer getCounter(int pos)
     {
         return counter.get(pos);

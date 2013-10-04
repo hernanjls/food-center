@@ -70,6 +70,13 @@ public class BranchSwipeListViewTouchListener implements View.OnTouchListener
          */
         void onSwipeLeft(ListView listView, int[] reverseSortedPositions);
 
+        /**
+         * Called when the user has swiped the list item to the right.
+         * 
+         * @param listView The originating {@link ListView}.
+         * @param reverseSortedPositions An array of positions to dismiss, sorted in descending
+         *            order for convenience.
+         */
         void onSwipeRight(ListView listView, int[] reverseSortedPositions);
     }
 
@@ -86,9 +93,9 @@ public class BranchSwipeListViewTouchListener implements View.OnTouchListener
      * @see #SwipeListViewTouchListener(ListView, OnSwipeCallback, boolean, boolean)
      */
     public BranchSwipeListViewTouchListener(ListView listView,
-                                      OnSwipeCallback callback,
-                                      boolean dismissLeft,
-                                      boolean dismissRight)
+                                            OnSwipeCallback callback,
+                                            boolean dismissLeft,
+                                            boolean dismissRight)
     {
         mAnimationTime = listView.getContext()
             .getResources()
@@ -127,7 +134,8 @@ public class BranchSwipeListViewTouchListener implements View.OnTouchListener
      * {@link ListView} using
      * {@link ListView#setOnScrollListener(android.widget.AbsListView.OnScrollListener)}.
      * If a scroll listener is already assigned, the caller should still pass scroll changes
-     * through to this listener. This will ensure that this {@link BranchSwipeListViewTouchListener} is
+     * through to this listener. This will ensure that this {@link BranchSwipeListViewTouchListener}
+     * is
      * paused during list view scrolling.</p>
      * 
      * @see {@link BranchSwipeListViewTouchListener}

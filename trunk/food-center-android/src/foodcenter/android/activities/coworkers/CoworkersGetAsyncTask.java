@@ -1,6 +1,7 @@
 package foodcenter.android.activities.coworkers;
 
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -32,7 +33,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
     private final CoworkersGetCallback callback;
     private final ListView lv;
 
-    private final String query = CoworkersGetAsyncTask.class.getName();
+    private final static String usersKeyStore = CoworkersGetAsyncTask.class.getName() + "_USERS";
 
     private final boolean isEnabled; 
     
@@ -64,7 +65,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
             FoodCenterRequestFactory factory = AndroidRequestUtils.getFoodCenterRF(activity);
 
             @SuppressWarnings("unchecked")
-            List<String> rests = ObjectStore.get(List.class, query);
+            List<String> rests = ObjectStore.get(List.class, usersKeyStore);
             if (null != rests)
             {
                 publishProgress(rests.toArray(new String[0]));
@@ -88,7 +89,16 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
         CoworkersListAdapter adapter = new CoworkersListAdapter(activity, coworkers, isEnabled);
 
         lv.setAdapter(adapter);
-
+        
+        if (isEnabled)
+        {
+            @SuppressWarnings("unchecked")
+            Map<Integer, Boolean> selected = ObjectStore.get(Map.class, CoworkersActivity.SELECTED_KEY);
+            for (int pos : selected.keySet())
+            {
+                lv.setItemChecked(pos, selected.get(pos));
+            }
+        }
         // Notify PullToRefreshAttacher that the refresh has finished
         callback.hideSpinner();
     }
@@ -116,7 +126,7 @@ public class CoworkersGetAsyncTask extends AsyncTask<Void, String, Exception>
             if (null != response)
             {
                 // Save the response in cache!
-                ObjectStore.put(List.class, query, response);
+                ObjectStore.put(List.class, usersKeyStore, response);
                 coworkers = response.toArray(coworkers);
             }
             publishProgress(coworkers);

@@ -9,8 +9,7 @@ import foodcenter.android.data.OrderData;
 
 public class OrderCourseListAdapter extends AbstractCourseAdapter
 {
-    public OrderCourseListAdapter(Activity activity,
-                            OrderData data)
+    public OrderCourseListAdapter(Activity activity, OrderData data)
     {
         super(activity, data.getCourses(), data.getCounters());
     }
@@ -38,7 +37,7 @@ public class OrderCourseListAdapter extends AbstractCourseAdapter
     {
         return false;
     }
-    
+
     private View getHeaderView(View view, ViewGroup parent)
     {
         if ((view == null) || (R.id.order_list_header_cnt != view.getId()))
