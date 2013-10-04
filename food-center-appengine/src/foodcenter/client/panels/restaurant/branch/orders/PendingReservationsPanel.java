@@ -38,7 +38,9 @@ public class PendingReservationsPanel extends FlexTable
     public PendingReservationsPanel(String branchId)
     {
         super();
-
+        
+        setStyleName("one-column-emphasis");
+        
         reservations = new ArrayList<TableReservationProxy>();
 
         this.setWidth("100%");
@@ -70,14 +72,14 @@ public class PendingReservationsPanel extends FlexTable
         // prints the header
         setText(row, 0, "Reservation information");
         setText(row, 1, "Wants to arrive between:");
-        
+        getRowFormatter().setStyleName(row, "th");
         ++row;
         for (TableReservationProxy o : reservations)
         {
             setWidget(row, 0, new CompanyMembersPanel(o));
             setWidget(row, 1, new PendingAvailableTimesPanel(o));
             setWidget(row, 2, new PendingReservationControlPanel(o));
-            
+            getRowFormatter().setStyleName(row, "td");
             ++row;
         }
     }

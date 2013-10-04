@@ -328,6 +328,7 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
                         setWidget(row, 3, new CoursesInfoPanel(o));
                         setText(row, 4, price.toString());
                         setText(row, 5, o.getStatus().getName());
+                        getRowFormatter().setStyleName(row, "td");
                         ++row;
                     }
                 }

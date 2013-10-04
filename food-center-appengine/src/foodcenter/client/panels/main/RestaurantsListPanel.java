@@ -140,23 +140,24 @@ public class RestaurantsListPanel extends VerticalPanel implements RedrawablePan
                 restsTable.setWidget(row, COLUMN_DELETE_BUTTON, delete);
             }
         }
+        
+        restsTable.getRowFormatter().setStyleName(row, "td");
     }
 
     private void printRestaurantsTableHeader()
     {
-        restsTable.setText(0, COLUMN_IMAGE, "Image");
         restsTable.setText(0, COLUMN_NAME, "Name");
         restsTable.setText(0, COLUMN_DELIVERY, "Delivery");
         restsTable.setText(0, COLUMN_TAKEAWAY, "Take Away");
         restsTable.setText(0, COLUMN_TABLE, "Table");
-
+        
         if (isAdmin)
         {
             Button newButton = new Button("New");
             newButton.addClickHandler(new OnClickNewRestaurant());
             restsTable.setWidget(0, COLUMN_NEW_BUTTON, newButton);
         }
-
+        restsTable.getRowFormatter().setStyleName(0, "th");
     }
 
     private Panel createOptionsPannel()

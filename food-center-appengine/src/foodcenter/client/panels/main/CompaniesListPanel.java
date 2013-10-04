@@ -74,6 +74,7 @@ public class CompaniesListPanel extends VerticalPanel implements RedrawablePanel
         compsTable = new FlexTable();
         add(compsTable);
 
+        compsTable.setStyleName("one-column-emphasis");
         redraw();
     }
 
@@ -139,11 +140,11 @@ public class CompaniesListPanel extends VerticalPanel implements RedrawablePanel
                 compsTable.setWidget(row, COLUMN_DELETE_BUTTON, delete);
             }
         }
+        compsTable.getRowFormatter().setStyleName(row, "td");
     }
 
     private void printCompanysTableHeader()
     {
-        compsTable.setText(0, COLUMN_IMAGE, "Image");
         compsTable.setText(0, COLUMN_NAME, "Name");
         compsTable.setText(0, COLUMN_DELIVERY, "Delivery");
         compsTable.setText(0, COLUMN_TAKEAWAY, "Take Away");
@@ -155,7 +156,7 @@ public class CompaniesListPanel extends VerticalPanel implements RedrawablePanel
             newButton.addClickHandler(new OnClickNewCompany());
             compsTable.setWidget(0, COLUMN_NEW_BUTTON, newButton);
         }
-
+        compsTable.getRowFormatter().setStyleName(0, "th");
     }
 
     private Panel createOptionsPannel()
