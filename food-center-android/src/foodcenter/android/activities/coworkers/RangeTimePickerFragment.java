@@ -1,5 +1,6 @@
 package foodcenter.android.activities.coworkers;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
 
 import android.app.Activity;
@@ -10,34 +11,40 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.NumberPicker;
 import android.widget.TimePicker;
 import foodcenter.android.R;
 
 public class RangeTimePickerFragment extends DialogFragment
 {
 
+    private final static String[] DISPLAYED_MINS = { "0", "10", "20", "30", "40", "50" };
+
     public interface RangeTimePickerListener
     {
         /**
          * called after a reserve click
+         * 
          * @param dialog
          */
         public void onReserveClick(RangeTimePickerFragment dialog);
 
         /**
          * called after a cancel click
+         * 
          * @param dialog
          */
         public void onCancelClick(RangeTimePickerFragment dialog);
     }
 
+    
     private RangeTimePickerListener listener;
 
     private int startHr;
     private int startMin;
     private int endHr;
     private int endMin;
-    
+
     // Override the Fragment.onAttach() method to instantiate the LoginDialogListener
     @Override
     public void onAttach(Activity activity)
@@ -63,21 +70,34 @@ public class RangeTimePickerFragment extends DialogFragment
         LayoutInflater inflater = (LayoutInflater) getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.range_time_picker, null);
 
-        
         // Use the current time as the default values for the picker
         final Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        int minute = 0;
 
         final TimePicker dpStartDate = (TimePicker) view.findViewById(R.id.dpStartDate);
         dpStartDate.setIs24HourView(true);
         dpStartDate.setCurrentHour(hour);
         dpStartDate.setCurrentMinute(minute);
+        NumberPicker startMinSpiner = getMinuteSpinner(dpStartDate);
+        if (null != startMinSpiner)
+        {
+            startMinSpiner.setMinValue(0);
+            startMinSpiner.setMaxValue(DISPLAYED_MINS.length - 1);
+            startMinSpiner.setDisplayedValues(DISPLAYED_MINS);
+        }
 
         final TimePicker dpEndDate = (TimePicker) view.findViewById(R.id.dpEndDate);
         dpEndDate.setIs24HourView(true);
         dpEndDate.setCurrentHour(hour + 1);
         dpEndDate.setCurrentMinute(minute);
+        NumberPicker endMinSpiner = getMinuteSpinner(dpEndDate);
+        if (null != endMinSpiner)
+        {
+            endMinSpiner.setMinValue(0);
+            endMinSpiner.setMaxValue(DISPLAYED_MINS.length - 1);
+            endMinSpiner.setDisplayedValues(DISPLAYED_MINS);
+        }
 
         // Build the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -89,15 +109,15 @@ public class RangeTimePickerFragment extends DialogFragment
             public void onClick(DialogInterface dialog, int which)
             {
                 startHr = dpStartDate.getCurrentHour();
-                startMin = dpStartDate.getCurrentMinute();
-                
+                startMin = Integer.parseInt(DISPLAYED_MINS[dpStartDate.getCurrentMinute()]);
+
                 endHr = dpEndDate.getCurrentHour();
-                endMin = dpEndDate.getCurrentMinute();
-                
+                endMin = Integer.parseInt(DISPLAYED_MINS[dpEndDate.getCurrentMinute()]);
+
                 listener.onReserveClick(RangeTimePickerFragment.this);
             }
         });
-        
+
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
         {
             @Override
@@ -106,13 +126,11 @@ public class RangeTimePickerFragment extends DialogFragment
                 listener.onCancelClick(RangeTimePickerFragment.this);
             }
         });
-        
 
         Dialog res = builder.create();
         res.setCanceledOnTouchOutside(false);
         return res;
     }
-
 
     public int getStartHr()
     {
@@ -153,4 +171,19 @@ public class RangeTimePickerFragment extends DialogFragment
     {
         this.endMin = endMin;
     }
+
+    private NumberPicker getMinuteSpinner(TimePicker t)
+    {
+        try
+        {
+            Field f = t.getClass().getDeclaredField("mMinuteSpinner"); // NoSuchFieldException
+            f.setAccessible(true);
+            return (NumberPicker) f.get(t); // IllegalAccessException
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
 }
