@@ -16,29 +16,29 @@ public abstract class AbstractCourseAdapter extends BaseAdapter
 {
 
     protected final Activity activity;
-    protected final List<CourseProxy> courses;
-    protected final Map<Integer, Integer> counter; // position -> counter
 
-    public AbstractCourseAdapter(Activity activity,
-                                 List<CourseProxy> courses,
-                                 Map<Integer, Integer> counter)
+    public AbstractCourseAdapter(Activity activity)
     {
         super();
         this.activity = activity;
-        this.courses = courses;
-        this.counter = counter;
     }
-
+    
+    /** get position -> numItems counter */
+    protected abstract Map<Integer, Integer> getCounter();
+    
+    /** get list of courses, null where there is no course*/
+    protected abstract List<CourseProxy> getCourses();
+    
     @Override
     public int getCount()
     {
-        return courses.size();
+        return getCourses().size();
     }
 
     @Override
     public CourseProxy getItem(int position)
     {
-        return courses.get(position);
+        return getCourses().get(position);
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class AbstractCourseAdapter extends BaseAdapter
             holder.priceView.setText(c.getPrice().toString());
         }
 
-        holder.cntView.setText(counter.get(position).toString());
+        holder.cntView.setText(getCounter().get(position).toString());
 
         if (null != c.getInfo())
         {
@@ -99,13 +99,13 @@ public abstract class AbstractCourseAdapter extends BaseAdapter
         {
             return 0.0;
         }
-        return b.getPrice() * counter.get(pos);
+        return b.getPrice() * getCounter().get(pos);
     }
 
     public double getTotalPrice()
     {
         Double totalCost = 0.0;
-        int n = courses.size();
+        int n = getCourses().size();
         for (int i = 0; i < n; ++i)
         {
             totalCost += getPrice(i);
