@@ -47,7 +47,7 @@ public class AndroidRequestUtils
     
     /** The URL of the production service. */
     public static final String PROD_URL = "https://food-center.appspot.com";
-    public static final String DEV_URL = "http://10.0.0.32:8888";
+    public static final String[] DEV_URLS = {"http://10.0.0.32:8888", "http://192.168.2.106:8888" };
     
 
     /** Cookie name for authorization. */

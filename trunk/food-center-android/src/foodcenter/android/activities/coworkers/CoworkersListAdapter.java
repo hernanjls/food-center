@@ -1,5 +1,8 @@
 package foodcenter.android.activities.coworkers;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.View;
@@ -16,18 +19,18 @@ public class CoworkersListAdapter extends BaseAdapter
     private static final int PROFILE_IMG = R.drawable.ic_person;
     private static final int COWORKER_IMG = R.drawable.ic_group;
 
-    private final String[] coworkers;
+    private final List<String> coworkers;
     private final String me;
 
     private final Activity activity;
 
     private final boolean enabled;
 
-    public CoworkersListAdapter(Activity activity, String[] coworkers, boolean isEnabled)
+    public CoworkersListAdapter(Activity activity, List<String> coworkers, boolean isEnabled)
     {
         super();
         this.activity = activity;
-        this.coworkers = coworkers;
+        this.coworkers = (null != coworkers) ? coworkers : new LinkedList<String>();
         this.enabled = isEnabled;
 
         me = AndroidRequestUtils.getSharedPreferences(activity.getApplicationContext())
@@ -43,17 +46,13 @@ public class CoworkersListAdapter extends BaseAdapter
         {
             return 0;
         }
-        return coworkers.length;
+        return coworkers.size();
     }
 
     @Override
     public String getItem(int position)
     {
-        if (position > getCount())
-        {
-            return null;
-        }
-        return coworkers[position];
+        return coworkers.get(position);
     }
 
     // Require for structure, not really used in my code. Can
@@ -64,6 +63,12 @@ public class CoworkersListAdapter extends BaseAdapter
         return position;
     }
 
+    @Override
+    public boolean hasStableIds()
+    {
+       return true;
+    }
+    
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View view, ViewGroup parent)
     {
@@ -102,5 +107,18 @@ public class CoworkersListAdapter extends BaseAdapter
     {
         private ImageView img;
         private TextView txt;
+    }
+    
+    public List<String> getSavedState()
+    {
+        List<String> res = new LinkedList<String>();
+        res.addAll(coworkers);
+        return res;
+    }
+    
+    public void addCoworkers(List<String> coworkers)
+    {
+        this.coworkers.addAll(coworkers);
+        notifyDataSetChanged();
     }
 }

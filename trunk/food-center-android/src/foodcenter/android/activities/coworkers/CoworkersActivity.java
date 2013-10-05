@@ -2,8 +2,7 @@ package foodcenter.android.activities.coworkers;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
@@ -21,11 +20,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import foodcenter.android.ObjectStore;
 import foodcenter.android.R;
 import foodcenter.android.activities.MsgBroadcastReceiver;
 import foodcenter.android.activities.branch.BranchActivity;
-import foodcenter.android.activities.coworkers.CoworkersGetAsyncTask.CoworkersGetCallback;
+import foodcenter.android.activities.coworkers.CoworkersGetRunnable.CoworkersGetCallback;
 import foodcenter.android.activities.coworkers.MakeTableReservationAsyncTask.MakeTableReservationCallback;
 import foodcenter.android.activities.coworkers.RangeTimePickerFragment.RangeTimePickerListener;
 import foodcenter.android.activities.rest.RestActivity;
@@ -43,8 +41,6 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
 
     private final static String RESERVE_FRAG_TAG = "foodcenter.android.RESERVE_FRAG_TAG";
 
-    public final static String SELECTED_KEY = "foodcenter.android.SELECTED_COWORKERS_KEY";
-    
     /** list view hold all the workers */
     private ListView lv;
 
@@ -57,10 +53,9 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     /** Handles dialog calls and toasts */
     private ProgressDialog progress;
     private MsgBroadcastReceiver handleMsg;
-    
-    private Map<Integer, Boolean> selected = null;
 
-    @SuppressWarnings("unchecked")
+    private CoworkersListAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -72,19 +67,12 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
 
         handleMsg = new MsgBroadcastReceiver(progress);
         handleMsg.registerMe(this);
-        
-        selected = ObjectStore.get(Map.class, SELECTED_KEY);
-        if (null == selected)
-        {
-            selected = new TreeMap<Integer, Boolean>();
-            ObjectStore.put(Map.class, SELECTED_KEY, selected);
-        }
-        
+
         lv = (ListView) findViewById(R.id.coworkers_view_list);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lv.setMultiChoiceModeListener(new ModeCallback());
         lv.setOnItemClickListener(this);
-            
+
         initActionBar();
         initPullToRefresh();
 
@@ -95,15 +83,25 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
             restId = extras.getString(RestActivity.EXTRA_REST_ID);
         }
 
+        boolean isReservation = (null != branchId) && (null != restId);
+        @SuppressWarnings("unchecked")
+        List<String> savedState = (List<String>) getLastCustomNonConfigurationInstance();
+
+        adapter = new CoworkersListAdapter(this, savedState, isReservation);
+        lv.setAdapter(adapter);
+        
+        if (null == savedState)
+        {
+            pullToRefreshAttacher.setRefreshing(true);
+            new Thread(new CoworkersGetRunnable(this, this)).start();
+        }
     }
 
     @Override
-    protected void onStart()
+    public Object onRetainCustomNonConfigurationInstance()
     {
-        super.onStart();
-
-        boolean isReservation = (null != branchId) && (null != restId);
-        new CoworkersGetAsyncTask(this, this, lv, isReservation).execute();
+        final List<String> savedState = adapter.getSavedState();
+        return savedState;
     }
 
     @Override
@@ -112,13 +110,12 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         unregisterReceiver(handleMsg);
         super.onDestroy();
     }
-    
+
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
     {
         // 1st click, after this moving to action mode
         lv.setItemChecked(position, true);
-        selected.put(position, true);
     }
 
     private void initActionBar()
@@ -186,13 +183,6 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     }
 
     @Override
-    public void onBackPressed()
-    {
-        selected.clear();
-        super.onBackPressed();
-    }
-    
-    @Override
     public void onReservationFail(String msg)
     {
         MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
@@ -204,23 +194,37 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         String msg = getString(R.string.reservation_success);
         MsgBroadcastReceiver.progressDismissAndToastMsg(this, msg);
 
-        // Clear the object store
-        ObjectStore.put(Map.class, SELECTED_KEY, null);
-        
         // Navigate back to main view
         NavUtils.navigateUpFromSameTask(this);
     }
 
     @Override
-    public void showSpinner()
+    public void onSuccessGetCoworkers(final List<String> coworkers)
     {
-        pullToRefreshAttacher.setRefreshing(true);
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                pullToRefreshAttacher.setRefreshComplete();
+                adapter.addCoworkers(coworkers);
+            };
+        });
+
     }
 
     @Override
-    public void hideSpinner()
+    public void onFailGetCoworkers(final String msg)
     {
-        pullToRefreshAttacher.setRefreshComplete();
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                pullToRefreshAttacher.setRefreshComplete();
+                MsgBroadcastReceiver.progressDismissAndToastMsg(CoworkersActivity.this, msg);
+            };
+        });
     }
 
     @Override
@@ -228,7 +232,10 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
     {
         String msg = getString(R.string.make_table_reservation);
         MsgBroadcastReceiver.progress(CoworkersActivity.this, msg);
-        ReservationData data = getReservationData(dialog.getStartHr(), dialog.getStartMin(), dialog.getEndHr(), dialog.getEndMin());
+        ReservationData data = getReservationData(dialog.getStartHr(),
+                                                  dialog.getStartMin(),
+                                                  dialog.getEndHr(),
+                                                  dialog.getEndMin());
         new MakeTableReservationAsyncTask(CoworkersActivity.this, CoworkersActivity.this).execute(data);
 
     }
@@ -264,7 +271,7 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         fromCalendar.set(Calendar.SECOND, 0);
         Date fromDate = fromCalendar.getTime();
         res.setFromDate(fromDate);
-        
+
         // Set acceptable end date
         Calendar toCalendar = Calendar.getInstance();
         toCalendar.setTime(new Date());
@@ -314,6 +321,7 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
+            //
         }
 
         @Override
@@ -322,15 +330,13 @@ public class CoworkersActivity extends FragmentActivity implements OnItemClickLi
                                               long id,
                                               boolean checked)
         {
-            selected.put(position, checked);
             showTotalSelected(mode);
         }
 
         private void showTotalSelected(ActionMode mode)
         {
-            
-            String s = getString(R.string.total_selected, lv.getCheckItemIds().length);
-            Log.d("showTotalSelected", "num checked items: " + lv.getCheckItemIds().length);
+            String s = getString(R.string.total_selected, lv.getCheckedItemCount()); 
+            Log.d("showTotalSelected", s);
             mode.setSubtitle(s);
         }
     }

@@ -194,7 +194,10 @@ public class LoginDialogFragment extends DialogFragment
     {
         ArrayList<String> result = new ArrayList<String>();
         result.add(AndroidRequestUtils.PROD_URL);
-        result.add(AndroidRequestUtils.DEV_URL);
+        for (String url : AndroidRequestUtils.DEV_URLS)
+        {
+            result.add(url);
+        }
         return result;
     }
 

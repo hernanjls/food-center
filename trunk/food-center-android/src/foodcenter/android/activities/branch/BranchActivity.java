@@ -32,6 +32,7 @@ import foodcenter.android.R;
 import foodcenter.android.activities.coworkers.CoworkersActivity;
 import foodcenter.android.activities.order.OrderActivity;
 import foodcenter.android.activities.rest.RestActivity;
+import foodcenter.android.data.MenuSavedState;
 import foodcenter.android.data.OrderData;
 import foodcenter.service.enums.ServiceType;
 import foodcenter.service.proxies.RestaurantBranchProxy;
@@ -83,13 +84,6 @@ public class BranchActivity extends FragmentActivity
         handleIntent(getIntent());
     }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        handleIntent(getIntent());
-    }
-
     /** Initialize the action bar of this activity */
     private void initActionBar()
     {
@@ -105,9 +99,10 @@ public class BranchActivity extends FragmentActivity
     {
         int pos = reverseSortedPositions[0];
 
-        if (null != adapter.getItem(pos) && !adapter.decreaseCounter(pos))
+        if (null != adapter.getItem(pos))
         {
-            lv.setItemChecked(pos, false);
+            boolean newState = adapter.decreaseCounter(pos);
+            lv.setItemChecked(pos, newState);
         }
     }
 
@@ -120,6 +115,14 @@ public class BranchActivity extends FragmentActivity
             adapter.increaseCounter(pos);
             lv.setItemChecked(pos, true);
         }
+    }
+
+    
+    @Override
+    public Object onRetainCustomNonConfigurationInstance()
+    {
+        final MenuSavedState savedState = adapter.getSavedState();
+        return savedState;
     }
 
     @Override
@@ -144,6 +147,18 @@ public class BranchActivity extends FragmentActivity
     {
         super.setTitle(title);
         getActionBar().setTitle(title);
+    }
+
+    public void onClickActionModeDoneButton(View view)
+    {
+        adapter.clearCounters();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        adapter.clearCounters();
+        super.onBackPressed();
     }
 
     @Override
@@ -224,24 +239,9 @@ public class BranchActivity extends FragmentActivity
             services = new ArrayList<ServiceType>();
         }
 
-        adapter = ObjectStore.get(BranchMenuListAdapter.class, branch.getId());
-        if (null == adapter)
-        {
-            adapter = new BranchMenuListAdapter(this, branch.getMenu());
-            ObjectStore.put(BranchMenuListAdapter.class, branch.getId(), adapter);
-        }
+        MenuSavedState savedState = (MenuSavedState) getLastCustomNonConfigurationInstance();
+        adapter = new BranchMenuListAdapter(this, branch.getMenu(), savedState);
         lv.setAdapter(adapter);
-
-        int n = adapter.getCount();
-
-        // Set the checked items after rotating the screen
-        for (int i = 0; i < n; ++i)
-        {
-            if (adapter.isEnabled(i) && adapter.getCounter(i) > 0)
-            {
-                lv.setItemChecked(i, true);
-            }
-        }
 
         TextView phone = (TextView) findViewById(R.id.branch_drawer_phone);
         phone.setText(branch.getPhone());
@@ -316,7 +316,7 @@ public class BranchActivity extends FragmentActivity
         private final DecimalFormat df = new DecimalFormat("#.0");
 
         @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        public boolean onCreateActionMode(final ActionMode mode, Menu menu)
         {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.branch_course_list_select_menu, menu);
@@ -330,13 +330,20 @@ public class BranchActivity extends FragmentActivity
 
             mode.setTitle("Select Items");
             showTotalPrice(mode);
+
             return true;
         }
 
         @Override
+        public void onDestroyActionMode(ActionMode mode)
+        {
+            adapter.clearCounters();
+        }
+        
+        @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu)
         {
-            return true;
+            return false;
         }
 
         @Override
@@ -362,12 +369,6 @@ public class BranchActivity extends FragmentActivity
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode mode)
-        {
-//            adapter.clearCounters();
-        }
-
-        @Override
         public void onItemCheckedStateChanged(ActionMode mode,
                                               int position,
                                               long id,
@@ -377,14 +378,16 @@ public class BranchActivity extends FragmentActivity
             // Select & add 1 to counter
             if (checked && 0 == adapter.getCounter(position))
             {
-                onSwipeRight(lv, new int[] { position });
+                adapter.increaseCounter(position);
             }
             else if (!checked)
             {
                 adapter.clearCounter(position);
             }
 
+            // Update the price!
             showTotalPrice(mode);
+
         }
 
         /** Shows the total price in the action mode subtitle */
@@ -395,5 +398,5 @@ public class BranchActivity extends FragmentActivity
             // Show total price on action bar
             mode.setSubtitle(s);
         }
-    }
+    }    
 }

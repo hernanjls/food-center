@@ -1,17 +1,36 @@
 package foodcenter.android.activities.order;
 
+import java.util.List;
+import java.util.Map;
+
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import foodcenter.android.R;
 import foodcenter.android.adapters.AbstractCourseAdapter;
 import foodcenter.android.data.OrderData;
+import foodcenter.service.proxies.CourseProxy;
 
 public class OrderCourseListAdapter extends AbstractCourseAdapter
 {
+
+    private final OrderData data;
     public OrderCourseListAdapter(Activity activity, OrderData data)
     {
-        super(activity, data.getCourses(), data.getCounters());
+        super(activity);
+        this.data = data;
+    }
+
+    @Override
+    protected Map<Integer, Integer> getCounter()
+    {
+        return data.getCounters();
+    }
+
+    @Override
+    protected List<CourseProxy> getCourses()
+    {
+        return data.getCourses();
     }
 
     @Override
@@ -49,5 +68,4 @@ public class OrderCourseListAdapter extends AbstractCourseAdapter
         return view;
 
     }
-
 }

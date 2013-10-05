@@ -27,6 +27,7 @@
     
     <style name="FoodCenterTheme.Branch">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:actionModeCloseButtonStyle">@style/HandleableDoneButton</item>
     </style>
     
     <style name="FoodCenterTheme.OrderHistory">
@@ -37,4 +38,7 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
+    <style name="HandleableDoneButton" parent="@android:style/Widget.DeviceDefault.ActionButton.CloseMode">
+    	<item name="android:onClick">onClickActionModeDoneButton</item>
+	</style>
 </resources>
