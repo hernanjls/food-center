@@ -19,6 +19,12 @@ import foodcenter.service.proxies.UserProxy;
 public class HeaderProfilePanel extends HorizontalPanel implements ImageUploadedCallback
 {
 
+    private final static String APP_FILE_NAME = "food-center-android.apk";
+    private final static String APP_PATH = "https%3A//food-center.appspot.com/" + APP_FILE_NAME;
+    private final static String APP_DOWNLOAD_IMG_PATH = "images/food_center_logo.jpg";
+    private final static String APP_BARCODE_PATH = "http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=" + APP_PATH
+                                                   + "&chld=H|0";
+
     private final static int POPUP_WIDTH_PX = 350;
 
     private final static int BIG_PROFILE_IMAGE_WIDTH_PX = 100;
@@ -28,6 +34,7 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
     private final static int SMALL_PROFILE_IMAGE_HEIGHT_PX = 30;
 
     private final EditableImage profileImg;
+    private final EditableImage downloadImg;
     private PopupPanel profilePopup;
 
     private final UserProxy user;
@@ -39,20 +46,44 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
 
         this.user = user;
         this.profileImg = new EditableImage(null, new OnClickProfileImage());
+        this.downloadImg = new EditableImage(null, new ClickHandler()
+        {
+            @Override
+            public void onClick(ClickEvent event)
+            {
+                PopupPanel p = new PopupPanel(true);
+                p.add(new EditableImage(APP_BARCODE_PATH, new ClickHandler()
+                {
+
+                    @Override
+                    public void onClick(ClickEvent event)
+                    {
+                        Window.Location.assign(APP_FILE_NAME);
+                    }
+                }));
+                p.show();
+                p.center();
+
+            }
+        });
 
         imgUrl = user.getImageUrl();
         profileImg.updateImage(imgUrl,
                                SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
                                SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
-        
-        setStyleName("header-panel");
 
+        setStyleName("header-panel");
+        downloadImg.updateImage(APP_DOWNLOAD_IMG_PATH,
+                                SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
+                                SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
         // add the logo image
         add(new EditableImage("/images/logo.png"));
 
         // It only applies to widgets added after this property is set.
         setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 
+        add(downloadImg);
+        
         add(new Label(user.getNickName()));
 
         add(profileImg);
@@ -68,7 +99,7 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
                                SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
 
         boolean isShow = (null != profilePopup) && profilePopup.isShowing();
-        
+
         createProfilePopup();
 
         if (isShow)
