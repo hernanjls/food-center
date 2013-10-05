@@ -64,13 +64,14 @@ public class RestaurantWorkerService extends ClientService
         DbTableReservation reservation = DbHandler.find(DbTableReservation.class, reservationId);
         if (null == reservation)
         {
-            logger.error(ServiceError.INVALID_RESERVATION_ID+ reservationId);
-            throw new ServiceError(ServiceError.INVALID_RESERVATION_ID+ reservationId);
+            logger.error(ServiceError.INVALID_RESERVATION_ID + reservationId);
+            throw new ServiceError(ServiceError.INVALID_RESERVATION_ID + reservationId);
         }
         String branchId = reservation.getRestBranchId();
         checkBranchChef(branchId); //TODO change to checkBranchWaiter
 
         reservation.setStatus(TableReservationStatus.DECLINED);
+        reservation.setConfirmationDate(new Date());
         reservation = DbHandler.save(reservation);
         if (null == reservation)
         {
