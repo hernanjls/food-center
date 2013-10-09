@@ -212,8 +212,11 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
             logger.fine("channel was created");
 
             // close current socket if it is opened
-            socket.close();
-            socket = null;
+            if (null != socket)
+            {
+                socket.close();
+                socket = null;
+            }
 
             // channel should never be null here
             logger.fine("openning socket");
@@ -247,7 +250,7 @@ public class RestaurantBranchPanel extends PopupPanel implements RedrawablePanel
             }
             else
             {
-                //TODO throw error here
+                Window.alert("Invalid order type...");
             }
         }
 
