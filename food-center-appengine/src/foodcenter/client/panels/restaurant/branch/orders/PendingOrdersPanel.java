@@ -64,7 +64,7 @@ public class PendingOrdersPanel extends FlexTable
 
     public void redraw()
     {
-        clear();
+        removeAllRows();
         int row = 0;
         setText(row, 0, "Order information");
         setText(row, 1, "Date");
