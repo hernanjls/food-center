@@ -6,4 +6,5 @@ gaeHrdEnabled=true
 gaeIsEclipseDefaultInstPath=true
 googleCloudSqlEnabled=false
 localDevMySqlEnabled=true
-validationExclusions=src/foodcenter/client/panels/RestaurantsListPanel.java
+ormEnhancementInclusions=src/foodcenter/server/db/modules/|test/|.apt_generated/
+validationExclusions=
