@@ -41,24 +41,27 @@ public class CommonServices
 
     public static void broadcastToRestaurant(AbstractDbOrder order, OrderBroadcastType type)
     {
-
+        logger.info("Broadcasting to restaurant");
         List<DbChannelToken> tokens = getChannelTokens(order.getRestBranchId());
         if ((null == tokens) || tokens.isEmpty())
         {
+            logger.trace("tokens is empty or null");
             return;
         }
 
+        logger.debug("creating json bean for orderId: " + order.getId());
         OrderBroadcast msgBean = factory.create(OrderBroadcast.class).as();
         
         msgBean.setType(type);
         msgBean.setId(order.getId());
         
         String msg = AutoBeanHelper.serializeToJson(msgBean);
-        
+        logger.debug("broadcasting " + msg + " to " + tokens.size() + " tokens");
         ChannelService channelService = ChannelServiceFactory.getChannelService();
         
         for (DbChannelToken t : tokens)
         {
+            logger.trace("broadcasting to token" + t.getKey());
             channelService.sendMessage(new ChannelMessage(t.getKey(), msg));
         }
     }
