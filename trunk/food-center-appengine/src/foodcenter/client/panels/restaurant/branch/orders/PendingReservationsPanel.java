@@ -67,7 +67,7 @@ public class PendingReservationsPanel extends FlexTable
     
     public void redraw()
     {
-        clear();
+        removeAllRows();
         int row = 0;
         // prints the header
         setText(row, 0, "Reservation information");
