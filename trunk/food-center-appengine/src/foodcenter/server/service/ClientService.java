@@ -35,7 +35,7 @@ public class ClientService
 {
     
     private static UserService userService = UserServiceFactory.getUserService();
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static Logger logger = LoggerFactory.getLogger(ClientService.class);
     private static boolean isDev = SystemProperty.environment.value() != SystemProperty.Environment.Value.Production;
 
     private static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -109,11 +109,14 @@ public class ClientService
             logger.debug(ServiceError.PREMISSION_DENIED_MODIFY_ORDER + " orderId=" + order.getId());
             throw new ServiceError(ServiceError.PREMISSION_DENIED_MODIFY_ORDER);
         }
-
+        logger.debug("orderId: " + order.getId() );
+        
         // Set the user of the current order
         User user = UsersManager.getUser();
         order.setUserEmail(user.getEmail().toLowerCase());
         String rBranchId = order.getRestBranchId();
+        
+        logger.debug("rBranchId = " + rBranchId);
         if (null == rBranchId)
         {
             logger.debug(ServiceError.INVALID_REST_BRANCH_ID + rBranchId);
@@ -150,8 +153,9 @@ public class ClientService
         }
         order.setCompId(comp.getId());
         order.setCompName(comp.getName());
-        
+        logger.debug("fill abstract order is done");
     }
+    
     public static DbOrder makeOrder(DbOrder order)
     {
         logger.info("makeOrder is called");

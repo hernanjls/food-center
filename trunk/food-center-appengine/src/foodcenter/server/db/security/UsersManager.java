@@ -25,7 +25,7 @@ public class UsersManager
     
     public static boolean isAdmin()
     {
-        return userService.isUserAdmin();
+        return userService.isUserLoggedIn() && userService.isUserAdmin();
     }
     
     public static DbUser getDbUser()
