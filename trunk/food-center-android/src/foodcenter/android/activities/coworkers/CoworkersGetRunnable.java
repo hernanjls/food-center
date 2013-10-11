@@ -52,6 +52,7 @@ public class CoworkersGetRunnable extends Receiver<List<String>> implements Runn
             if (null != coworkers)
             {
                 callback.onSuccessGetCoworkers(coworkers);
+                return;
             }
 
             factory.getClientService().getCoworkers().fire(this);

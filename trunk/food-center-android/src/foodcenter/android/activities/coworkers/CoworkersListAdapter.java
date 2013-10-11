@@ -109,6 +109,7 @@ public class CoworkersListAdapter extends BaseAdapter
         private TextView txt;
     }
     
+    /** return the coworkers in this adapter */
     public List<String> getSavedState()
     {
         List<String> res = new LinkedList<String>();

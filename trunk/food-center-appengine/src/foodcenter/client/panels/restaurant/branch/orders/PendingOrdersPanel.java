@@ -20,7 +20,6 @@ import foodcenter.client.panels.common.EditableImage;
 import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.enums.ServiceType;
-import foodcenter.service.proxies.CourseOrderProxy;
 import foodcenter.service.proxies.OrderProxy;
 import foodcenter.service.requset.RestaurantChefServiceRequest;
 
@@ -76,7 +75,7 @@ public class PendingOrdersPanel extends FlexTable
         {
             setWidget(row, 0, new PendingOrderTypePanel(o));
             setText(row, 1, formatter.format(o.getDate()));
-            setWidget(row, 2, new PendingOrderCoursesPanel(o));
+            setWidget(row, 2, new CoursesInfoPanel(o));
             setWidget(row, 3, new PendingOrderControlPanel(o));
             getRowFormatter().setStyleName(row, "td");
             ++row;
@@ -171,25 +170,6 @@ public class PendingOrdersPanel extends FlexTable
             String extra = (ServiceType.DELIVERY == order.getService()) ? order.getCompBranchAddr()
                                                                        : service.getName();
             body.add(new Label(extra));
-        }
-    }
-
-    private class PendingOrderCoursesPanel extends VerticalPanel
-    {
-        private PendingOrderCoursesPanel(OrderProxy order)
-        {
-            super();
-
-            List<CourseOrderProxy> courses = order.getCourses();
-            if (null == courses || courses.isEmpty())
-            {
-                return;
-            }
-
-            for (CourseOrderProxy c : courses)
-            {
-                add(new Label(c.getName()));
-            }
         }
     }
 

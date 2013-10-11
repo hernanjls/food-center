@@ -62,17 +62,7 @@ public class DbRestaurant extends AbstractDbObject
     public void jdoPostLoad()
     {
         super.jdoPostLoad();
-        
-        User user = UsersManager.getUser();
-     
-        // Set edit permission (this happens in post load before any changes to admins)
-        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail().toLowerCase()));
-        
-        // Make sure image can be shown!
-        if (0 == getImageUrl().length())
-        {
-            setImageUrl(DEFAULT_ICON_PATH);
-        }
+        setPermission();
     }
 
     public String getName()
@@ -143,5 +133,23 @@ public class DbRestaurant extends AbstractDbObject
     public void setInfo(String info)
     {
         this.info = info;
+    }
+
+    /**
+     * called on postLoad
+     */
+    private void setPermission()
+    {
+        User user = UsersManager.getUser();
+        
+        // Set edit permission (this happens in post load before any changes to admins)
+        setEditable(UsersManager.isAdmin() || admins.contains(user.getEmail().toLowerCase()));
+        
+        // Make sure image can be shown!
+        if (0 == getImageUrl().length())
+        {
+            setImageUrl(DEFAULT_ICON_PATH);
+        }
+
     }
 }
