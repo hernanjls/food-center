@@ -20,6 +20,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
 import foodcenter.client.WebClientUtils;
+import foodcenter.client.panels.restaurant.branch.orders.CoursesInfoPanel;
 import foodcenter.client.service.WebRequestUtils;
 import foodcenter.service.enums.OrderStatus;
 import foodcenter.service.proxies.CourseOrderProxy;
@@ -330,22 +331,6 @@ public class BranchOrdersHistoryPanel extends VerticalPanel
                         setText(row, 5, o.getStatus().getName());
                         getRowFormatter().setStyleName(row, "td");
                         ++row;
-                    }
-                }
-
-                private class CoursesInfoPanel extends VerticalPanel
-                {
-                    private CoursesInfoPanel(OrderProxy order)
-                    {
-                        if (null == order.getCourses())
-                        {
-                            return;
-                        }
-                        for (CourseOrderProxy c : order.getCourses())
-                        {
-                            add(new Label(c.getName()));
-                        }
-
                     }
                 }
             }

@@ -69,11 +69,7 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     @Override
     public void jdoPostLoad()
     {
-        if (null != imageKey)
-        {
-            buildImageUrl();
-        }
-
+        buildImageUrl();
     }
 
     @Override
@@ -120,10 +116,10 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
         {
             // Set the image key
             this.imageKey = imageKey;
-            
-            // Set the image url 
-            buildImageUrl();
         }
+        
+        // Set the image url
+        buildImageUrl();
     }
 
     @Override
@@ -157,8 +153,9 @@ public abstract class AbstractDbObject implements StoreCallback, Serializable,
     
     private void buildImageUrl()
     {
-        imageUrl = ("/blobservlet?" //
-            + ImageServlet.BLOB_SERVE_KEY
-            + "=" + imageKey);
+        if (null != imageKey)
+        {
+            imageUrl = ("/blobservlet?" + ImageServlet.BLOB_SERVE_KEY + "=" + imageKey);
+        }
     }
 }

@@ -39,6 +39,17 @@ public abstract class AbstractGAETest
     protected int numBranchMenuCats = 0;
     protected int numBranchMenuCatCourses = 0;
 
+    /**
+     * should be called during tests to switch admin behavior
+     * @param isAdmin true for admin false otherwise.
+     * 
+     * @note default behavior isAdmin=true
+     */
+    protected void setEnvIsAdmin(boolean isAdmin)
+    {
+        helper.setEnvIsAdmin(isAdmin);
+    }
+    
     @Before
     public void setUp()
     {
@@ -54,6 +65,10 @@ public abstract class AbstractGAETest
     @After
     public void tearDown()
     {
+        // Revert for the default behavior
+        helper.setEnvIsAdmin(true);
+        
+        // tear down the helper for next tests
         helper.tearDown();
     }
 

@@ -61,9 +61,8 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
                         Window.Location.assign(APP_FILE_NAME);
                     }
                 }));
-                p.show();
                 p.center();
-
+                p.show();
             }
         });
 
@@ -76,17 +75,20 @@ public class HeaderProfilePanel extends HorizontalPanel implements ImageUploaded
         downloadImg.updateImage(APP_DOWNLOAD_IMG_PATH,
                                 SMALL_PROFILE_IMAGE_WIDTH_PX + "px",
                                 SMALL_PROFILE_IMAGE_HEIGHT_PX + "px");
+                
         // add the logo image
         add(new EditableImage("/images/logo.png"));
 
         // It only applies to widgets added after this property is set.
         setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
-
-        add(downloadImg);
         
         add(new Label(user.getNickName()));
 
         add(profileImg);
+        
+        // add the download application panel
+        add(downloadImg);
+
     }
 
     @Override
